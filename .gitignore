@@ -2,6 +2,10 @@
 __pycache__/
 *.py[cod]
 
+# vim
+*~
+*.swp
+
 # C extensions
 *.so
 
