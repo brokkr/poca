@@ -2,18 +2,18 @@ import os
 import shutil
 import logging
 
-import eyeD3
+import eyed3
 from urlgrabber import urlgrab, progress
 
 from poco import errors
 
 _settings_synonyms = { \
-    '2.3': eyeD3.ID3_V2_3, \
-    '2.4': eyeD3.ID3_V2_4, \
-    'latin-1': eyeD3.LATIN1_ENCODING, \
-    'utf-16': eyeD3.UTF_16_ENCODING, \
-    'utf-16be': eyeD3.UTF_16BE_ENCODING, \
-    'utf-8': eyeD3.UTF_8_ENCODING \
+    '2.3': eyed3.ID3_V2_3, \
+    '2.4': eyed3.ID3_V2_4, \
+    'latin-1': eyed3.LATIN1_ENCODING, \
+    'utf-16': eyed3.UTF_16_ENCODING, \
+    'utf-16be': eyed3.UTF_16BE_ENCODING, \
+    'utf-8': eyed3.UTF_8_ENCODING \
     }
 
 def delete_audio_file(entry_dic, sub_dic):
@@ -42,9 +42,9 @@ def download_audio_file(entry_dic, sub_dic, args_ns):
 def tag_audio_file(sets_dic, entry_dic, sub_dic):
     '''Tags one audio file with supplied metadata'''
     localfile = _get_path(entry_dic, sub_dic)
-    container = eyeD3.Tag()
+    container = eyed3.Tag()
 
-    if not eyeD3.isMp3File(localfile) or not container.link(localfile):
+    if not eyed3.isMp3File(localfile) or not container.link(localfile):
         error = 'The file ' + localfile + ' could not be tagged. '
         suggest = ['Please check to see if the feed delivers valid mp3 files.']
         errors.errors(error, suggest, fatal=False, title=sub_dic['title'].upper())
@@ -57,7 +57,7 @@ def tag_audio_file(sets_dic, entry_dic, sub_dic):
     tags.update(sub_dic['metadata'])
 
     if sets_dic['metadata']['removeid3v1'] == 'yes':
-        container.remove(eyeD3.ID3_V1)
+        container.remove(eyed3.ID3_V1)
     id3version = _settings_synonyms[sets_dic['metadata']['id3version']]
     id3encoding = _settings_synonyms[sets_dic['metadata']['id3encoding']]
     container.header.setVersion(id3version)
