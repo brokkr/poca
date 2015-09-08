@@ -15,7 +15,7 @@ including id3 tagging, cronjob compatibility, error logging prefs, etc.
 
 Installing
 ----------
- $ sudo ./setup.py install
+ $ sudo python2 ./setup.py install
 
 Notes on install
 ----------------
@@ -30,6 +30,7 @@ Notes on dependencies
 ---------------------
 * You will need to use Python2 (not Python3) for both setup and running the program.
 * In order for XML parsing to work (elementTree), Python 2.5 or higher is required.
-* The following third-party modules are required: feedparser, urlgrabber, eyeD3.
+* The following third-party modules are required: feedparser, urlgrabber, eyed3
+  (not the older eyeD3), pysqlite.
 
 
