@@ -7,15 +7,6 @@ from urlgrabber import urlgrab, progress
 
 from poco import errors
 
-_settings_synonyms = { \
-    '2.3': eyed3.ID3_V2_3, \
-    '2.4': eyed3.ID3_V2_4, \
-    'latin-1': eyed3.LATIN1_ENCODING, \
-    'utf-16': eyed3.UTF_16_ENCODING, \
-    'utf-16be': eyed3.UTF_16BE_ENCODING, \
-    'utf-8': eyed3.UTF_8_ENCODING \
-    }
-
 def delete_audio_file(entry_dic, sub_dic):
     '''Deletes one file'''
     localfile = _get_path(entry_dic, sub_dic)
@@ -42,34 +33,22 @@ def download_audio_file(entry_dic, sub_dic, args_ns):
 def tag_audio_file(sets_dic, entry_dic, sub_dic):
     '''Tags one audio file with supplied metadata'''
     localfile = _get_path(entry_dic, sub_dic)
-    container = eyed3.Tag()
-
-    if not eyed3.isMp3File(localfile) or not container.link(localfile):
+    container = eyed3.load(localfile)
+    if not container:
         error = 'The file ' + localfile + ' could not be tagged. '
         suggest = ['Please check to see if the feed delivers valid mp3 files.']
         errors.errors(error, suggest, fatal=False, title=sub_dic['title'].upper())
         return
 
     tags = {}
-    tags['artist'] = container.getArtist()
-    tags['album'] = container.getAlbum()
-    tags['genre'] = container.getGenre()
+    tags['artist'] = container.tag.artist
+    tags['album'] = container.tag.album
+    tags['title'] = container.tag.title
+    tags['track_num'] = container.tag.track_num
+    tags['genre'] = container.tag.genre.name
     tags.update(sub_dic['metadata'])
 
-    if sets_dic['metadata']['removeid3v1'] == 'yes':
-        container.remove(eyed3.ID3_V1)
-    id3version = _settings_synonyms[sets_dic['metadata']['id3version']]
-    id3encoding = _settings_synonyms[sets_dic['metadata']['id3encoding']]
-    container.header.setVersion(id3version)
-    container.setTextEncoding(id3encoding)
-
-    container.setArtist(tags['artist'])
-    container.setAlbum(tags['album'])
-    container.setGenre(tags['genre'])
-    try:
-        container.update(id3version)
-    except UnicodeEncodeError:
-        pass
+    # missing any way to write back the info with the proper version and encoding
 
 def check_path(sub_dic):
     '''Creates one directory'''

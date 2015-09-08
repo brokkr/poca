@@ -56,8 +56,8 @@ def main(paths_dic, args_ns, sets_dic, subs_list, p, q):
         for entry in channel.entries['pomelos']:
             entry_dic = channel.entry_db[entry]
             poco.files.download_audio_file(entry_dic, sub_dic, args_ns)
-            if sub_dic.has_key('metadata'):
-                poco.files.tag_audio_file(sets_dic, entry_dic, sub_dic)
+            #if sub_dic.has_key('metadata'):
+            #    poco.files.tag_audio_file(sets_dic, entry_dic, sub_dic)
             poco.history.add_entry(q, sub_dic, entry_dic)
 
         # poco.history.save(paths_dic, sub_dic, channel.new_history_dic())
