@@ -9,13 +9,13 @@ from distutils.core import setup
 
 setup(\
 name='poca', \
-version='0.1.1', \
+version='0.1.2', \
 license='GPL3', \
 description='a command line podcast client', \
 long_description='A cron-friendly, disk-space-conscious, command line podcast aggregator, written in Python', \
 author='Mads Michelsen', \
-author_email='madchine@gmail.com', \
-url='http://code.google.com/p/poca/', \
+author_email='reannual@gmail.com', \
+url='https://github.com/brokkr/poca', \
 scripts=['src/poca'], \
 packages=['poco'], \
 package_dir={'poco': 'src/poco'}, \
