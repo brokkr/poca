@@ -18,6 +18,7 @@ import initialization
 import history
 import output
 import files
+import id3v23_frames
 
 from channel import Channel
 

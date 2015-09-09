@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 # 
-# Copyright 2010, 2011 Mads Michelsen (madchine@gmail.com)
+# Copyright 2010, 2011, 2015 Mads Michelsen (reannual@gmail.com)
 # 
 # This file is part of Poca.
 # Poca is free software: you can redistribute it and/or modify it under the terms \
@@ -50,8 +50,7 @@ def main(paths_dic, args_ns, sets_dic, subs_list):
             entry_dic = channel.entry_db[entry]
             poco.files.download_audio_file(entry_dic, sub_dic, args_ns)
             if sub_dic.has_key('metadata'):
-                #poco.files.tag_audio_file(sets_dic, entry_dic, sub_dic)
-                pass
+                poco.files.tag_audio_file(sets_dic, entry_dic, sub_dic)
 
         poco.history.save(paths_dic, sub_dic, channel.new_history_dic())
 

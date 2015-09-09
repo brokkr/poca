@@ -1,11 +1,11 @@
 import os
 import shutil
 import logging
-
-#import eyed3
-#from urlgrabber import urlgrab, progress
 import requests
 
+from mutagen import id3
+
+from poco.id3v23_frames import frame_dic
 from poco import errors
 
 def delete_audio_file(entry_dic, sub_dic):
@@ -33,6 +33,26 @@ def download_audio_file(entry_dic, sub_dic, args_ns):
     # how to test if the right file was downloaded?
     # check file length? file name? 
     # not fool-proof as these could have been provided by the program itself...
+
+def tag_audio_file(sets_dic, entry_dic, sub_dic):
+    '''Reintroducing id3 tagging using mutagen'''
+    # get general metadata settings
+    id3version_dic = {'2.3': 3, '2.4': 4}
+    id3encoding_dic = {'latin1': 0, 'utf16': 1, 'utf16be': 2, 'utf8': 3}
+    id3v1_dic = {'yes': 0, 'no': 2}
+    id3version = id3version_dic[sets_dic['metadata']['id3version']]
+    id3encoding = id3encoding_dic[sets_dic['metadata']['id3encoding']]
+    id3v1 = id3v1_dic[sets_dic['metadata']['removeid3v1']] 
+    # overwrite metadata in the present file 
+    localfile = _get_path(entry_dic, sub_dic)
+    id3tag = id3.ID3(localfile)
+    if id3version == 3:
+        id3tag.update_to_v23()
+    for override in sub_dic['metadata']:
+        frame = frame_dic[override]
+        ftext = sub_dic['metadata'][override]
+        id3tag.add(frame(encoding=id3encoding, text=ftext))
+        id3tag.save(v1=id3v1, v2_version=id3version)
 
 def check_path(sub_dic):
     '''Creates one directory'''

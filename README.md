@@ -1,8 +1,8 @@
 ## Poca 1.1.2 Update
 Poca has been moved from Google Code to Github and brought into 2015, having
 lingered in 2011 for some years. This means that 
-* id3 tagging has been disabled (for now) due to issues with more recent eyed3 
-  versions. 
+* ~~id3 tagging has been disabled (for now) due to issues with more recent eyed3 
+  versions.~~ Reinserted using mutagen.
 * 'urlgrabber' module has been replaced by 'requests'. This means more troublefree 
   downloads. It also means no more progressmeter. It also also means that quiet /
   cron mode is no longer guaranteed to be silent (for now).
@@ -43,6 +43,6 @@ If this is unacceptable, please patch the setup.py file or contact the author.
 ###Notes on dependencies
 * You will need to use Python2 (not Python3) for both setup and running the program.
 * In order for XML parsing to work (elementTree), Python 2.5 or higher is required.
-* The following third-party modules are required: feedparser, requests.
+* The following third-party modules are required: feedparser, requests, mutagen.
 * Pip can install all of these using 'pip install [name of module]'
 
