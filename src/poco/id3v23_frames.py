@@ -34,7 +34,7 @@ frame_dic = { \
     "fileowner": id3.TOWN,
     "filetype": id3.TFLT,
     "genre": id3.TCON,
-    "grouping": id2.TIT1,
+    "grouping": id3.TIT1,
     "initialkey": id3.TKEY,
     "isrc": id3.TSRC,
     "itunesalbumsortorder": id3.TSO2,
