@@ -8,7 +8,6 @@
 # either version 3 of the License, or (at your option) any later version.
 
 import poco 
-import sys
 
 
 def configure():
@@ -21,21 +20,16 @@ def configure():
     sets_dic, subs_list = poco.subsconfig.sets_n_subs(paths_dic)
     if args_ns.errors_mail and sets_dic.has_key('mail_account'):
         remote_logger = poco.output.add_mail_handler(sets_dic, remote_logger)
-    p, q = poco.history.create_librarian(paths_dic)
-    # poco.history.stuff_it(q, 'blaaaaaah')
-    # poco.history.end_it(p, q)
-    # sys.exit()
-    return (paths_dic, args_ns, sets_dic, subs_list, p, q)
+    return (paths_dic, args_ns, sets_dic, subs_list)
 
-def main(paths_dic, args_ns, sets_dic, subs_list, p, q):
+def main(paths_dic, args_ns, sets_dic, subs_list):
     '''Loops through the subscriptions, updating each in turn'''
     for i, sub_dic in enumerate(subs_list):
 
-        # sub_log = poco.history.retrieve(paths_dic, sub_dic)
-        # rewrite retrieve function to call db service?
+        sub_log = poco.history.retrieve(paths_dic, sub_dic)
 
         poco.output.print_heading(args_ns, sub_dic, i)
-        channel = poco.Channel(sub_dic, None)
+        channel = poco.Channel(sub_dic, sub_log)
         if not channel.parse_feed() and not channel.reconfigure:
             poco.output.print_no_news_is_good_news(args_ns)
             continue
@@ -52,22 +46,21 @@ def main(paths_dic, args_ns, sets_dic, subs_list, p, q):
         for entry in channel.entries['grapefruits']:
             entry_dic = channel.entry_db[entry]
             poco.files.delete_audio_file(entry_dic, sub_dic)
-            # insert call to librarian to set active to false?
         for entry in channel.entries['pomelos']:
             entry_dic = channel.entry_db[entry]
             poco.files.download_audio_file(entry_dic, sub_dic, args_ns)
-            #if sub_dic.has_key('metadata'):
-            #    poco.files.tag_audio_file(sets_dic, entry_dic, sub_dic)
-            poco.history.add_entry(q, sub_dic, entry_dic)
+            if sub_dic.has_key('metadata'):
+                #poco.files.tag_audio_file(sets_dic, entry_dic, sub_dic)
+                pass
 
-        # poco.history.save(paths_dic, sub_dic, channel.new_history_dic())
+        poco.history.save(paths_dic, sub_dic, channel.new_history_dic())
 
 if __name__ == '__main__':
     try:
-        paths_dic, args_ns, sets_dic, subs_list, p, q = configure()
+        paths_dic, args_ns, sets_dic, subs_list = configure()
         if args_ns.restart:
             poco.files.restart(paths_dic, subs_list)
-        main(paths_dic, args_ns, sets_dic, subs_list, p, q)
+        main(paths_dic, args_ns, sets_dic, subs_list)
     except KeyboardInterrupt:
         pass
 

@@ -12,7 +12,7 @@ def paths_config():
     '''Returns a dictionary with path settings'''
     paths_dic = {}
     paths_dic['config_dir'] = path.expanduser(path.join('~', '.poca'))
-    paths_dic['history_log'] = path.join(paths_dic['config_dir'], 'history.sqlite')
+    paths_dic['history_log'] = path.join(paths_dic['config_dir'], 'history.log')
     paths_dic['errors_log'] = path.join(paths_dic['config_dir'], 'errors.log')
     paths_dic['config_file'] = path.join(paths_dic['config_dir'], 'poca.xml')
     return paths_dic

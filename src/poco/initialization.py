@@ -8,7 +8,6 @@
 from os import path, makedirs
 from sys import exit
 from shutil import copyfile
-import shelve
 
 
 config_example = '/etc/poca.example.xml'
@@ -27,12 +26,4 @@ def test_paths(paths_dic):
         copyfile(config_example, paths_dic['config_file'])
         for line in msg: print line
         exit()
-
-def read_log(paths_dic):
-    '''reads log and extracts data'''
-    def read_log(paths_dic):
-        log = shelve.open(paths_dic['history_log'])
-        
-
-
 

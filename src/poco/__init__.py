@@ -5,7 +5,7 @@
 # of the GNU General Public License as published by the Free Software Foundation, \
 # either version 3 of the License, or (at your option) any later version.
 
-VERSION = "0.2.0-alpha"
+VERSION = "0.1.1"
 MAINTAINER = "Mads Michelsen <madchine@gmail.com>"
 DESCRIPTION = "A cron-friendly, disk-space-conscious, command line podcast \
 aggregator, written in Python"

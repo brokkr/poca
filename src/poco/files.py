@@ -2,8 +2,9 @@ import os
 import shutil
 import logging
 
-import eyed3
-from urlgrabber import urlgrab, progress
+#import eyed3
+#from urlgrabber import urlgrab, progress
+import requests
 
 from poco import errors
 
@@ -20,35 +21,18 @@ def delete_audio_file(entry_dic, sub_dic):
 
 def download_audio_file(entry_dic, sub_dic, args_ns):
     '''Downloads one file'''
-    meter = progress.text_progress_meter()
+    #meter = progress.text_progress_meter()
     localfile = _get_path(entry_dic, sub_dic)
     if args_ns.quiet:
-        dummy = urlgrab(entry_dic['url'].encode('ascii'), localfile)
+        file_object = requests.get(entry_dic['url'])
     else:
-        dummy = urlgrab(entry_dic['url'].encode('ascii'), localfile, progress_obj=meter)
+        file_object = requests.get(entry_dic['url'])
+    if file_object.status_code == 200:
+        open(localfile, 'w').write(file_object.content)
+
     # how to test if the right file was downloaded?
     # check file length? file name? 
     # not fool-proof as these could have been provided by the program itself...
-
-def tag_audio_file(sets_dic, entry_dic, sub_dic):
-    '''Tags one audio file with supplied metadata'''
-    localfile = _get_path(entry_dic, sub_dic)
-    container = eyed3.load(localfile)
-    if not container:
-        error = 'The file ' + localfile + ' could not be tagged. '
-        suggest = ['Please check to see if the feed delivers valid mp3 files.']
-        errors.errors(error, suggest, fatal=False, title=sub_dic['title'].upper())
-        return
-
-    tags = {}
-    tags['artist'] = container.tag.artist
-    tags['album'] = container.tag.album
-    tags['title'] = container.tag.title
-    tags['track_num'] = container.tag.track_num
-    tags['genre'] = container.tag.genre.name
-    tags.update(sub_dic['metadata'])
-
-    # missing any way to write back the info with the proper version and encoding
 
 def check_path(sub_dic):
     '''Creates one directory'''
