@@ -10,6 +10,7 @@
 from mutagen import id3
 
 # translation taken from http://puddletag.sourceforge.net/source/id3.html
+# originally licensed under Apache License version 2.0
 
 frame_dic = { \
     "album": id3.TALB,

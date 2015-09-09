@@ -1,4 +1,4 @@
-# Copyright 2010, 2011 Mads Michelsen (madchine@gmail.com)
+# Copyright 2010, 2011, 2015 Mads Michelsen (reannual@gmail.com)
 # 
 # This file is part of Poca.
 # Poca is free software: you can redistribute it and/or modify it under the terms \
