@@ -8,6 +8,7 @@ lingered in 2011 for some years. This means that
   cron mode is no longer guaranteed to be silent (for now).
 * The switch to sqlite logging in the more 'recent' code has been reversed as has
   a half-hearted attempt to go multiprocess.
+
 Other than that things should work. Going forward I hope to reinstate foresaid 
 functionality. And maybe cut down on dependencies. 
 
