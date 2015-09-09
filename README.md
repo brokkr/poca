@@ -1,20 +1,20 @@
 ## Poca 1.1.2 Update
 Poca has been moved from Google Code to Github and brought into 2015, having
 lingered in 2011 for some years. This means that 
-* id3 tagging has been disabled (for now) due to issues with more recent eyed3 \
+* id3 tagging has been disabled (for now) due to issues with more recent eyed3 
   versions. 
-* 'urlgrabber' module has been replaced by 'requests'. This means more troublefree \
-  downloads. It also means no more progressmeter. It also also means that quiet /\
+* 'urlgrabber' module has been replaced by 'requests'. This means more troublefree 
+  downloads. It also means no more progressmeter. It also also means that quiet /
   cron mode is no longer guaranteed to be silent (for now).
-* The switch to sqlite logging in the more 'recent' code has been reversed as has \
+* The switch to sqlite logging in the more 'recent' code has been reversed as has
   a half-hearted attempt to go multiprocess.
-Other than that things should work. Going forward I hope to reinstate foresaid \
+Other than that things should work. Going forward I hope to reinstate foresaid 
 functionality. And maybe cut down on dependencies. 
 
 ## Poca
 Poca is a command line podcast client, written in Python. Though started as a 
 simple learning project script, it has grown to be a solid, capable program, 
-that in the best *NIX tradition attemps to "do one thing and do it well".
+that in the best \*NIX tradition attemps to "do one thing and do it well".
 
 Functionality-wise, the focus is - as the name hints at - to reign in its 
 appetite: Subscribing to a feed should not simply downloading each new episode 
@@ -23,7 +23,7 @@ the latest episodes available while old ones are deleted. This is done by
 specifying the amount of disk space allocated to each feed.
  
 As for user interface and design, Poca is intended to be a powerful and 
-easy-to-use podcast tool (also in the *NIX spirit) rather than pre-molded 
+easy-to-use podcast tool (also in the \*NIX spirit) rather than pre-molded 
 podcast package. This leaves extensive options in the hands of the user, 
 including id3 tagging, cronjob compatibility, error logging prefs, etc.
 
