@@ -2,8 +2,9 @@ import os
 import shutil
 import logging
 
-import eyed3
-from urlgrabber import urlgrab, progress
+#import eyed3
+#from urlgrabber import urlgrab, progress
+import requests
 
 from poco import errors
 
@@ -20,12 +21,15 @@ def delete_audio_file(entry_dic, sub_dic):
 
 def download_audio_file(entry_dic, sub_dic, args_ns):
     '''Downloads one file'''
-    meter = progress.text_progress_meter()
+    #meter = progress.text_progress_meter()
     localfile = _get_path(entry_dic, sub_dic)
     if args_ns.quiet:
-        dummy = urlgrab(entry_dic['url'], localfile)
+        file_object = requests.get(entry_dic['url'])
     else:
-        dummy = urlgrab(entry_dic['url'], localfile, progress_obj=meter)
+        file_object = requests.get(entry_dic['url'])
+    if file_object.status_code == 200:
+        open(localfile, 'w').write(file_object.content)
+
     # how to test if the right file was downloaded?
     # check file length? file name? 
     # not fool-proof as these could have been provided by the program itself...

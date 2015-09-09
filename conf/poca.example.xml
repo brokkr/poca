@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <poca version="0.1">
 
+
 	<settings>
 		<base_directory>/home/user/poca</base_directory>
         <metadata>
@@ -16,12 +17,13 @@
         </mail_account>
 	</settings>
 	
+	
 	<subscriptions>
 	
 		<subscription>
-			<title>interview</title>
-			<url>http://downloads.bbc.co.uk/podcasts/worldservice/interview/rss.xml</url>
-			<max_mb>55</max_mb>
+			<title>6 minutes vocabulary</title>
+			<url>http://www.bbc.co.uk/programmes/p02pc9xz/episodes/downloads.rss</url>
+			<max_mb>20</max_mb>
 			<metadata>
 				<artist>BBC World Service</artist>
 				<album>The Interview</album>
@@ -32,7 +34,7 @@
 		<subscription>
 			<title>francais facile</title>
 			<url>http://www.rfi.fr/radiofr/podcast/journalFrancaisFacile.xml</url>
-			<max_mb>30</max_mb>
+			<max_mb>20</max_mb>
 			<metadata>
 				<album>Journal en français facile</album>
 				<genre>podcast</genre>
@@ -45,16 +47,8 @@
 			<max_mb>30</max_mb>
 		</subscription>
 	
-		<subscription>
-			<title>savage love</title>
-			<url>http://feeds.thestranger.com/stranger/savage</url>
-			<max_mb>200</max_mb>
-			<metadata>
-				<artist>Dan Savage</artist>
-			</metadata>
-		</subscription>
-	
 	</subscriptions>
+
 
 </poca>
 
