@@ -43,7 +43,6 @@ If this is unacceptable, please patch the setup.py file or contact the author.
 ###Notes on dependencies
 * You will need to use Python2 (not Python3) for both setup and running the program.
 * In order for XML parsing to work (elementTree), Python 2.5 or higher is required.
-* The following third-party modules are required: feedparser, requests, eyed3
-  (not the older eyeD3).
+* The following third-party modules are required: feedparser, requests.
 * Pip can install all of these using 'pip install [name of module]'
 
