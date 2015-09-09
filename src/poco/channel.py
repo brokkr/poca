@@ -63,7 +63,7 @@ class Channel:
             entry_dic = {}
             entry_dic['title'] = entry.title
             entry_dic['pubdate'] = entry.updated
-            entry_dic['url'] = entry.enclosures[0]['href'].decode('utf-8')
+            entry_dic['url'] = entry.enclosures[0]['href'].encode('ascii')
             try:
                 entry_dic['filename'] = self._get_filename(entry_dic)
             except urllib2.HTTPError:
@@ -129,10 +129,10 @@ class Channel:
             self.entries['red']
         new_yellow = self.entries['limes']
         new_entries = {'red': new_red, 'yellow': new_yellow}
-        # return {'entries': new_entries, \
-        # 'entry_db': self.entry_db, \
-        # 'max_mb': int(self.sub_dic['max_mb']), \
-        # 'updated': self.updated}
+        return {'entries': new_entries, \
+        'entry_db': self.entry_db, \
+        'max_mb': int(self.sub_dic['max_mb']), \
+        'updated': self.updated}
 
     def _get_filename(self, entry_dic):
         '''Checks for file existence and redirects and \
