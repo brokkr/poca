@@ -52,12 +52,12 @@
 
 
 <section name = "Author">
-<p><arg>Poca</arg> was written by Mads Michelsen &lt;madchine@gmail.com&gt;.
-For more information go to <url href="http://code.google.com/p/poca"/></p>
+<p><arg>Poca</arg> was written by Mads Michelsen &lt;reannual@gmail.com&gt;.
+For more information go to <url href="https://github.com/brokkr/poca"/></p>
 </section>
 
 <section name = "Copyright">
-<p>Copyright 2010, 2011 Mads Michelsen</p>
+<p>Copyright 2010, 2011, 2015 Mads Michelsen</p>
 
 <p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</p>
 
@@ -68,7 +68,7 @@ For more information go to <url href="http://code.google.com/p/poca"/></p>
 
 
 <section name = "Bugs">
-<p>The author is grateful for any notification of bugs and/or requests. Please go to <url href="http://code.google.com/p/poca/issues/list"/> to report.</p>
+<p>The author is grateful for any notification of bugs and/or requests. Please go to <url href="https://github.com/brokkr/poca/issues"/> to report.</p>
 </section>
 
 <section name = "Comments">
