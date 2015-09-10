@@ -1,4 +1,4 @@
-##Poca 1.1.2 Update
+##Poca 1.1.9 Update
 Poca has been moved from Google Code to Github and brought into 2015, having
 lingered in 2011 for some years. This means that 
 * ~~id3 tagging has been disabled (for now) due to issues with more recent eyed3 
@@ -14,11 +14,12 @@ lingered in 2011 for some years. This means that
 Other than that things should work. 
 
 ####Future plans
- * 0.2: ID3 tagging reimplemented using mutagen. Includes id3 version and
+ * 0.2:  ID3 tagging reimplemented using mutagen. Includes id3 version and
    encoding preferences and extensive frame override support. Quiet and
    progress download modes supported.
- * 0.3: Code cleanup. Feedparser dependency eliminated (possibly).
- * 0.4: Sqlite (or other db) logging reimplemented.
+ * 0.3:  Code cleanup. Feedparser dependency eliminated (possibly).
+ * 0.4:  Sqlite (or other db) logging reimplemented.
+ * 0.5:  Maximum can be specified as space and/or number of episodes.
 
 ##Poca
 Poca is a command line podcast client, written in Python. Though started as a 
@@ -26,9 +27,9 @@ simple learning project script, it has grown to be a solid, capable program,
 that in the best \*NIX tradition attemps to "do one thing and do it well".
 
 Functionality-wise, the focus is - as the name hints at - to reign in its 
-appetite: Subscribing to a feed should not simply downloading each new episode 
+appetite: Subscribing to a feed should not mean downloading each new episode 
 until the harddrive is groaning under the weight, rather it should mean having 
-the latest episodes available while old ones are deleted. This is done by 
+the latest episodes available while old ones are discarded. This is done by 
 specifying the amount of disk space allocated to each feed.
  
 As for user interface and design, Poca is intended to be a powerful and 
