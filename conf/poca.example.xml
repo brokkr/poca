@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <poca version="0.1">
 
-
 	<settings>
 		<base_directory>/home/user/poca</base_directory>
         <metadata>
+            <!-- the following values are possible:
+                 * id3version: 2.3, 2.4
+                 * id3encoding: latin1, utf16, utf16be, utf8 (only with 2.4)
+                 * removeid3v1: yes, no
+            -->
             <id3version>2.3</id3version>
-            <id3encoding>latin-1</id3encoding>
+            <id3encoding>latin1</id3encoding>
             <removeid3v1>yes</removeid3v1>
         </metadata>
         <mail_account>
@@ -19,14 +23,26 @@
 	
 	
 	<subscriptions>
+        <!-- some podcasts included to exemplify subscription configuration -->
 	
 		<subscription>
+            <!-- the meaning of the subscription options are as follows:
+                 * title: the name used for the folder of the subscription
+                 * url: the address of the rss feed
+                 * max_mb: the maximum disk space (in Mb) availlable to the \
+                   subscription. Any more than this will not be downloaded / be
+                   deleted.
+            -->
 			<title>6 minutes vocabulary</title>
 			<url>http://www.bbc.co.uk/programmes/p02pc9xz/episodes/downloads.rss</url>
 			<max_mb>20</max_mb>
 			<metadata>
-				<artist>BBC World Service</artist>
-				<album>The Interview</album>
+                <!-- these settings will be used to overwrite the mp3 file's
+                     id3 metadata. the available metadata tags can be found @
+                     http://puddletag.sourceforge.net/source/id3.html#text-frames
+                -->
+				<artist>BBC</artist>
+				<album>6 min vocab</album>
 				<genre>podcast</genre>
 			</metadata>
 		</subscription>

@@ -1,11 +1,23 @@
+#!/usr/bin/env python2                                                                                                                           
+#                                                                                    
+# Copyright 2010, 2011, 2015 Mads Michelsen (reannual@gmail.com)                     
+# except functions progress_download and silent_download copyright PabloG 
+# (http://stackoverflow.com/users/394/pablog) and Mads Michelsen 2015
+#                                                                                    
+# This file is part of Poca.                                                         
+# Poca is free software: you can redistribute it and/or modify it under the terms \  
+# of the GNU General Public License as published by the Free Software Foundation, \  
+# either version 3 of the License, or (at your option) any later version. 
+
+
 import os
 import shutil
 import logging
+import urllib2
 
-#import eyed3
-#from urlgrabber import urlgrab, progress
-import requests
+from mutagen import id3
 
+from poco.id3v23_frames import frame_dic
 from poco import errors
 
 def delete_audio_file(entry_dic, sub_dic):
@@ -19,20 +31,71 @@ def delete_audio_file(entry_dic, sub_dic):
         'Have you deleted/moved files manually? Or changed permissions?']
         errors.errors(error, suggest, fatal=False, title=sub_dic['title'].upper())
 
+def progress_download(url, localfile):
+    # get metainformation and open remote and local file, respectively
+    u = urllib2.urlopen(url)
+    f = open(localfile, 'w')
+    meta = u.info()
+    mega = 1024*1024.
+    file_size = int(meta.getheaders("Content-Length")[0]) / mega
+    file_size_dl = 0
+    block_sz = 65536
+
+    # download chunks of block_size until there is no more to read
+    while True:
+        buffer = u.read(block_sz)
+        if not buffer:
+            break
+        file_size_dl += len(buffer) / mega
+        f.write(buffer)
+        status = os.path.basename(localfile)[:36].ljust(40) + "%7.2f Mb  [%3.2f%%]" % \
+            (file_size_dl, file_size_dl * 100. / file_size)
+        status = status + chr(8)*(len(status)+1)
+        print status,
+
+    # close file and print a newline
+    f.close()
+    print '\n'
+
+def silent_download(url, localfile):
+    '''silent download for cron job operations'''
+    u = urllib2.urlopen(url)
+    f = open(localfile, 'w')
+    block_sz = 65536
+    while True:
+        buffer = u.read(block_sz)
+        if not buffer:
+            break
+        f.write(buffer)
+    f.close()
+
 def download_audio_file(entry_dic, sub_dic, args_ns):
     '''Downloads one file'''
-    #meter = progress.text_progress_meter()
     localfile = _get_path(entry_dic, sub_dic)
     if args_ns.quiet:
-        file_object = requests.get(entry_dic['url'])
+        silent_download(entry_dic['url'], localfile)
     else:
-        file_object = requests.get(entry_dic['url'])
-    if file_object.status_code == 200:
-        open(localfile, 'w').write(file_object.content)
+        progress_download(entry_dic['url'], localfile)
 
-    # how to test if the right file was downloaded?
-    # check file length? file name? 
-    # not fool-proof as these could have been provided by the program itself...
+def tag_audio_file(sets_dic, entry_dic, sub_dic):
+    '''Reintroducing id3 tagging using mutagen'''
+    # get general metadata settings
+    id3version_dic = {'2.3': 3, '2.4': 4}
+    id3encoding_dic = {'latin1': 0, 'utf16': 1, 'utf16be': 2, 'utf8': 3}
+    id3v1_dic = {'yes': 0, 'no': 2}
+    id3version = id3version_dic[sets_dic['metadata']['id3version']]
+    id3encoding = id3encoding_dic[sets_dic['metadata']['id3encoding']]
+    id3v1 = id3v1_dic[sets_dic['metadata']['removeid3v1']] 
+    # overwrite metadata in the present file 
+    localfile = _get_path(entry_dic, sub_dic)
+    id3tag = id3.ID3(localfile)
+    if id3version == 3:
+        id3tag.update_to_v23()
+    for override in sub_dic['metadata']:
+        frame = frame_dic[override]
+        ftext = sub_dic['metadata'][override]
+        id3tag.add(frame(encoding=id3encoding, text=ftext))
+        id3tag.save(v1=id3v1, v2_version=id3version)
 
 def check_path(sub_dic):
     '''Creates one directory'''
