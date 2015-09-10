@@ -1,4 +1,4 @@
-##Poca 1.1.9 Update
+##Poca 0.1.9 Update
 Poca has been moved from Google Code to Github and brought into 2015, having
 lingered in 2011 for some years. This means that 
 * ~~id3 tagging has been disabled (for now) due to issues with more recent eyed3 
@@ -17,7 +17,8 @@ Other than that things should work.
  * 0.2:  ID3 tagging reimplemented using mutagen. Includes id3 version and
    encoding preferences and extensive frame override support. Quiet and
    progress download modes supported.
- * 0.3:  Code cleanup. Feedparser dependency eliminated (possibly).
+ * 0.3:  Code cleanup. Feedparser dependency eliminated (possibly). Renaming
+   files from tags.
  * 0.4:  Sqlite (or other db) logging reimplemented.
  * 0.5:  Maximum can be specified as space and/or number of episodes.
 
