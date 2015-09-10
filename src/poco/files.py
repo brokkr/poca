@@ -1,6 +1,8 @@
 #!/usr/bin/env python2                                                                                                                           
 #                                                                                    
 # Copyright 2010, 2011, 2015 Mads Michelsen (reannual@gmail.com)                     
+# except functions progress_download and silent_download copyright PabloG 
+# (http://stackoverflow.com/users/394/pablog) and Mads Michelsen 2015
 #                                                                                    
 # This file is part of Poca.                                                         
 # Poca is free software: you can redistribute it and/or modify it under the terms \  
@@ -11,7 +13,7 @@
 import os
 import shutil
 import logging
-import requests
+import urllib2
 
 from mutagen import id3
 
@@ -29,20 +31,51 @@ def delete_audio_file(entry_dic, sub_dic):
         'Have you deleted/moved files manually? Or changed permissions?']
         errors.errors(error, suggest, fatal=False, title=sub_dic['title'].upper())
 
+def progress_download(url, localfile):
+    # get metainformation and open remote and local file, respectively
+    u = urllib2.urlopen(url)
+    f = open(localfile, 'w')
+    meta = u.info()
+    mega = 1024*1024.
+    file_size = int(meta.getheaders("Content-Length")[0]) / mega
+    file_size_dl = 0
+    block_sz = 65536
+
+    # download chunks of block_size until there is no more to read
+    while True:
+        buffer = u.read(block_sz)
+        if not buffer:
+            break
+        file_size_dl += len(buffer) / mega
+        f.write(buffer)
+        status = os.path.basename(localfile)[:36].ljust(40) + "%7.2f Mb  [%3.2f%%]" % \
+            (file_size_dl, file_size_dl * 100. / file_size)
+        status = status + chr(8)*(len(status)+1)
+        print status,
+
+    # close file and print a newline
+    f.close()
+    print '\n'
+
+def silent_download(url, localfile):
+    '''silent download for cron job operations'''
+    u = urllib2.urlopen(url)
+    f = open(localfile, 'w')
+    block_sz = 65536
+    while True:
+        buffer = u.read(block_sz)
+        if not buffer:
+            break
+        f.write(buffer)
+    f.close()
+
 def download_audio_file(entry_dic, sub_dic, args_ns):
     '''Downloads one file'''
-    #meter = progress.text_progress_meter()
     localfile = _get_path(entry_dic, sub_dic)
     if args_ns.quiet:
-        file_object = requests.get(entry_dic['url'])
+        silent_download(entry_dic['url'], localfile)
     else:
-        file_object = requests.get(entry_dic['url'])
-    if file_object.status_code == 200:
-        open(localfile, 'w').write(file_object.content)
-
-    # how to test if the right file was downloaded?
-    # check file length? file name? 
-    # not fool-proof as these could have been provided by the program itself...
+        progress_download(entry_dic['url'], localfile)
 
 def tag_audio_file(sets_dic, entry_dic, sub_dic):
     '''Reintroducing id3 tagging using mutagen'''
