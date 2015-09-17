@@ -15,7 +15,7 @@ import shutil
 import logging
 import urllib2
 
-from mutagen import id3
+import mutagen
 
 from poco.id3v23_frames import frame_dic
 from poco import errors
@@ -88,7 +88,15 @@ def tag_audio_file(sets_dic, entry_dic, sub_dic):
     id3v1 = id3v1_dic[sets_dic['metadata']['removeid3v1']] 
     # overwrite metadata in the present file 
     localfile = _get_path(entry_dic, sub_dic)
-    id3tag = id3.ID3(localfile)
+    try:
+        id3tag = mutagen.id3.ID3(localfile)
+    except ID3NoHeaderError:
+        easytag = mutagen.File(localfile, easy=True)
+        easytag.add_tags()
+        mp3title = os.path.basename(localfile).split('.')[0]
+        easytag['title'] = mp3title
+        easytag.save()
+        id3tag = mutagen.id3.ID3(localfile)
     if id3version == 3:
         id3tag.update_to_v23()
     for override in sub_dic['metadata']:
