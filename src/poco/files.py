@@ -90,7 +90,7 @@ def tag_audio_file(sets_dic, entry_dic, sub_dic):
     localfile = _get_path(entry_dic, sub_dic)
     try:
         id3tag = mutagen.id3.ID3(localfile)
-    except ID3NoHeaderError:
+    except mutagen.id3.ID3NoHeaderError:
         easytag = mutagen.File(localfile, easy=True)
         easytag.add_tags()
         mp3title = os.path.basename(localfile).split('.')[0]
