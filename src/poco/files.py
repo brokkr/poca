@@ -88,6 +88,11 @@ def tag_audio_file(sets_dic, entry_dic, sub_dic):
     id3v1 = id3v1_dic[sets_dic['metadata']['removeid3v1']] 
     # overwrite metadata in the present file 
     localfile = _get_path(entry_dic, sub_dic)
+    file_extension = os.path.splitext(localfile)[1].lower()
+    if file_extension != '.mp3':
+        return
+    if not sub_dic.has_key('metadata'):
+        return
     try:
         id3tag = mutagen.id3.ID3(localfile)
     except mutagen.id3.ID3NoHeaderError:
