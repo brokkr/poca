@@ -108,7 +108,15 @@ def tag_audio_file(sets_dic, entry_dic, sub_dic):
         frame = frame_dic[override]
         ftext = sub_dic['metadata'][override]
         id3tag.add(frame(encoding=id3encoding, text=ftext))
-        id3tag.save(v1=id3v1, v2_version=id3version)
+        Try:
+            id3tag.save(v1=id3v1, v2_version=id3version)
+        except UnicodeEncodeError:
+            error = 'The metadata overrides contain Unicode characters
+            but you have chosen a non-Unicode encoding.'
+            suggest = ['Please change either your Unicode preference or 
+            your overrides']
+            errors.errors(error, suggest, fatal=True, title=sub_dic['title'].upper())
+            
 
 def check_path(sub_dic):
     '''Creates one directory'''
