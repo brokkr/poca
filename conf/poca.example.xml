@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<poca version="0.1">
+<poca version="0.2">
 
 	<settings>
 		<base_directory>/home/user/poca</base_directory>
         <metadata>
-            <!-- the following values are possible:
-                 * id3version: 2.3, 2.4
-                 * id3encoding: latin1, utf16, utf16be, utf8 (only with 2.4)
-                 * removeid3v1: yes, no
-            -->
+        <!-- the following values are possible:
+        * id3version: 2.3, 2.4
+        * unicode: yes (use utf16 encoding with 2.3, utf8 encoding with 2.4), 
+          no (use latin1 encoding)
+        * removeid3v1: yes, no
+        -->
             <id3version>2.3</id3version>
-            <id3encoding>latin1</id3encoding>
+            <unicode>yes</unicode>
             <removeid3v1>yes</removeid3v1>
         </metadata>
-        <mail_account>
-            <host>smtp.mymailhost.com</host>
-            <fromaddr>poca@poca.com</fromaddr>
-            <toaddr>mymailaddress@gmail.com</toaddr>
-            <subject>Poca encounted a problem</subject>
-        </mail_account>
 	</settings>
 	
 	
