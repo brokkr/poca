@@ -81,11 +81,13 @@ def tag_audio_file(sets_dic, entry_dic, sub_dic):
     '''Reintroducing id3 tagging using mutagen'''
     # get general metadata settings
     id3version_dic = {'2.3': 3, '2.4': 4}
-    id3encoding_dic = {'latin1': 0, 'utf16': 1, 'utf16be': 2, 'utf8': 3}
-    id3v1_dic = {'yes': 0, 'no': 2}
     id3version = id3version_dic[sets_dic['metadata']['id3version']]
-    id3encoding = id3encoding_dic[sets_dic['metadata']['id3encoding']]
+    id3v1_dic = {'yes': 0, 'no': 2}
     id3v1 = id3v1_dic[sets_dic['metadata']['removeid3v1']] 
+    id3encoding = 0
+    if sets_dic['metadata']['unicode'] == 'yes':
+        id3encoding_dic = {3: 1, 4: 3}
+        id3encoding = id3encoding_dic[id3version]
     # overwrite metadata in the present file 
     localfile = _get_path(entry_dic, sub_dic)
     file_extension = os.path.splitext(localfile)[1].lower()
@@ -98,8 +100,7 @@ def tag_audio_file(sets_dic, entry_dic, sub_dic):
     except mutagen.id3.ID3NoHeaderError:
         easytag = mutagen.File(localfile, easy=True)
         easytag.add_tags()
-        mp3title = os.path.basename(localfile).split('.')[0]
-        easytag['title'] = mp3title
+        easytag['title'] = os.path.basename(localfile).split('.')[0]
         easytag.save()
         id3tag = mutagen.id3.ID3(localfile)
     if id3version == 3:
@@ -108,14 +109,14 @@ def tag_audio_file(sets_dic, entry_dic, sub_dic):
         frame = frame_dic[override]
         ftext = sub_dic['metadata'][override]
         id3tag.add(frame(encoding=id3encoding, text=ftext))
-        Try:
+        try:
             id3tag.save(v1=id3v1, v2_version=id3version)
         except UnicodeEncodeError:
-            error = 'The metadata overrides contain Unicode characters
-            but you have chosen a non-Unicode encoding.'
-            suggest = ['Please change either your Unicode preference or 
-            your overrides']
-            errors.errors(error, suggest, fatal=True, title=sub_dic['title'].upper())
+            error = 'The metadata overrides contain Unicode characters\n\
+but you have chosen a non-Unicode encoding.'
+            suggest = ['Please change either your Unicode preference or \
+your overrides']
+            errors.errors(error, suggest)
             
 
 def check_path(sub_dic):

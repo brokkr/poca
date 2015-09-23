@@ -15,8 +15,9 @@ def errors(error_msg, suggest_msg, fatal=False, title=''):
     stream_logger = logging.getLogger('slogger')
     remote_logger = logging.getLogger('rlogger')
     logging.raiseExceptions = 0
-    stream_logger.error(error_msg)
-    remote_logger.error(title + error_msg + ' '.join(suggest_msg))
+    #stream_logger.error(error_msg)
+    stream_logger.error(title + error_msg + '\n' + ' '.join(suggest_msg) + '\n')
+    remote_logger.error(title + error_msg + '\n' + ' '.join(suggest_msg) + '\n')
     if fatal:
         sys.exit()
 
