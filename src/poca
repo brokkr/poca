@@ -13,7 +13,6 @@ import poco
 
 def configure():
     '''reference for how we used to do things'''
-    about = 'Poca ' + poco.VERSION 
     #args_ns = poco.argsconfig.args_config(paths_dic, about)
     #stream_logger, remote_logger = poco.output.loggers(args_ns)
     #if args_ns.errors_mail and sets_dic.has_key('mail_account'):
@@ -53,9 +52,9 @@ def main(paths_dic, args_ns, sets_dic, subs_list):
 if __name__ == '__main__':
     try:
         config = poco.config.Config()
-        if args_ns.restart:
-            poco.files.restart(paths_dic, subs_list)
-        main(paths_dic, args_ns, sets_dic, subs_list)
+        #if args_ns.restart:
+        #    poco.files.restart(paths_dic, subs_list)
+        #main(paths_dic, args_ns, sets_dic, subs_list)
     except KeyboardInterrupt:
         pass
 

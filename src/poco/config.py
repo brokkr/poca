@@ -9,11 +9,14 @@ from os import path, makedirs
 from sys import exit
 from shutil import copyfile
 import xml.etree.ElementTree as ElementTree
-from poco import errors
+from poco import errors, VERSION, DESCRIPTION
+import argparse
+
 
 class Config:
     def __init__(self):
         self.paths = Paths()
+        self.args = get_args()
         xml_root = self.get_xml()
         self.prefs = Prefs(xml_root)
         self.subs = get_subs(xml_root)
@@ -93,3 +96,17 @@ class Sub:
         for element in xml_metadata.getchildren():
             metadata[element.tag] = element.text
         return metadata
+
+def get_args():
+    '''Returns arguments from a command line argument parser'''
+    about = "Poca " + VERSION + " : " + DESCRIPTION
+    parser = argparse.ArgumentParser(description=about)
+
+    parser.add_argument('-q', '--quiet', action='store_true', 
+        default=False, help='Quiet mode (useful for cron jobs)')
+    parser.add_argument('-r', '--restart', action='store_true', 
+        default=False, help='Deletes all created directories with contents \
+        plus log file and starts over')
+
+    return parser.parse_args()
+

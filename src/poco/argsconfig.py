@@ -10,15 +10,15 @@ import argparse
 
 def args_config(paths_dic, about):
     '''Returns arguments from a command line argument parser based on argparse'''
-    _parser = argparse.ArgumentParser(description=about)
+    parser = argparse.ArgumentParser(description=about)
 
-    _parser.add_argument('-q', '--quiet', action='store_true', \
+    parser.add_argument('-q', '--quiet', action='store_true', \
         default=False, help='Quiet mode (useful for cron jobs)')
-    _parser.add_argument('-r', '--restart', action='store_true', \
+    parser.add_argument('-r', '--restart', action='store_true', \
         default=False, help='Deletes all created directories with contents \
         plus log file and starts over')
 
-    errors_group = _parser.add_argument_group(title='error logging')
+    errors_group = parser.add_argument_group(title='error logging')
     errors_group.add_argument('-f', '--errors-file', action='store', \
         nargs='?', const=paths_dic['errors_log'], default=None, \
         help='Specifies a file to use for error logging; \
@@ -28,6 +28,6 @@ def args_config(paths_dic, about):
         default=False, help='Use the mail account setup in poca.xml to generate \
         email error logging. One email will be sent per error encountered.')
 
-    args_ns = _parser.parse_args()
+    args_ns = parser.parse_args()
     return args_ns
 
