@@ -7,12 +7,11 @@
 
 VERSION = "0.3alpha"
 MAINTAINER = "Mads Michelsen <mail@brokkr.net>"
-DESCRIPTION = "A cron-friendly, disk-space-conscious, command line podcast \
-aggregator, written in Python"
+DESCRIPTION = ("A cron-friendly, disk-space-conscious, command line podcast "
+"aggregator, written in Python")
 URL = "https://github.com/brokkr/poca"
 
 import config
-import argsconfig
 import history
 import output
 import files

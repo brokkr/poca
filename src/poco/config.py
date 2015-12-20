@@ -68,6 +68,7 @@ class Prefs:
                 getattr(self, element)
         except AttributeError:
             print 'Yikes! Required setting is missing!'
+            # This needs to make proper use of error logging functions
             exit()
 
 def get_subs(xml_root):
@@ -88,6 +89,7 @@ class Sub:
             xml_sub.remove(xml_metadata)
         for element in xml_sub.getchildren():
             setattr(self, element.tag, element.text)
+            # test if all required attributes are set (and valid?)
     
     def extract_metadata(self, xml_metadata):
         metadata = {}
