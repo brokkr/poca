@@ -12,16 +12,12 @@ import poco
 
 
 def configure():
-    '''Creates the data-holding instances for paths, arguments, and subscriptions'''
+    '''reference for how we used to do things'''
     about = 'Poca ' + poco.VERSION 
-    paths_dic = poco.pathsconfig.paths_config()
-    args_ns = poco.argsconfig.args_config(paths_dic, about)
-    poco.initialization.test_paths(paths_dic)
-    stream_logger, remote_logger = poco.output.loggers(args_ns)
-    sets_dic, subs_list = poco.subsconfig.sets_n_subs(paths_dic)
-    if args_ns.errors_mail and sets_dic.has_key('mail_account'):
-        remote_logger = poco.output.add_mail_handler(sets_dic, remote_logger)
-    return (paths_dic, args_ns, sets_dic, subs_list)
+    #args_ns = poco.argsconfig.args_config(paths_dic, about)
+    #stream_logger, remote_logger = poco.output.loggers(args_ns)
+    #if args_ns.errors_mail and sets_dic.has_key('mail_account'):
+    #    remote_logger = poco.output.add_mail_handler(sets_dic, remote_logger)
 
 def main(paths_dic, args_ns, sets_dic, subs_list):
     '''Loops through the subscriptions, updating each in turn'''
@@ -56,7 +52,7 @@ def main(paths_dic, args_ns, sets_dic, subs_list):
 
 if __name__ == '__main__':
     try:
-        paths_dic, args_ns, sets_dic, subs_list = configure()
+        config = poco.config.Config()
         if args_ns.restart:
             poco.files.restart(paths_dic, subs_list)
         main(paths_dic, args_ns, sets_dic, subs_list)
