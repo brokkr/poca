@@ -55,6 +55,7 @@ class Paths:
             copyfile(config_example, self.config_file)
         for line in msg: 
             print line
+            # This needs to make proper use of error logging functions
         exit()
 
 class Prefs:
