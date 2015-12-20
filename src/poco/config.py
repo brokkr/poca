@@ -105,8 +105,8 @@ def get_args():
     parser.add_argument('-q', '--quiet', action='store_true', 
         default=False, help='Quiet mode (useful for cron jobs)')
     parser.add_argument('-r', '--restart', action='store_true', 
-        default=False, help='Deletes all created directories with contents \
-        plus log file and starts over')
+        default=False, help=('Delete all created directories with contents '
+        'plus log file and start over'))
 
     return parser.parse_args()
 
