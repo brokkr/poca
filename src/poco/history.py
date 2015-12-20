@@ -7,6 +7,7 @@
 
 
 import shelve
+import pickle
 
 
 def retrieve(paths_dic, sub_dic):
@@ -25,3 +26,6 @@ def save(paths_dic, sub_dic, new_log):
     log[sub_dic['title']] = new_log
     log.close()
 
+class Log:
+    def __init__(self):
+        pass

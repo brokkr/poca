@@ -11,6 +11,7 @@ DESCRIPTION = "A cron-friendly, disk-space-conscious, command line podcast \
 aggregator, written in Python"
 URL = "https://github.com/brokkr/poca"
 
+import config
 import pathsconfig
 import argsconfig
 import subsconfig 

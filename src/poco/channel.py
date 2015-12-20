@@ -32,6 +32,9 @@ class Channel:
             self.updated = sub_log['updated']
             if sub_log['max_mb'] != int(sub_dic['max_mb']):
                 self.reconfigure = True
+        print self.entries
+        print self.entry_db
+
 
     def parse_feed(self):
         '''Uses Mark Pilgrims feedparser module to download and parse. If the \
