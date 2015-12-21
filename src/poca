@@ -8,7 +8,6 @@
 # the Free Software Foundation, either version 3 of the License, 
 # or (at your option) any later version.
 
-
 import poco 
 
 
@@ -47,10 +46,10 @@ if __name__ == '__main__':
     try:
         config = poco.config.Config()
         logger = poco.output.get_logger(config)
-        #msg_error = "Oh oh!"
-        #msg_suggest = "Do something"
-        #logger.error(msg_error)
-        #logger.info(msg_suggest)
+        msg_error = "Oh oh!"
+        msg_suggest = "Do something"
+        logger.error(msg_error)
+        logger.info(msg_suggest)
     except KeyboardInterrupt:
         pass
 

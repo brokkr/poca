@@ -1,15 +1,19 @@
-# Copyright 2010, 2011, 2015 Mads Michelsen (reannual@gmail.com)
+#!/usr/bin/env python2
+# 
+# Copyright 2010-2015 Mads Michelsen (mail@brokkr.net)
 # 
 # This file is part of Poca.
-# Poca is free software: you can redistribute it and/or modify it under the terms \
-# of the GNU General Public License as published by the Free Software Foundation, \
-# either version 3 of the License, or (at your option) any later version.
+# Poca is free software: you can redistribute it and/or modify it 
+# under the terms of the GNU General Public License as published by 
+# the Free Software Foundation, either version 3 of the License, 
+# or (at your option) any later version.
+
 
 from os import path, makedirs
 from sys import exit
 from shutil import copyfile
 import xml.etree.ElementTree as ElementTree
-from poco import errors, VERSION, DESCRIPTION
+from poco import output, VERSION, DESCRIPTION
 import argparse
 
 
