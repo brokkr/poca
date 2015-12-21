@@ -12,6 +12,10 @@
 import shelve
 import pickle
 
+class Jar:
+    def __init__(self):
+        self.yellow = []
+        self.red = []
 
 def retrieve(paths_dic, sub_dic):
     '''Retrieves the saved entries for the subscription in question'''
