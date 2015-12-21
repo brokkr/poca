@@ -8,13 +8,14 @@
 # the Free Software Foundation, either version 3 of the License, 
 # or (at your option) any later version.
 
+import argparse
 
 from os import path, makedirs
 from sys import exit
 from shutil import copyfile
-import xml.etree.ElementTree as ElementTree
-from poco import output, VERSION, DESCRIPTION
-import argparse
+from xml.etree import ElementTree 
+
+from poco import VERSION, DESCRIPTION
 
 
 class Config:

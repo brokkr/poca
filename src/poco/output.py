@@ -13,15 +13,15 @@ import logging
 
 
 color_codes = { \
-    'reset': '\033[0;0m', \
-    'bold': '\033[1m', \
-    'red': '\033[31m', \
-    'green': '\033[32m', \
-    'blue': '\033[34m', \
-    'lred': '\033[1;31m', \
-    'lgreen': '\033[1;32m', \
-    'yellow': '\033[1;33m', \
-    'lblue': '\033[1;34m' \
+    'reset': '\033[0;0m',
+    'bold': '\033[1m',
+    'red': '\033[31m',
+    'green': '\033[32m',
+    'blue': '\033[34m',
+    'lred': '\033[1;31m',
+    'lgreen': '\033[1;32m',
+    'yellow': '\033[1;33m',
+    'lblue': '\033[1;34m'
     }
 
 def colorize(_string, color):
