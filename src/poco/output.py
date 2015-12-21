@@ -7,20 +7,7 @@
 
 
 import logging
-import logging.handlers
 
-
-category_synonyms = [ \
-    ('red', 'Known and retired', 'reset'), \
-    ('yellow', 'Known and in use', 'reset'), \
-    ('green', 'Heretofore unknown', 'reset'), \
-    ('oranges', 'All known', 'reset'), \
-    ('lemons', 'All potential', 'reset'), \
-    ('limes', 'To be used', 'reset'), \
-    ('pomelos', 'To be downloaded', 'green'), \
-    ('grapefruits', 'To be deleted', 'red'), \
-    ('citrons', 'To be discarded', 'reset') \
-    ]
 
 color_codes = { \
     'reset': '\033[0;0m', \
@@ -34,45 +21,30 @@ color_codes = { \
     'lblue': '\033[1;34m' \
     }
 
-def _colorize(_string, color):
+def colorize(_string, color):
     return color_codes[color] + str(_string) + color_codes['reset']
 
-def loggers(args_ns):
-    stream_logger = logging.getLogger('slogger')
-    stream_logger.setLevel(logging.WARN)
-    remote_logger = logging.getLogger('rlogger')
-    remote_logger.setLevel(logging.WARN)
-
+def get_logger(config):
+    logger = logging.getLogger('POCA')
+    logger.setLevel(logging.INFO)
     null_handler = logging.NullHandler()
-    null_handler.setLevel(logging.WARN)
-    stream_logger.addHandler(null_handler)
-    remote_logger.addHandler(null_handler)
-
-    if not args_ns.quiet:
-        stream_formatter = logging.Formatter(_colorize("Error: ", 'lred') + \
-        "%(message)s")
+    logger.addHandler(null_handler)
+    if not config.args.quiet:
         stream_handler = logging.StreamHandler()
-        stream_handler.setLevel(logging.ERROR)
+        stream_handler.setLevel(logging.INFO)
+        stream_formatter = logging.Formatter(colorize("%(levelname)s: ", 
+            "lred") + "%(message)s")
         stream_handler.setFormatter(stream_formatter)
-        stream_logger.addHandler(stream_handler)
-    if args_ns.errors_file:
-        file_formatter = logging.Formatter("%(asctime)s - %(message)s")
-        file_handler = logging.FileHandler(args_ns.errors_file)
+        logger.addHandler(stream_handler)
+    if config.args.log_errors:
+        file_handler = logging.FileHandler(config.paths.errors)
         file_handler.setLevel(logging.ERROR)
+        file_formatter = logging.Formatter("%(asctime)s - %(message)s", 
+            datefmt='%Y-%m-%d %H:%M')
         file_handler.setFormatter(file_formatter)
-        remote_logger.addHandler(file_handler)
-    return (stream_logger, remote_logger)
+        logger.addHandler(file_handler)
+    return logger
 
-def add_mail_handler(sets_dic, remote_logger):
-    mail_formatter = logging.Formatter("%(asctime)s - %(message)s")
-    mail_handler = logging.handlers.SMTPHandler(sets_dic['mail_account']['host'], \
-    sets_dic['mail_account']['fromaddr'], \
-    [sets_dic['mail_account']['toaddr']], \
-    sets_dic['mail_account']['subject'])
-    mail_handler.setLevel(logging.ERROR)
-    mail_handler.setFormatter(mail_formatter)
-    remote_logger.addHandler(mail_handler)
-    return remote_logger
 
 def print_heading(args_ns, sub_dic, i):
     '''Prints heading for each channel'''

@@ -1,19 +1,16 @@
 #!/usr/bin/env python2
 # 
-# Copyright 2010, 2011, 2015 Mads Michelsen (reannual@gmail.com)
+# Copyright 2010-2015 Mads Michelsen (mail@brokkr.net)
 # 
 # This file is part of Poca.
-# Poca is free software: you can redistribute it and/or modify it under the terms \
-# of the GNU General Public License as published by the Free Software Foundation, \
-# either version 3 of the License, or (at your option) any later version.
+# Poca is free software: you can redistribute it and/or modify it 
+# under the terms of the GNU General Public License as published by 
+# the Free Software Foundation, either version 3 of the License, 
+# or (at your option) any later version.
 
 
 import poco 
 
-
-def configure():
-    '''reference for how we used to do things'''
-    #stream_logger, remote_logger = poco.output.loggers(args_ns)
 
 def main(paths_dic, args_ns, sets_dic, subs_list):
     '''Loops through the subscriptions, updating each in turn'''
@@ -49,9 +46,11 @@ def main(paths_dic, args_ns, sets_dic, subs_list):
 if __name__ == '__main__':
     try:
         config = poco.config.Config()
-        #if args_ns.restart:
-        #    poco.files.restart(paths_dic, subs_list)
-        #main(paths_dic, args_ns, sets_dic, subs_list)
+        logger = poco.output.get_logger(config)
+        #msg_error = "Oh oh!"
+        #msg_suggest = "Do something"
+        #logger.error(msg_error)
+        #logger.info(msg_suggest)
     except KeyboardInterrupt:
         pass
 
