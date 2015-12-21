@@ -26,26 +26,34 @@ class Channel:
         self.old_jar = history.Jar()
         self.new_jar = history.Jar()
         self.doc = feedparser.parse(self.subscription.url)
-        ids = [ entry.id for entry in self.doc.entries ]
-        self.red = [ id for id in self.old_jar.red if id in ids ]
+        uids = [ entry.id for entry in self.doc.entries ]
+        self.red = [ uid for uid in self.old_jar.red if uid in uids ]
         self.yellow = self.old_jar.yellow
-        self.green = [ id for id in ids if id not in self.red 
-            and id not in self.yellow ]
+        self.green = [ uid for uid in uids if uid not in self.red 
+            and uid not in self.yellow ]
         mega = float(1024 * 1024)
         max_bytes = float(self.subscription.max_mb) * mega
         current_bytes = 0
+        self.full = False
         # green
-        for id in self.green:
-            entry = [ entry for entry in self.doc.entries if entry.id == id ][0]
+        while len(self.green) > 0:
+            uid = self.green.pop(0)
+            entry = [ entry for entry in self.doc.entries if entry.id == uid ][0]
             entry_bytes = self.get_size(entry)
             if current_bytes + entry_bytes < max_bytes:
                 #download
                 current_bytes += entry_bytes
-                self.yellow.append(id)
+                self.yellow.append(uid)
                 print 'Downloading: ', entry.title
                 print 'Size: ', round(entry_bytes / mega, 2)
             else:
+                self.red.append(uid)
+                self.red.extend(self.green)
+                self.green = []
+                self.full = True
                 break
+        # yellow
+
         print 'Total size: ', round(current_bytes / mega, 2)
         print 'Max allowed size: ', round(max_bytes / mega, 2)
 
