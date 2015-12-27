@@ -26,18 +26,21 @@ class Channel:
         self.old_jar = history.Jar()
         self.new_jar = history.Jar()
         self.doc = feedparser.parse(self.subscription.url)
-        uids = [ entry.id for entry in self.doc.entries ]
-        self.red = [ uid for uid in self.old_jar.red if uid in uids ]
-        self.yellow = self.old_jar.yellow
-        self.green = [ uid for uid in uids if uid not in self.red 
-            and uid not in self.yellow ]
+        #uids = [ entry.id for entry in self.doc.entries ]
+        self.jardic = { entry.id : entry for entry in self.doc.entries }
+        #self.red = [ uid for uid in self.old_jar.red if uid in uids ]
+        #self.yellow = self.old_jar.yellow
+        #self.green = [ uid for uid in uids if uid not in self.red 
+        #    and uid not in self.yellow ]
         mega = float(1024 * 1024)
         max_bytes = float(self.subscription.max_mb) * mega
         current_bytes = 0
         self.full = False
+
+    def holdover(self):
         # green
-        while len(self.green) > 0:
-            uid = self.green.pop(0)
+        while len(uids) > 0:
+            uid = uids.pop(0)
             entry = [ entry for entry in self.doc.entries if entry.id == uid ][0]
             entry_bytes = self.get_size(entry)
             if current_bytes + entry_bytes < max_bytes:
