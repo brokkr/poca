@@ -11,11 +11,18 @@
 
 import shelve
 import pickle
+from os import path
 
 class Jar:
-    def __init__(self):
-        self.yellow = []
-        self.red = []
+    def __init__(self, paths, subscriptption):
+        self.dic = []
+        self.lst = []
+        self.filename = path.join(paths.config_dir, 'db', subscription.title)
+    
+    def save(self, uid_lst, uid_dic):
+        pass
+        
+        
 
 def retrieve(paths_dic, sub_dic):
     '''Retrieves the saved entries for the subscription in question'''

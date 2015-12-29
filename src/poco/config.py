@@ -33,7 +33,8 @@ class Config:
         except ElementTree.ParseError:
             error = "The settings file could not be parsed. "
             suggest = ["Please check to see that it is wellformed etc."]
-            errors.errors(error, suggest, fatal=True)
+            #errors.errors(error, suggest, fatal=True)
+            print error
 
 class Paths:
     def __init__(self):

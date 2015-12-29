@@ -23,11 +23,12 @@ class Channel:
         #self.update(config)
         #self.upgrade(logger)
         self.subscription = config.subs[i]
-        self.old_jar = history.Jar()
-        self.new_jar = history.Jar()
+        #self.old_jar = history.Jar()
+        self.new_jar = history.Jar(config.paths, self.subscription)
         self.doc = feedparser.parse(self.subscription.url)
-        #uids = [ entry.id for entry in self.doc.entries ]
+        uids = [ entry.id for entry in self.doc.entries ]
         self.jardic = { entry.id : entry for entry in self.doc.entries }
+
         #self.red = [ uid for uid in self.old_jar.red if uid in uids ]
         #self.yellow = self.old_jar.yellow
         #self.green = [ uid for uid in uids if uid not in self.red 
