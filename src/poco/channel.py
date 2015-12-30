@@ -20,29 +20,38 @@ from poco import history
 class Channel:
     def __init__(self, config, logger, i):
         '''A class for a single subscription/channel'''
-        #self.update(config)
-        #self.upgrade(logger)
-        self.subscription = config.subs[i]
-        #self.old_jar = history.Jar()
-        self.new_jar = history.Jar(config.paths, self.subscription)
-        self.doc = feedparser.parse(self.subscription.url)
-        uids = [ entry.id for entry in self.doc.entries ]
-        self.jardic = { entry.id : entry for entry in self.doc.entries }
+        self.sub = config.subs[i]
+        # Something new, something old, somwthing combined from the two
+        self.feed = Feed(self.sub)
+        self.jar = history.get_jar(config.paths, self.sub)
+        self.combo = Combo(self.feed, self.jar)
+        # From combined list, find the ones we want
+        #wanted = Wanted(sub, combo)
+        #unwanted = [ x for x in jar.lst if x not in wanted.lst ]
 
-        #self.red = [ uid for uid in self.old_jar.red if uid in uids ]
-        #self.yellow = self.old_jar.yellow
-        #self.green = [ uid for uid in uids if uid not in self.red 
-        #    and uid not in self.yellow ]
+class Feed:
+    def __init__(self, sub):
+        doc = feedparser.parse(sub.url)
+        self.lst = [ entry.id for entry in doc.entries ]
+        self.dic = { entry.id : entry for entry in doc.entries }
+
+class Combo:
+    def __init__(self, feed, jar):
+        self.lst = list(feed.lst)
+        self.lst.extend(x for x in jar.lst if x not in feed.lst)
+        self.dic = feed.dic.copy()
+        self.dic.update(jar.dic)
+
+class Wanted:
+    def __init__(self, sub, combo):
         mega = float(1024 * 1024)
-        max_bytes = float(self.subscription.max_mb) * mega
-        current_bytes = 0
-        self.full = False
+        max_bytes = sub.max_mb * mega
+        cur_bytes = float(0)
+        full = False
 
-    def holdover(self):
-        # green
-        while len(uids) > 0:
-            uid = uids.pop(0)
-            entry = [ entry for entry in self.doc.entries if entry.id == uid ][0]
+        while len(combo.lst) > 0:
+            uid = combo.lst.pop(0)
+            entry = combo.dic[uid]
             entry_bytes = self.get_size(entry)
             if current_bytes + entry_bytes < max_bytes:
                 #download

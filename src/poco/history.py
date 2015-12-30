@@ -9,37 +9,26 @@
 # or (at your option) any later version.
 
 
-import shelve
 import pickle
 from os import path
 
-class Jar:
-    def __init__(self, paths, subscriptption):
-        self.dic = []
+def get_jar(paths, sub):
+    filename = path.join(paths.db_dir, sub.title)
+    if path.isfile(filename):
+        with open(filename, 'r') as f:
+            jar = pickle.load(f)
+    else:
+        jar = NewJar(filename)
+    return jar
+
+class NewJar:
+    def __init__(self, filename):
+        self.filename = filename
         self.lst = []
-        self.filename = path.join(paths.config_dir, 'db', subscription.title)
-    
-    def save(self, uid_lst, uid_dic):
-        pass
-        
-        
+        self.dic = {}
+        self.save()
 
-def retrieve(paths_dic, sub_dic):
-    '''Retrieves the saved entries for the subscription in question'''
-    log = shelve.open(paths_dic['history_log'])
-    try:
-        return log[sub_dic['title']]
-    except KeyError:
-        return
-    finally:
-        log.close()
+    def save(self):
+        with open(self.filename, 'w') as f:
+            pickle.dump(self, f)
 
-def save(paths_dic, sub_dic, new_log):
-    '''Opens log and saves updated entries the for subscription in question'''
-    log = shelve.open(paths_dic['history_log'])
-    log[sub_dic['title']] = new_log
-    log.close()
-
-class Log:
-    def __init__(self):
-        pass

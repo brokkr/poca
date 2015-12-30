@@ -41,6 +41,7 @@ class Paths:
         '''Returns a dictionary with path settings'''
         self.config_dir = path.expanduser(path.join('~', '.poca'))
         self.config_file = path.join(self.config_dir, 'poca.xml')
+        self.db_dir = path.join(self.config_dir, 'db')
         self.history = path.join(self.config_dir, 'history.log')
         self.errors = path.join(self.config_dir, 'errors.log')
 
