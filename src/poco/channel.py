@@ -22,17 +22,38 @@ class Channel:
         '''A class for a single subscription/channel'''
         self.sub = config.subs[i]
         db_filename = path.join(config.paths.db_dir, self.sub.title)
-        # Something new, something old, somwthing combined from the two
+        # Find all available entries
         self.feed = Feed(self.sub)
         print self.feed.lst
         self.jar = history.get_jar(db_filename)
         print self.jar.lst
         self.combo = Combo(self.feed, self.jar)
         print self.combo.lst
-        # From combined list, find the ones we want
-        self.wanted = Wanted(db_filename)
-        self.wanted.want(self.sub, self.combo)
+        # Find all the ones we want (and don't want)
+        self.wanted = Wanted(self.sub, self.combo)
         self.unwanted = [ x for x in self.jar.lst if x not in self.wanted.lst ]
+        # Act on the ones we have and those we don't for each category
+        for uid in self.unwanted:
+            self.remove(uid)
+        self.new_jar = history.Jar(db_filename)
+        for uid in self.wanted.lst:
+            if uid not in self.jar.lst:
+                self.get(uid)
+            else:
+                self.check(uid)
+                print 'Already got it! UID: ', uid
+
+    def remove(self, uid):
+        print 'removing ', uid
+
+    def get(self, uid):
+        #download the file, and if successful
+        self.new_jar.lst.append(uid)
+        self.new_jar.dic[uid] = self.wanted.dic[uid]
+        self.new_jar.save()
+
+    def check(self, uid):
+        print 'checking ', uid
 
 class Feed:
     def __init__(self, sub):
@@ -47,8 +68,9 @@ class Combo:
         self.dic = feed.dic.copy()
         self.dic.update(jar.dic)
 
-class Wanted(history.NewJar):
-    def want(self, sub, combo):
+class Wanted():
+    def __init__(self, sub, combo):
+        self.lst, self.dic = ( [], {} )
         mega = float(1024 * 1024)
         self.max_bytes = int(sub.max_mb) * mega
         self.cur_bytes = 0
@@ -56,11 +78,12 @@ class Wanted(history.NewJar):
         for uid in combo.lst:
             entry = combo.dic[uid]
             uid_bytes = self.get_size(entry)
-            #print uid, uid_bytes
             if self.cur_bytes + uid_bytes < self.max_bytes:
                 self.cur_bytes += uid_bytes
                 self.lst.append(uid)
-                self.dic[uid] = combo.dic[uid]
+                entry['poca_size'] = uid_bytes
+                entry['poca_filename'] = self.get_filename(entry)
+                self.dic[uid] = entry
                 print 'Downloading: ', entry.title
                 print 'Size: ', round(uid_bytes / mega, 2)
             else:
@@ -73,8 +96,11 @@ class Wanted(history.NewJar):
         try:
             size = int(entry.enclosures[0]['length'])
         except KeyError:
-            url = entry.enclosures[0]['href'].encode('ascii')
-            size = int(self.get_file_info(url, 'Content-Length'))
+            if entry.has_key('poca_size'):
+                size = entry['poca_size']
+            else:
+                url = entry.enclosures[0]['href'].encode('ascii')
+                size = int(self.get_file_info(url, 'Content-Length'))
         return size
 
     def get_file_info(self, url, info_key):
@@ -83,6 +109,9 @@ class Wanted(history.NewJar):
         value = f.info()[info_key]
         f.close()
         return value
+
+    def get_filename(self, entry):
+        pass
         
             
         

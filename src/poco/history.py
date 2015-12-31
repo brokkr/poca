@@ -17,11 +17,11 @@ def get_jar(db_filename):
         with open(db_filename, 'r') as f:
             jar = pickle.load(f)
     else:
-        jar = NewJar(db_filename)
+        jar = Jar(db_filename)
         jar.save()
     return jar
 
-class NewJar:
+class Jar:
     def __init__(self, db_filename):
         self.db_filename = db_filename
         self.lst = []
