@@ -23,11 +23,14 @@ class Channel:
         self.sub = config.subs[i]
         # Something new, something old, somwthing combined from the two
         self.feed = Feed(self.sub)
+        print self.feed.lst
         self.jar = history.get_jar(config.paths, self.sub)
+        print self.jar.lst
         self.combo = Combo(self.feed, self.jar)
+        print self.combo.lst
         # From combined list, find the ones we want
-        #wanted = Wanted(sub, combo)
-        #unwanted = [ x for x in jar.lst if x not in wanted.lst ]
+        self.wanted = Wanted(self.sub, self.combo)
+        self.unwanted = [ x for x in self.jar.lst if x not in self.wanted.lst ]
 
 class Feed:
     def __init__(self, sub):
@@ -44,31 +47,27 @@ class Combo:
 
 class Wanted:
     def __init__(self, sub, combo):
+        self.lst = []
+        self.dic = {}
         mega = float(1024 * 1024)
-        max_bytes = sub.max_mb * mega
-        cur_bytes = float(0)
-        full = False
+        self.max_bytes = int(sub.max_mb) * mega
+        self.cur_bytes = 0
 
-        while len(combo.lst) > 0:
-            uid = combo.lst.pop(0)
+        for uid in combo.lst:
             entry = combo.dic[uid]
-            entry_bytes = self.get_size(entry)
-            if current_bytes + entry_bytes < max_bytes:
-                #download
-                current_bytes += entry_bytes
-                self.yellow.append(uid)
+            uid_bytes = self.get_size(entry)
+            #print uid, uid_bytes
+            if self.cur_bytes + uid_bytes < self.max_bytes:
+                self.cur_bytes += uid_bytes
+                self.lst.append(uid)
+                self.dic[uid] = combo.dic[uid]
                 print 'Downloading: ', entry.title
-                print 'Size: ', round(entry_bytes / mega, 2)
+                print 'Size: ', round(uid_bytes / mega, 2)
             else:
-                self.red.append(uid)
-                self.red.extend(self.green)
-                self.green = []
-                self.full = True
                 break
-        # yellow
 
-        print 'Total size: ', round(current_bytes / mega, 2)
-        print 'Max allowed size: ', round(max_bytes / mega, 2)
+        print 'Total size: ', round(self.cur_bytes / mega, 2)
+        print 'Max allowed size: ', round(self.max_bytes / mega, 2)
 
     def get_size(self, entry):
         try:
