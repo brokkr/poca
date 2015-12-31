@@ -12,23 +12,22 @@
 import pickle
 from os import path
 
-def get_jar(paths, sub):
-    filename = path.join(paths.db_dir, sub.title)
-    if path.isfile(filename):
-        with open(filename, 'r') as f:
+def get_jar(db_filename):
+    if path.isfile(db_filename):
+        with open(db_filename, 'r') as f:
             jar = pickle.load(f)
     else:
-        jar = NewJar(filename)
+        jar = NewJar(db_filename)
+        jar.save()
     return jar
 
 class NewJar:
-    def __init__(self, filename):
-        self.filename = filename
+    def __init__(self, db_filename):
+        self.db_filename = db_filename
         self.lst = []
         self.dic = {}
-        self.save()
 
     def save(self):
-        with open(self.filename, 'w') as f:
+        with open(self.db_filename, 'w') as f:
             pickle.dump(self, f)
 

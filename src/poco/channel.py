@@ -9,7 +9,7 @@
 # or (at your option) any later version.
 
 import urllib2
-from os.path import basename 
+from os import path
 from urlparse import urlparse
 
 import feedparser
@@ -21,15 +21,17 @@ class Channel:
     def __init__(self, config, logger, i):
         '''A class for a single subscription/channel'''
         self.sub = config.subs[i]
+        db_filename = path.join(config.paths.db_dir, self.sub.title)
         # Something new, something old, somwthing combined from the two
         self.feed = Feed(self.sub)
         print self.feed.lst
-        self.jar = history.get_jar(config.paths, self.sub)
+        self.jar = history.get_jar(db_filename)
         print self.jar.lst
         self.combo = Combo(self.feed, self.jar)
         print self.combo.lst
         # From combined list, find the ones we want
-        self.wanted = Wanted(self.sub, self.combo)
+        self.wanted = Wanted(db_filename)
+        self.wanted.want(self.sub, self.combo)
         self.unwanted = [ x for x in self.jar.lst if x not in self.wanted.lst ]
 
 class Feed:
@@ -45,10 +47,8 @@ class Combo:
         self.dic = feed.dic.copy()
         self.dic.update(jar.dic)
 
-class Wanted:
-    def __init__(self, sub, combo):
-        self.lst = []
-        self.dic = {}
+class Wanted(history.NewJar):
+    def want(self, sub, combo):
         mega = float(1024 * 1024)
         self.max_bytes = int(sub.max_mb) * mega
         self.cur_bytes = 0
@@ -213,7 +213,7 @@ class oldChannel:
         removes query strings from url.'''
         f = urllib2.urlopen(entry_dic['url'])
         parsed_url = urlparse(f.geturl())
-        filename = basename(parsed_url.path)
+        filename = path.basename(parsed_url.path)
         f.close()
         return filename
 

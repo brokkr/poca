@@ -80,14 +80,11 @@ class Prefs:
             exit()
 
 def get_subs(xml_root):
-    subslist = []
     xml_subs = xml_root.find('subscriptions')
     if xml_subs is None:
-        return subslist
-    for xml_sub in xml_subs.getchildren():
-        sub = Sub(xml_sub)
-        subslist.append(sub)
-    return subslist
+        return []
+    else:
+        return [ Sub(xml_sub) for xml_sub in xml_subs.getchildren() ]
 
 class Sub:
     def __init__(self, xml_sub):
