@@ -16,19 +16,18 @@ import feedparser
 
 from poco import output
 from poco import history
+from poco import files
+
 
 class Channel:
-    def __init__(self, config, logger, i):
+    def __init__(self, config, logger, sub):
         '''A class for a single subscription/channel'''
-        self.sub = config.subs[i]
+        self.sub = sub
         db_filename = path.join(config.paths.db_dir, self.sub.title)
         # Find all available entries
         self.feed = Feed(self.sub)
-        print self.feed.lst
         self.jar = history.get_jar(db_filename)
-        print self.jar.lst
         self.combo = Combo(self.feed, self.jar)
-        print self.combo.lst
         # Find all the ones we want (and don't want)
         self.wanted = Wanted(self.sub, self.combo)
         self.unwanted = [ x for x in self.jar.lst if x not in self.wanted.lst ]
@@ -36,20 +35,24 @@ class Channel:
         for uid in self.unwanted:
             self.remove(uid)
         self.new_jar = history.Jar(db_filename)
+        files.check_path(self.sub)
         for uid in self.wanted.lst:
             if uid not in self.jar.lst:
-                self.get(uid)
+                self.get(config.args, uid)
             else:
                 self.check(uid)
-                print 'Already got it! UID: ', uid
 
     def remove(self, uid):
         print 'removing ', uid
+        entry = self.unwanted.dic[uid]
+        files.delete_audio_file(entry)
+        # consider removing it from self.jar at this stage and updating the file
 
-    def get(self, uid):
-        #download the file, and if successful
+    def get(self, args, uid):
+        entry = self.wanted.dic[uid]
+        files.download_audio_file(args, entry)
         self.new_jar.lst.append(uid)
-        self.new_jar.dic[uid] = self.wanted.dic[uid]
+        self.new_jar.dic[uid] = entry
         self.new_jar.save()
 
     def check(self, uid):
@@ -81,8 +84,10 @@ class Wanted():
             if self.cur_bytes + uid_bytes < self.max_bytes:
                 self.cur_bytes += uid_bytes
                 self.lst.append(uid)
+                entry['poca_url'] = entry.enclosures[0]['href']
                 entry['poca_size'] = uid_bytes
                 entry['poca_filename'] = self.get_filename(entry)
+                entry['poca_abspath'] = path.join(sub.sub_dir, entry['poca_filename'])
                 self.dic[uid] = entry
                 print 'Downloading: ', entry.title
                 print 'Size: ', round(uid_bytes / mega, 2)
@@ -111,9 +116,7 @@ class Wanted():
         return value
 
     def get_filename(self, entry):
-        pass
-        
-            
+        return path.basename(entry['poca_url'])
         
 
 class oldChannel:

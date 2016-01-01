@@ -24,7 +24,7 @@ class Config:
         self.args = get_args()
         xml_root = self.get_xml()
         self.prefs = Prefs(xml_root)
-        self.subs = get_subs(xml_root)
+        self.subs = get_subs(self.prefs, xml_root)
 
     def get_xml(self):
         '''Returns the XML tree root harvested from the users poca.xml file.'''
@@ -79,15 +79,15 @@ class Prefs:
             # This needs to make proper use of error logging functions
             exit()
 
-def get_subs(xml_root):
+def get_subs(prefs, xml_root):
     xml_subs = xml_root.find('subscriptions')
     if xml_subs is None:
         return []
     else:
-        return [ Sub(xml_sub) for xml_sub in xml_subs.getchildren() ]
+        return [ Sub(prefs, xml_sub) for xml_sub in xml_subs.getchildren() ]
 
 class Sub:
-    def __init__(self, xml_sub):
+    def __init__(self, prefs, xml_sub):
         xml_metadata = xml_sub.find('metadata')
         self.metadata = self.extract_metadata(xml_metadata)
         if xml_metadata is not None:
@@ -95,6 +95,7 @@ class Sub:
         for element in xml_sub.getchildren():
             setattr(self, element.tag, element.text)
             # test if all required attributes are set (and valid?)
+        self.sub_dir = path.join(prefs.base_dir, self.title)
     
     def extract_metadata(self, xml_metadata):
         metadata = {}

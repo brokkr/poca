@@ -20,21 +20,20 @@ import mutagen
 from poco.id3v23_frames import frame_dic
 from poco import output
 
-def delete_audio_file(entry_dic, sub_dic):
+def delete_audio_file(entry):
     '''Deletes one file'''
-    localfile = _get_path(entry_dic, sub_dic)
     try:
-        os.remove(localfile)
+        os.remove(entry.poca_abspath)
     except OSError:
-        error = 'The file ' + localfile + ' could not be deleted. '
+        error = 'The file ' + entry.poca_abspath + ' could not be deleted. '
         suggest = ['Was poca interrupted during the last run?', \
         'Have you deleted/moved files manually? Or changed permissions?']
-        errors.errors(error, suggest, fatal=False, title=sub_dic['title'].upper())
+        #errors.errors(error, suggest, fatal=False, title=sub_dic['title'].upper())
 
-def progress_download(url, localfile):
+def progress_download(entry):
     # get metainformation and open remote and local file, respectively
-    u = urllib2.urlopen(url)
-    f = open(localfile, 'w')
+    u = urllib2.urlopen(entry['poca_url'])
+    f = open(entry['poca_abspath'], 'w')
     meta = u.info()
     mega = 1024*1024.
     file_size = int(meta.getheaders("Content-Length")[0]) / mega
@@ -48,7 +47,7 @@ def progress_download(url, localfile):
             break
         file_size_dl += len(buffer) / mega
         f.write(buffer)
-        status = os.path.basename(localfile)[:36].ljust(40) + "%7.2f Mb  [%3.2f%%]" % \
+        status = entry['poca_filename'][:36].ljust(40) + "%7.2f Mb  [%3.2f%%]" % \
             (file_size_dl, file_size_dl * 100. / file_size)
         status = status + chr(8)*(len(status)+1)
         print status,
@@ -57,10 +56,10 @@ def progress_download(url, localfile):
     f.close()
     print '\n'
 
-def silent_download(url, localfile):
+def silent_download(entry):
     '''silent download for cron job operations'''
-    u = urllib2.urlopen(url)
-    f = open(localfile, 'w')
+    u = urllib2.urlopen(entry['poca_url'])
+    f = open(entry['poca_abspath'], 'w')
     block_sz = 65536
     while True:
         buffer = u.read(block_sz)
@@ -69,13 +68,12 @@ def silent_download(url, localfile):
         f.write(buffer)
     f.close()
 
-def download_audio_file(entry_dic, sub_dic, args_ns):
+def download_audio_file(args, entry):
     '''Downloads one file'''
-    localfile = _get_path(entry_dic, sub_dic)
-    if args_ns.quiet:
-        silent_download(entry_dic['url'], localfile)
+    if args.quiet:
+        silent_download(entry)
     else:
-        progress_download(entry_dic['url'], localfile)
+        progress_download(entry)
 
 def tag_audio_file(sets_dic, entry_dic, sub_dic):
     '''Reintroducing id3 tagging using mutagen'''
@@ -119,16 +117,16 @@ your overrides']
             errors.errors(error, suggest)
             
 
-def check_path(sub_dic):
+def check_path(sub):
     '''Creates one directory'''
-    if os.path.isdir(sub_dic['sub_dir']):
+    if os.path.isdir(sub.sub_dir):
         return
     try:
-        os.makedirs(sub_dic['sub_dir'], 0755)
+        os.makedirs(sub.sub_dir)
     except OSError:
-        error = 'The directory ' + sub_dic['sub_dir']  + ' could not be created. ' 
+        error = 'The directory ' + sub.sub_dir  + ' could not be created. ' 
         suggest = ['Please check your configuration and permissions.']
-        errors.errors(error, suggest, fatal=True, title=sub_dic['title'].upper())
+        #errors.errors(error, suggest, fatal=True, title=sub.title.upper())
             
 def restart(paths_dic, subs_list):
     '''Deletes log file and all created directories'''
