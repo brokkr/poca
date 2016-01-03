@@ -30,9 +30,9 @@ class Channel:
         self.combo = Combo(self.feed, self.jar)
         # Find all the ones we want (and don't want)
         self.wanted = Wanted(self.sub, self.combo)
-        self.unwanted = [ x for x in self.jar.lst if x not in self.wanted.lst ]
+        self.unwanted = Unwanted(self.jar, self.wanted)
         # Act on the ones we have and those we don't for each category
-        for uid in self.unwanted:
+        for uid in self.unwanted.lst:
             self.remove(uid)
         self.new_jar = history.Jar(db_filename)
         files.check_path(self.sub)
@@ -117,7 +117,11 @@ class Wanted():
 
     def get_filename(self, entry):
         return path.basename(entry['poca_url'])
-        
+
+class Unwanted:
+    def __init__(self, jar, wanted):
+        self.lst = [ uid for uid in jar.lst if uid not in wanted.lst ]
+        self.dic = { uid : jar.dic[uid] for uid in jar.lst if uid not in wanted.lst }
 
 class oldChannel:
     def __init__(self, sub_dic, sub_log):

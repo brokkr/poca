@@ -15,6 +15,8 @@ import shutil
 import logging
 import urllib2
 
+import urllib
+
 import mutagen
 
 from poco.id3v23_frames import frame_dic
@@ -68,12 +70,17 @@ def silent_download(entry):
         f.write(buffer)
     f.close()
 
+def basic_download(entry):
+    urllib.urlretrieve(entry['poca_url'], entry['poca_abspath'])
+
 def download_audio_file(args, entry):
     '''Downloads one file'''
     if args.quiet:
-        silent_download(entry)
+        #silent_download(entry)
+        basic_download(entry)
     else:
-        progress_download(entry)
+        #progress_download(entry)
+        basic_download(entry)
 
 def tag_audio_file(sets_dic, entry_dic, sub_dic):
     '''Reintroducing id3 tagging using mutagen'''
