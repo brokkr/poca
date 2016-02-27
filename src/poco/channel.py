@@ -23,7 +23,7 @@ class Channel:
     def __init__(self, config, logger, sub):
         '''A class for a single subscription/channel'''
         self.sub = sub
-        db_filename = path.join(config.paths.db_dir, self.sub.title)
+        db_filename = path.join(config.paths.db_dir , self.sub.title)
         # Find all available entries
         self.feed = Feed(self.sub)
         self.jar = history.get_jar(db_filename)
@@ -46,7 +46,7 @@ class Channel:
         print 'removing ', uid
         entry = self.unwanted.dic[uid]
         files.delete_audio_file(entry)
-        # consider removing it from self.jar at this stage and updating the file
+        #consider removing it from self.jar at this stage and updating the file
 
     def get(self, args, uid):
         entry = self.wanted.dic[uid]
@@ -56,7 +56,8 @@ class Channel:
         self.new_jar.save()
 
     def check(self, uid):
-        print 'checking ', uid
+        title = self.wanted.dic[uid]['poca_filename']
+        print 'Checking existing file: ', title
 
 class Feed:
     def __init__(self, sub):
@@ -66,6 +67,7 @@ class Feed:
 
 class Combo:
     def __init__(self, feed, jar):
+        '''Copies feed then adds non-duplicates from jar'''
         self.lst = list(feed.lst)
         self.lst.extend(x for x in jar.lst if x not in feed.lst)
         self.dic = feed.dic.copy()
@@ -89,13 +91,11 @@ class Wanted():
                 entry['poca_filename'] = self.get_filename(entry)
                 entry['poca_abspath'] = path.join(sub.sub_dir, entry['poca_filename'])
                 self.dic[uid] = entry
-                print 'Downloading: ', entry.title
-                print 'Size: ', round(uid_bytes / mega, 2)
+                print 'Adding to wanted list: ', entry.title, ' @ ', round(uid_bytes / mega, 2), ' Mb'
             else:
                 break
 
-        print 'Total size: ', round(self.cur_bytes / mega, 2)
-        print 'Max allowed size: ', round(self.max_bytes / mega, 2)
+        print 'Total size: ', round(self.cur_bytes / mega, 2), ' out of ', round(self.max_bytes / mega, 2), ' Mb'
 
     def get_size(self, entry):
         try:
@@ -116,12 +116,13 @@ class Wanted():
         return value
 
     def get_filename(self, entry):
+        '''why is this a function of its own?'''
         return path.basename(entry['poca_url'])
 
 class Unwanted:
     def __init__(self, jar, wanted):
         self.lst = [ uid for uid in jar.lst if uid not in wanted.lst ]
-        self.dic = { uid : jar.dic[uid] for uid in jar.lst if uid not in wanted.lst }
+        self.dic = { uid : jar.dic[uid] for uid in self.lst }
 
 class oldChannel:
     def __init__(self, sub_dic, sub_log):

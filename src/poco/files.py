@@ -80,7 +80,7 @@ def download_audio_file(args, entry):
         basic_download(entry)
     else:
         #progress_download(entry)
-        basic_download(entry)
+        progress_download(entry)
 
 def tag_audio_file(sets_dic, entry_dic, sub_dic):
     '''Reintroducing id3 tagging using mutagen'''
