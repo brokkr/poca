@@ -1,31 +1,25 @@
-##Poca 0.1.9 Update
-Poca has been moved from Google Code to Github and brought into 2015, having
-lingered in 2011 for some years. This means that 
-* ~~id3 tagging has been disabled (for now) due to issues with more recent eyed3 
-  versions.~~ Reinserted using mutagen.
-* ~~'Urlgrabber' module has been replaced by 'requests'. This means more troublefree 
-  downloads. It also means no more progressmeter. It also also means that quiet /
-  cron mode is no longer guaranteed to be silent (for now).~~ No external
-  dependencies for file downloads (using urllib2 for silent and progress
-  downloads)
-* The switch to sqlite logging in the more 'recent' code has been reversed as has
-  a half-hearted attempt to go multiprocess.
-
-Other than that things should work. 
+##Poca 0.3 alpha
+The code is currently being given a major rewrite in the johnpeters branch in
+order to greatly simplify the inner workings. As a result expansions of
+functionality have been put on hold.
 
 ####Future plans
- * 0.2:  ID3 tagging reimplemented using mutagen. Includes id3 version and
-   encoding preferences and extensive frame override support. Quiet and
-   progress download modes supported.
- * 0.3:  Code cleanup. Feedparser dependency eliminated (possibly). Renaming
-   files from tags.
- * 0.4:  Sqlite (or other db) logging reimplemented.
- * 0.5:  Maximum can be specified as space and/or number of episodes.
+ * 0.3: Push to master branch of new architecture. Basic functionality
+   supported (i.e. no metadata manipulation, basic silent and non-silent
+   downloads)
+ * 0.4:  ID3 tagging reimplemented using mutagen. Includes id3 version and
+   encoding preferences and extensive frame override support. Improved output.
+ * 0.5:  Renaming files from tags and/or podcast metadata.
+ * 0.6:  Self-righting: Insuring that the db and the files on disk never get
+   out of sync whatever happens.
+ * 0.7:  Maximum can be specified as space and/or number of episodes or left
+   out entirely.
+ * 0.8:  Support for .ogg and other formats
+ * 0.9:  Subscription editing via the command line. Default suggestions (i.e.
+   title) are presented to user. Possible [search engine addition](http://stackoverflow.com/questions/3201052/podcast-search-api).
 
 ##Poca
-Poca is a command line podcast client, written in Python. Though started as a 
-simple learning project script, it has grown to be a solid, capable program, 
-that in the best \*NIX tradition attemps to "do one thing and do it well".
+Poca is a command line podcast client, written in Python. 
 
 Functionality-wise, the focus is - as the name hints at - to reign in its 
 appetite: Subscribing to a feed should not mean downloading each new episode 
@@ -45,7 +39,7 @@ To install to /usr/local simply do
 
 setup.py is geared for install on POSIX environments. This means that the 
 following assumptions are made as regards file placement:
- * An example configuration file 8'poca.xml') is put in the '/etc' directory. 
+ * An example configuration file ('poca.xml') is put in the '/etc' directory. 
    The file contains commented examples of subscriptions that should make it 
    easy to add your own.
  * Running 'poca' on a fresh install (no configuration) will place a copy of
