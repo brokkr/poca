@@ -23,21 +23,19 @@ from poco import files
 class Channel:
     def __init__(self, config, logger, sub):
         '''A class for a single subscription/channel'''
-        self.sub = sub
+        self.sub, self.logger = sub, logger
+        self.logger.info(sub.title.upper())
         # Find all available entries
         self.feed = Feed(self.sub)
         self.jar = history.get_jar(config.paths, self.sub)
         self.combo = Combo(self.feed, self.jar)
         # Find all the ones we want (and don't want)
-        self.wanted = Wanted(self.sub, self.combo)
+        self.wanted = Wanted(self.sub, self.combo, logger)
         self.unwanted = Unwanted(self.jar, self.wanted)
         # Act on the ones we have and those we don't for each category
         for uid in self.unwanted.lst:
-            self.remove(uid)
-        raw_input("Press Enter to continue...")
+            self.remove(uid, self.unwanted.dic[uid])
         self.new_jar = history.Jar(config.paths, self.sub)
-        # is this necessary? doesn't download function check as well?
-        files.check_path(self.sub)
         for uid in self.wanted.lst:
             entry = self.wanted.dic[uid]
             if uid not in self.jar.lst:
@@ -46,35 +44,31 @@ class Channel:
                 self.check(uid, entry, config.args)
             self.new_jar.lst.append(uid)
             self.new_jar.dic[uid] = entry
-            print "Saving jar:  ", self.new_jar.lst
             self.new_jar.save()
         # should any by mistake remain in the old jar (i.e. not have been 
         # either removed or renewed) we add them to the new jar. 
         for uid in self.jar.lst:
             self.check(uid, self.jar.dic[uid], config.args)
-        print 
-        raw_input("Press Enter to continue...")
+        logger.info('')
 
-    def remove(self, uid):
-        title = self.unwanted.dic[uid]['poca_filename']
-        print 'Removing existing file: ', title
-        # remove the entry from the jar list and dictionary
+    def remove(self, uid, entry):
+        self.logger.info(' Removing existing file:  ' + entry['poca_filename'])
+        # first we delete the actual file
+        files.delete_file(entry['poca_abspath'])
+        # then remove the entry from the jar list and dictionary
         self.jar.lst.remove(uid)
-        entry = self.jar.dic.pop(uid)
+        dummy = self.jar.dic.pop(uid)
         self.jar.save()
-        # delete the actual file
-        files.delete_audio_file(entry)
 
     def get(self, uid, entry, args):
         files.download_audio_file(args, entry)
 
     def check(self, uid, entry, args):
-        print 'Checking existing file: ', entry['poca_filename']
+        self.logger.info(' Checking existing file:  ' + entry['poca_filename'])
         if not path.isfile(entry['poca_abspath']):
             self.get(uid, args)
         self.jar.lst.remove(uid)
         dummy = self.jar.dic.pop(uid)
-        
 
 class Feed:
     def __init__(self, sub):
@@ -91,7 +85,7 @@ class Combo:
         self.dic.update(jar.dic)
 
 class Wanted():
-    def __init__(self, sub, combo):
+    def __init__(self, sub, combo, logger):
         self.lst, self.dic = ( [], {} )
         mega = float(1024 * 1024)
         self.max_bytes = int(sub.max_mb) * mega
@@ -108,11 +102,13 @@ class Wanted():
                 entry['poca_filename'] = self.get_filename(entry)
                 entry['poca_abspath'] = path.join(sub.sub_dir, entry['poca_filename'])
                 self.dic[uid] = entry
-                print 'Adding to wanted list: ', entry.title, ' @ ', round(uid_bytes / mega, 2), ' Mb'
+                logger.info(' Adding to wanted list:   ' + entry.title + 
+                    ' @ ' + str(round(uid_bytes / mega, 2)) + ' Mb')
             else:
                 break
-
-        print 'Total size: ', round(self.cur_bytes / mega, 2), ' out of ', round(self.max_bytes / mega, 2), ' Mb'
+        logger.info(' Total size:              ' + 
+            str(round(self.cur_bytes / mega, 2)) + ' / ' + 
+            str(round(self.max_bytes / mega, 2)) + ' Mb')
 
     def get_size(self, entry):
         try:

@@ -22,60 +22,61 @@ import mutagen
 from poco.id3v23_frames import frame_dic
 from poco import output
 
-def delete_audio_file(entry):
-    '''Deletes one file'''
+
+def check_path(check_dir):
+    '''Create a directory'''
+    if os.path.isdir(check_dir):
+        return
     try:
-        os.remove(entry.poca_abspath)
+        os.makedirs(check_dir)
     except OSError:
-        error = 'The file ' + entry.poca_abspath + ' could not be deleted. '
+        error = 'The directory ' + check_dir  + ' could not be created. ' 
+        suggest = ['Please check your configuration and permissions.']
+        #errors.errors(error, suggest, fatal=True, title=sub.title.upper())
+
+def delete_file(filepath):
+    '''Deletes a file'''
+    try:
+        os.remove(filepath)
+    except OSError:
+        error = 'The file ' + filepath + ' could not be deleted. '
         suggest = ['Was poca interrupted during the last run?', \
         'Have you deleted/moved files manually? Or changed permissions?']
         #errors.errors(error, suggest, fatal=False, title=sub_dic['title'].upper())
 
-def progress_download(entry):
-    # get metainformation and open remote and local file, respectively
-    u = urllib2.urlopen(entry['poca_url'])
-    f = open(entry['poca_abspath'], 'w')
-    meta = u.info()
-    mega = 1024*1024.
-    file_size = int(meta.getheaders("Content-Length")[0]) / mega
-    file_size_dl = 0
-    block_sz = 65536
-
-    # download chunks of block_size until there is no more to read
-    while True:
-        buffer = u.read(block_sz)
-        if not buffer:
-            break
-        file_size_dl += len(buffer) / mega
-        f.write(buffer)
-        status = entry['poca_filename'][:36].ljust(40) + "%7.2f Mb  [%3.2f%%]" % \
-            (file_size_dl, file_size_dl * 100. / file_size)
-        status = status + chr(8)*(len(status)+1)
-        print status,
-    f.close()
-    print
-
-def silent_download(entry):
-    '''silent download for cron job operations'''
-    u = urllib2.urlopen(entry['poca_url'])
-    f = open(entry['poca_abspath'], 'w')
-    block_sz = 65536
-    while True:
-        buffer = u.read(block_sz)
-        if not buffer:
-            break
-        f.write(buffer)
-    f.close()
-
 def download_audio_file(args, entry):
     '''Downloads one file'''
-    if args.quiet:
-        #silent_download(entry)
-        basic_download(entry)
-    else:
-        #progress_download(entry)
-        progress_download(entry)
+    check_path(os.path.dirname(entry['poca_abspath']))
+    try:
+        u = urllib2.urlopen(entry['poca_url'])
+        f = open(entry['poca_abspath'], 'w')
+        meta = u.info()
+        mega = 1024*1024.
+        file_size = int(meta.getheaders("Content-Length")[0]) / mega
+        file_size_dl = 0
+        block_sz = 65536
+        # download chunks of block_size until there is no more to read
+        while True:
+            buffer = u.read(block_sz)
+            if not buffer:
+                break
+            file_size_dl += len(buffer) / mega
+            f.write(buffer)
+            if not args.quiet:
+                heading = "Downloading new file:    " + entry['poca_filename']
+                status = heading[0:60].ljust(63) + "%7.2f Mb  [%3.0f%%]" % \
+                    (file_size_dl, file_size_dl * 100. / file_size)
+                status = status + chr(8)*(len(status)+1)
+                print status,
+        f.close()
+        if not args.quiet:
+            print
+    except urllib2.HTTPError, e:
+        # bad url?
+        print e
+    except IOError, e:
+        # bad permissions, bad file path, drive full etc. 
+        print e
 
 def tag_audio_file(sets_dic, entry_dic, sub_dic):
     '''Reintroducing id3 tagging using mutagen'''
@@ -117,18 +118,6 @@ but you have chosen a non-Unicode encoding.'
             suggest = ['Please change either your Unicode preference or \
 your overrides']
             errors.errors(error, suggest)
-            
-
-def check_path(sub):
-    '''Creates one directory'''
-    if os.path.isdir(sub.sub_dir):
-        return
-    try:
-        os.makedirs(sub.sub_dir)
-    except OSError:
-        error = 'The directory ' + sub.sub_dir  + ' could not be created. ' 
-        suggest = ['Please check your configuration and permissions.']
-        #errors.errors(error, suggest, fatal=True, title=sub.title.upper())
             
 def restart(paths_dic, subs_list):
     '''Deletes log file and all created directories'''

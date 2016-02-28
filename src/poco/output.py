@@ -12,7 +12,7 @@
 import logging
 
 
-color_codes = { \
+color_codes = { 
     'reset': '\033[0;0m',
     'bold': '\033[1m',
     'red': '\033[31m',
@@ -35,8 +35,7 @@ def get_logger(config):
     if not config.args.quiet:
         stream_handler = logging.StreamHandler()
         stream_handler.setLevel(logging.INFO)
-        stream_formatter = logging.Formatter(colorize("%(levelname)s: ", 
-            "lred") + "%(message)s")
+        stream_formatter = logging.Formatter("%(message)s")
         stream_handler.setFormatter(stream_formatter)
         logger.addHandler(stream_handler)
     if config.args.log_errors:

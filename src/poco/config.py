@@ -16,6 +16,7 @@ from shutil import copyfile
 from xml.etree import ElementTree 
 
 from poco import VERSION, DESCRIPTION
+from poco import files
 
 
 class Config:
