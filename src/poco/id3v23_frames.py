@@ -1,16 +1,18 @@
-#!/usr/bin/env python2                                                                                                                           
-#                                                                                    
-# Copyright 2010, 2011, 2015 Mads Michelsen (reannual@gmail.com)                     
-#                                                                                    
-# This file is part of Poca.                                                         
-# Poca is free software: you can redistribute it and/or modify it under the terms \  
-# of the GNU General Public License as published by the Free Software Foundation, \  
-# either version 3 of the License, or (at your option) any later version. 
+#!/usr/bin/env python2
+# 
+# Copyright 2010-2015 Mads Michelsen (mail@brokkr.net)
+# 
+# This file is part of Poca.
+# Poca is free software: you can redistribute it and/or modify it 
+# under the terms of the GNU General Public License as published by 
+# the Free Software Foundation, either version 3 of the License, 
+# or (at your option) any later version.
+#
+# Translation taken from http://puddletag.sourceforge.net/source/id3.html
+# Originally licensed under Apache License version 2.0
+
 
 from mutagen import id3
-
-# translation taken from http://puddletag.sourceforge.net/source/id3.html
-# originally licensed under Apache License version 2.0
 
 frame_dic = { \
     "album": id3.TALB,

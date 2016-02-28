@@ -1,22 +1,84 @@
-# Copyright 2010, 2011, 2015 Mads Michelsen (reannual@gmail.com)
+#!/usr/bin/env python2
+# 
+# Copyright 2010-2015 Mads Michelsen (mail@brokkr.net)
 # 
 # This file is part of Poca.
-# Poca is free software: you can redistribute it and/or modify it under the terms \
-# of the GNU General Public License as published by the Free Software Foundation, \
-# either version 3 of the License, or (at your option) any later version.
+# Poca is free software: you can redistribute it and/or modify it 
+# under the terms of the GNU General Public License as published by 
+# the Free Software Foundation, either version 3 of the License, 
+# or (at your option) any later version.
 
-
-import logging
 import urllib2
 from os.path import basename 
 from urlparse import urlparse
 
 import feedparser
 
-from poco import errors
-
+from poco import output
+from poco import history
 
 class Channel:
+    def __init__(self, config, logger, i):
+        '''A class for a single subscription/channel'''
+        #self.update(config)
+        #self.upgrade(logger)
+        self.subscription = config.subs[i]
+        self.old_jar = history.Jar()
+        self.new_jar = history.Jar()
+        self.doc = feedparser.parse(self.subscription.url)
+        #uids = [ entry.id for entry in self.doc.entries ]
+        self.jardic = { entry.id : entry for entry in self.doc.entries }
+        #self.red = [ uid for uid in self.old_jar.red if uid in uids ]
+        #self.yellow = self.old_jar.yellow
+        #self.green = [ uid for uid in uids if uid not in self.red 
+        #    and uid not in self.yellow ]
+        mega = float(1024 * 1024)
+        max_bytes = float(self.subscription.max_mb) * mega
+        current_bytes = 0
+        self.full = False
+
+    def holdover(self):
+        # green
+        while len(uids) > 0:
+            uid = uids.pop(0)
+            entry = [ entry for entry in self.doc.entries if entry.id == uid ][0]
+            entry_bytes = self.get_size(entry)
+            if current_bytes + entry_bytes < max_bytes:
+                #download
+                current_bytes += entry_bytes
+                self.yellow.append(uid)
+                print 'Downloading: ', entry.title
+                print 'Size: ', round(entry_bytes / mega, 2)
+            else:
+                self.red.append(uid)
+                self.red.extend(self.green)
+                self.green = []
+                self.full = True
+                break
+        # yellow
+
+        print 'Total size: ', round(current_bytes / mega, 2)
+        print 'Max allowed size: ', round(max_bytes / mega, 2)
+
+    def get_size(self, entry):
+        try:
+            size = int(entry.enclosures[0]['length'])
+        except KeyError:
+            url = entry.enclosures[0]['href'].encode('ascii')
+            size = int(self.get_file_info(url, 'Content-Length'))
+        return size
+
+    def get_file_info(self, url, info_key):
+        '''Gets stats about the file to be downloaded, such as file size'''
+        f = urllib2.urlopen(url)
+        value = f.info()[info_key]
+        f.close()
+        return value
+        
+            
+        
+
+class oldChannel:
     def __init__(self, sub_dic, sub_log):
         '''A class for a single subscription/channel. It will parse the feed, \
         and create and maintain a data structure to be used for determining \
@@ -32,6 +94,9 @@ class Channel:
             self.updated = sub_log['updated']
             if sub_log['max_mb'] != int(sub_dic['max_mb']):
                 self.reconfigure = True
+        print self.entries
+        print self.entry_db
+
 
     def parse_feed(self):
         '''Uses Mark Pilgrims feedparser module to download and parse. If the \
@@ -143,12 +208,3 @@ class Channel:
         f.close()
         return filename
 
-    def _get_file_info(self, entry_dic, info_key):
-        '''Gets stats about the file to be downloaded, such as file size'''
-        f = urllib2.urlopen(entry_dic['url'])
-        value = f.info()[info_key]
-        f.close()
-        return value
-        
-            
-        

@@ -1,13 +1,21 @@
-# Copyright 2010, 2011, 2015 Mads Michelsen (reannual@gmail.com)
+#!/usr/bin/env python2
+# 
+# Copyright 2010-2015 Mads Michelsen (mail@brokkr.net)
 # 
 # This file is part of Poca.
-# Poca is free software: you can redistribute it and/or modify it under the terms \
-# of the GNU General Public License as published by the Free Software Foundation, \
-# either version 3 of the License, or (at your option) any later version.
+# Poca is free software: you can redistribute it and/or modify it 
+# under the terms of the GNU General Public License as published by 
+# the Free Software Foundation, either version 3 of the License, 
+# or (at your option) any later version.
 
 
 import shelve
+import pickle
 
+class Jar:
+    def __init__(self):
+        self.yellow = []
+        self.red = []
 
 def retrieve(paths_dic, sub_dic):
     '''Retrieves the saved entries for the subscription in question'''
@@ -25,3 +33,6 @@ def save(paths_dic, sub_dic, new_log):
     log[sub_dic['title']] = new_log
     log.close()
 
+class Log:
+    def __init__(self):
+        pass
