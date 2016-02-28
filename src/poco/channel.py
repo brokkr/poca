@@ -8,6 +8,7 @@
 # the Free Software Foundation, either version 3 of the License, 
 # or (at your option) any later version.
 
+import time
 import urllib2
 from os import path
 from urlparse import urlparse
@@ -23,10 +24,9 @@ class Channel:
     def __init__(self, config, logger, sub):
         '''A class for a single subscription/channel'''
         self.sub = sub
-        db_filename = path.join(config.paths.db_dir , self.sub.title)
         # Find all available entries
         self.feed = Feed(self.sub)
-        self.jar = history.get_jar(db_filename)
+        self.jar = history.get_jar(config.paths, self.sub)
         self.combo = Combo(self.feed, self.jar)
         # Find all the ones we want (and don't want)
         self.wanted = Wanted(self.sub, self.combo)
@@ -34,30 +34,46 @@ class Channel:
         # Act on the ones we have and those we don't for each category
         for uid in self.unwanted.lst:
             self.remove(uid)
-        self.new_jar = history.Jar(db_filename)
+        raw_input("Press Enter to continue...")
+        self.new_jar = history.Jar(config.paths, self.sub)
         files.check_path(self.sub)
         for uid in self.wanted.lst:
+            entry = self.wanted.dic[uid]
             if uid not in self.jar.lst:
-                self.get(config.args, uid)
+                self.get(uid, entry, config.args)
             else:
-                self.check(uid)
+                self.check(uid, entry, config.args)
+            self.new_jar.lst.append(uid)
+            self.new_jar.dic[uid] = entry
+            print "Saving jar:  ", self.new_jar.lst
+            self.new_jar.save()
+        # should any by mistake remain in the old jar (i.e. not have been 
+        # either removed or renewed) we add them to the new jar. 
+        for uid in self.jar.lst:
+            self.check(uid, self.jar.dic[uid], config.args)
+        print 
+        raw_input("Press Enter to continue...")
 
     def remove(self, uid):
-        print 'removing ', uid
-        entry = self.unwanted.dic[uid]
+        title = self.unwanted.dic[uid]['poca_filename']
+        print 'Removing existing file: ', title
+        # remove the entry from the jar list and dictionary
+        self.jar.lst.remove(uid)
+        entry = self.jar.dic.pop(uid)
+        self.jar.save()
+        # delete the actual file
         files.delete_audio_file(entry)
-        #consider removing it from self.jar at this stage and updating the file
 
-    def get(self, args, uid):
-        entry = self.wanted.dic[uid]
+    def get(self, uid, entry, args):
         files.download_audio_file(args, entry)
-        self.new_jar.lst.append(uid)
-        self.new_jar.dic[uid] = entry
-        self.new_jar.save()
 
-    def check(self, uid):
-        title = self.wanted.dic[uid]['poca_filename']
-        print 'Checking existing file: ', title
+    def check(self, uid, entry, args):
+        print 'Checking existing file: ', entry['poca_filename']
+        if not path.isfile(entry['poca_abspath']):
+            self.get(uid, args)
+        self.jar.lst.remove(uid)
+        dummy = self.jar.dic.pop(uid)
+        
 
 class Feed:
     def __init__(self, sub):
@@ -116,8 +132,10 @@ class Wanted():
         return value
 
     def get_filename(self, entry):
-        '''why is this a function of its own?'''
-        return path.basename(entry['poca_url'])
+        '''Parses URL to find base filename'''
+        parsed_url = urlparse(entry['poca_url'])
+        filename = path.basename(parsed_url.path)
+        return filename
 
 class Unwanted:
     def __init__(self, jar, wanted):

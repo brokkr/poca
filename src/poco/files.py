@@ -56,7 +56,8 @@ def progress_download(entry):
 
     # close file and print a newline
     f.close()
-    print '\n'
+    #print '\n'
+    print
 
 def silent_download(entry):
     '''silent download for cron job operations'''
