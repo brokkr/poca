@@ -11,37 +11,6 @@
 import poco 
 
 
-def main(paths_dic, args_ns, sets_dic, subs_list):
-    '''Loops through the subscriptions, updating each in turn'''
-    for i, sub_dic in enumerate(subs_list):
-
-        sub_log = poco.history.retrieve(paths_dic, sub_dic)
-
-        poco.output.print_heading(args_ns, sub_dic, i)
-        channel = poco.Channel(sub_dic, sub_log)
-        if not channel.parse_feed() and not channel.reconfigure:
-            poco.output.print_no_news_is_good_news(args_ns)
-            continue
-        channel.find_new()
-        channel.find_old()
-        if not channel.entries['green'] and not channel.reconfigure:
-            poco.output.print_no_news_is_good_news(args_ns)
-            continue
-        channel.analyze_for_size()
-        channel.create_change_lists()
-        poco.output.print_stats(args_ns, sub_dic, channel.entries)
-
-        poco.files.check_path(sub_dic)
-        for entry in channel.entries['grapefruits']:
-            entry_dic = channel.entry_db[entry]
-            poco.files.delete_audio_file(entry_dic, sub_dic)
-        for entry in channel.entries['pomelos']:
-            entry_dic = channel.entry_db[entry]
-            poco.files.download_audio_file(entry_dic, sub_dic, args_ns)
-            poco.files.tag_audio_file(sets_dic, entry_dic, sub_dic)
-
-        poco.history.save(paths_dic, sub_dic, channel.new_history_dic())
-
 if __name__ == '__main__':
     try:
         config = poco.config.Config()

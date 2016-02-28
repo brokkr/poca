@@ -53,10 +53,7 @@ def progress_download(entry):
             (file_size_dl, file_size_dl * 100. / file_size)
         status = status + chr(8)*(len(status)+1)
         print status,
-
-    # close file and print a newline
     f.close()
-    #print '\n'
     print
 
 def silent_download(entry):
@@ -70,9 +67,6 @@ def silent_download(entry):
             break
         f.write(buffer)
     f.close()
-
-def basic_download(entry):
-    urllib.urlretrieve(entry['poca_url'], entry['poca_abspath'])
 
 def download_audio_file(args, entry):
     '''Downloads one file'''

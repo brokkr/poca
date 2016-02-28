@@ -9,7 +9,7 @@
 # or (at your option) any later version.
 
 
-VERSION = "0.3alpha"
+VERSION = "0.3alpha1"
 MAINTAINER = "Mads Michelsen <mail@brokkr.net>"
 DESCRIPTION = ("A cron-friendly, disk-space-conscious, command line podcast "
 "aggregator, written in Python")
