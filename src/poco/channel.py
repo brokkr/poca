@@ -33,11 +33,13 @@ class Channel:
 
         for uid in list(set(self.jar.lst) - set(self.wanted.lst)):
             self.remove(uid, self.jar.dic[uid])
+            # insert return value to see if removal was successful
         self.new_jar = history.Jar(config.paths, self.sub)
         for uid in self.wanted.lst:
             entry = self.wanted.dic[uid]
+            # insert return value to see if download/check was successful
             if uid not in self.jar.lst:
-                self.get(uid, entry, config.args)
+                files.download_audio_file(config.args, entry)
             else:
                 self.check(uid, entry, config.args)
             self.new_jar.lst.append(uid)
@@ -56,20 +58,17 @@ class Channel:
         self.jar.lst.remove(uid)
         dummy = self.jar.dic.pop(uid)
         self.jar.save()
-
-    def get(self, uid, entry, args):
-        '''Calls the download function with args so it'll know whether to 
-        display a progress meter or do a silent download'''
-        files.download_audio_file(args, entry)
+        # return something something
 
     def check(self, uid, entry, args):
         '''Performs a quick check-up on existing keeper-files and removes 
         the entry from the old jar'''
         self.logger.info(' Checking existing file:  ' + entry['poca_filename'])
         if not path.isfile(entry['poca_abspath']):
-            self.get(uid, self.wanted.dic[uid], args)
+            files.download_audio_file(args, entry)
         self.jar.lst.remove(uid)
         dummy = self.jar.dic.pop(uid)
+        # return something something
 
 class Feed:
     def __init__(self, sub):

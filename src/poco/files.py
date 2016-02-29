@@ -43,6 +43,7 @@ def delete_file(filepath):
         suggest = ['Was poca interrupted during the last run?', \
         'Have you deleted/moved files manually? Or changed permissions?']
         #errors.errors(error, suggest, fatal=False, title=sub_dic['title'].upper())
+    # return something something
 
 def download_audio_file(args, entry):
     '''Downloads one file'''
@@ -73,10 +74,12 @@ def download_audio_file(args, entry):
             print
     except urllib2.HTTPError, e:
         # bad url?
+        # use logger
         print "HTTPError: ", e
     except IOError, e:
         # bad permissions, bad file path, drive full etc. 
         print "IOError: ", e
+    # return something something
 
 def tag_audio_file(sets_dic, entry_dic, sub_dic):
     '''Reintroducing id3 tagging using mutagen'''
