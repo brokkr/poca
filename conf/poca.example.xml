@@ -1,57 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <poca version="0.3alpha">
 
-	<settings>
-		<base_dir>/home/user/poca</base_dir>
+    <settings>
+        <base_dir>/home/user/poca</base_dir>
         <id3version>2.3</id3version>
         <id3unicode>yes</id3unicode>
         <id3removev1>yes</id3removev1>
-	</settings>
-	
-	
-	<subscriptions>
-        <!-- some podcasts included to exemplify subscription configuration -->
-	
-		<subscription>
-            <!-- the meaning of the subscription options are as follows:
-                 * title: the name used for the folder of the subscription
-                 * url: the address of the rss feed
-                 * max_mb: the maximum disk space (in Mb) availlable to the \
-                   subscription. Any more than this will not be downloaded / be
-                   deleted.
-            -->
-			<title>6 minutes vocabulary</title>
-			<url>http://www.bbc.co.uk/programmes/p02pc9xz/episodes/downloads.rss</url>
-			<max_mb>20</max_mb>
-			<metadata>
-                <!-- these settings will be used to overwrite the mp3 file's
-                     id3 metadata. the available metadata tags can be found @
-                     http://puddletag.sourceforge.net/source/id3.html#text-frames
-                -->
-				<artist>BBC</artist>
-				<album>6 min vocab</album>
-				<genre>podcast</genre>
-			</metadata>
-		</subscription>
-	
-		<subscription>
-			<title>francais facile</title>
-			<url>http://www.rfi.fr/radiofr/podcast/journalFrancaisFacile.xml</url>
-			<max_mb>20</max_mb>
-			<metadata>
-				<album>Journal en français facile</album>
-				<genre>podcast</genre>
-			</metadata>
-		</subscription>
-	
-		<subscription>
-			<title>radioavisen</title>
-			<url>http://podcast.dr.dk/p1/rssfeed/radioavisen.xml</url>
-			<max_mb>30</max_mb>
-		</subscription>
-	
-	</subscriptions>
+    </settings>
 
+    <subscriptions>
+    <!-- some podcasts included to exemplify subscription configuration -->
+
+        <subscription>
+        <!-- the meaning of the subscription options are as follows:
+        * title: the name used for the folder of the subscription
+        * url: the address of the rss feed
+        * max_mb: the maximum disk space (in Mb) availlable to the \
+        subscription. Any more than this will not be downloaded / be
+        deleted.
+        -->
+            <title>6 minutes vocabulary</title>
+            <url>http://www.bbc.co.uk/programmes/p02pc9xz/episodes/downloads.rss</url>
+            <max_mb>20</max_mb>
+            <metadata>
+            <!-- these settings will be used to overwrite the mp3 file's
+            id3 metadata. the metadata tag and all subtags are optional. 
+            the available metadata tags can be found @
+            http://puddletag.sourceforge.net/source/id3.html#text-frames
+            -->
+                <artist>BBC</artist>
+                <album>6 min vocab</album>
+                <genre>podcast</genre>
+            </metadata>
+        </subscription>
+
+        <subscription>
+            <title>francais facile</title>
+            <url>http://www.rfi.fr/radiofr/podcast/journalFrancaisFacile.xml</url>
+            <max_mb>20</max_mb>
+            <metadata>
+                <album>Journal en français facile</album>
+                <genre>podcast</genre>
+            </metadata>
+        </subscription>
+
+        <subscription>
+            <title>radioavisen</title>
+            <url>http://podcast.dr.dk/p1/rssfeed/radioavisen.xml</url>
+            <max_mb>30</max_mb>
+        </subscription>
+
+    </subscriptions>
 
 </poca>
 
