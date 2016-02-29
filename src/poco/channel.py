@@ -99,15 +99,14 @@ class Wanted():
 
         for uid in combo.lst:
             entry = combo.dic[uid]
-            uid_bytes = self.get_size(entry)
-            if self.cur_bytes + uid_bytes < self.max_bytes:
-                self.cur_bytes += uid_bytes
+            entry['poca_url'] = entry.enclosures[0]['href']
+            entry['poca_size'] = self.get_size(entry)
+            entry['poca_filename'] = self.get_filename(entry)
+            entry['poca_abspath'] = path.join(sub.sub_dir, 
+                entry['poca_filename'])
+            if self.cur_bytes + entry['poca_size'] < self.max_bytes:
+                self.cur_bytes += entry['poca_size']
                 self.lst.append(uid)
-                entry['poca_url'] = entry.enclosures[0]['href']
-                entry['poca_size'] = uid_bytes
-                entry['poca_filename'] = self.get_filename(entry)
-                entry['poca_abspath'] = path.join(sub.sub_dir, 
-                    entry['poca_filename'])
                 self.dic[uid] = entry
                 logger.info(' Adding to wanted list:   ' + entry.title + 
                     ' @ ' + str(round(uid_bytes / mega, 2)) + ' Mb')
@@ -123,19 +122,13 @@ class Wanted():
         try:
             size = int(entry.enclosures[0]['length'])
         except KeyError:
-            if entry.has_key('poca_size'):
-                size = entry['poca_size']
-            else:
-                # why are we encoding the url as ascii? a requirement 
-                # of urllib? Also we already have extracted the url to
-                # 'poca_url'?
-                url = entry.enclosures[0]['href'].encode('ascii')
-                size = int(self.get_file_info(url, 'Content-Length'))
+            size = int(self.get_file_info(entry['poca_url'], 'Content-Length'))
         return size
 
     def get_file_info(self, url, info_key):
         '''Gets stats about the file to be downloaded, such as file size'''
-        # could we use a 'with' statement here instead?
+        # Maybe integrte into get_size seeing as it's the only one to make 
+        # use of it? what other file info can we imagine having a use for?
         f = urllib2.urlopen(url)
         value = f.info()[info_key]
         f.close()
