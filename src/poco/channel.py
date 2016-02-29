@@ -32,43 +32,60 @@ class Channel:
         self.wanted = Wanted(self.sub, self.combo, logger)
 
         for uid in list(set(self.jar.lst) - set(self.wanted.lst)):
-            self.remove(uid, self.jar.dic[uid])
-            # insert return value to see if removal was successful
+            outcome = self.remove(uid, self.jar.dic[uid])
         self.new_jar = history.Jar(config.paths, self.sub)
         for uid in self.wanted.lst:
             entry = self.wanted.dic[uid]
-            # insert return value to see if download/check was successful
             if uid not in self.jar.lst:
-                files.download_audio_file(config.args, entry)
+                outcome = files.download_audio_file(config.args, entry)
             else:
-                self.check(uid, entry, config.args)
-            self.new_jar.lst.append(uid)
-            self.new_jar.dic[uid] = entry
-            self.new_jar.save()
+                outcome = self.check(uid, entry, config.args)
+            if outcome.success:
+                self.new_jar.lst.append(uid)
+                self.new_jar.dic[uid] = entry
+                self.new_jar.save()
+            else:
+                logger.info(' Something went wrong. Entry has been skipped')
         # should any - by mistake - remain in the old jar (i.e. not have been 
-        # either removed or renewed) we add them to the new jar. 
+        # either removed or renewed) we dispense with them.
         for uid in self.jar.lst:
-            self.check(uid, self.jar.dic[uid], config.args)
+            entry = self.jar.dic[uid]
+            outcome = self.remove(uid, entry, config.args)
+            logger.info(' Entry ' + entry.title + 'appears to have fallen ' +
+                'through the cracks. This should not happen. Entry has been ' +
+                'deleted. If this happens repeatedly, please consider ' +
+                'tipping off the developer.')
         logger.info('')
 
     def remove(self, uid, entry):
         '''Deletes the file and removes the entry from the old jar'''
-        self.logger.info(' Removing existing file:  ' + entry['poca_filename'])
-        files.delete_file(entry['poca_abspath'])
+        msg = (' Removing existing file:  ' + entry['poca_filename'])[0:60]
+        msg = (msg + ' ').ljust(63, '.') + ' '
+        outcome = files.delete_file(entry['poca_abspath'])
+        if outcome.success:
+            msg = msg + 'OK'
+        else:
+            msg = msg + 'FILE NOT FOUND. Please check manually.'
+        self.logger.info(msg)
         self.jar.lst.remove(uid)
         dummy = self.jar.dic.pop(uid)
         self.jar.save()
-        # return something something
+        return outcome
 
     def check(self, uid, entry, args):
         '''Performs a quick check-up on existing keeper-files and removes 
         the entry from the old jar'''
-        self.logger.info(' Checking existing file:  ' + entry['poca_filename'])
-        if not path.isfile(entry['poca_abspath']):
-            files.download_audio_file(args, entry)
+        msg = (' Checking existing file:  ' + entry['poca_filename'])[0:60]
+        msg = (msg + ' ').ljust(63, '.') + ' '
+        if path.isfile(entry['poca_abspath']):
+            self.logger.info(msg + 'OK')
+            outcome = output.Outcome(True, 'file ok')
+        else:
+            self.logger.info(msg + 'FILE NOT FOUND. Attempting download.')
+            outcome = files.download_audio_file(args, entry)
         self.jar.lst.remove(uid)
         dummy = self.jar.dic.pop(uid)
-        # return something something
+        return outcome
 
 class Feed:
     def __init__(self, sub):
@@ -93,7 +110,7 @@ class Wanted():
         '''Constructs a container for all the entries we have room for, 
         regardless of where they are, internet or local folder.'''
         self.lst, self.dic = ( [], {} )
-        mega = float(1024 * 1024)
+        mega = 1048576.0
         self.max_bytes = int(sub.max_mb) * mega
         self.cur_bytes = 0
 
@@ -101,6 +118,7 @@ class Wanted():
             entry = combo.dic[uid]
             entry['poca_url'] = entry.enclosures[0]['href']
             entry['poca_size'] = self.get_size(entry)
+            entry['poca_mb'] = str(round(entry.poca_size / mega, 2)) + ' Mb'
             entry['poca_filename'] = self.get_filename(entry)
             entry['poca_abspath'] = path.join(sub.sub_dir, 
                 entry['poca_filename'])
@@ -108,13 +126,15 @@ class Wanted():
                 self.cur_bytes += entry.poca_size
                 self.lst.append(uid)
                 self.dic[uid] = entry
-                logger.info(' Adding to wanted list:   ' + entry.title + 
-                    ' @ ' + str(round(entry.poca_size / mega, 2)) + ' Mb')
+                msg = (' Adding to wanted list:   ' + entry.title)[0:60] + ' '
+                msg = msg.ljust(63, '.') + ' ' + entry['poca_mb']
+                logger.info(msg)
             else:
                 break
-        logger.info(' Total size:              ' + 
-            str(round(self.cur_bytes / mega, 2)) + ' / ' + 
-            str(round(self.max_bytes / mega, 2)) + ' Mb')
+        total_mb = str(round(self.cur_bytes / mega, 2)) + ' Mb'
+        logger.info(' Total size: '.ljust(63, '.') + ' ' + total_mb)
+        max_mb = str(round(self.max_bytes / mega, 2)) + ' Mb'
+        logger.info(' Allotted space: '.ljust(63, '.') + ' ' + max_mb + '\n')
 
     def get_size(self, entry):
         '''Returns the entrys size in bytes. Tries to get if off of the

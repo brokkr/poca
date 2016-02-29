@@ -26,24 +26,20 @@ from poco import output
 def check_path(check_dir):
     '''Create a directory'''
     if os.path.isdir(check_dir):
-        return
+        return output.Outcome(True, 'Directory exists already')
     try:
         os.makedirs(check_dir)
-    except OSError:
-        error = 'The directory ' + check_dir  + ' could not be created. ' 
-        suggest = ['Please check your configuration and permissions.']
-        #errors.errors(error, suggest, fatal=True, title=sub.title.upper())
+        return output.Outcome(True, 'Directory was successfully created')
+    except OSError, e:
+        return output.Outcome(False, e)
 
 def delete_file(filepath):
     '''Deletes a file'''
     try:
         os.remove(filepath)
+        return output.Outcome(True, 'File was successfully deleted')
     except OSError:
-        error = 'The file ' + filepath + ' could not be deleted. '
-        suggest = ['Was poca interrupted during the last run?', \
-        'Have you deleted/moved files manually? Or changed permissions?']
-        #errors.errors(error, suggest, fatal=False, title=sub_dic['title'].upper())
-    # return something something
+        return output.Outcome(False, e)
 
 def download_audio_file(args, entry):
     '''Downloads one file'''
@@ -52,34 +48,31 @@ def download_audio_file(args, entry):
         u = urllib2.urlopen(entry['poca_url'])
         f = open(entry['poca_abspath'], 'w')
         meta = u.info()
-        mega = 1024*1024.
+        mega = 1048576.0
         file_size = int(meta.getheaders("Content-Length")[0]) / mega
-        file_size_dl = 0
+        fsize_dl = 0
         block_sz = 65536
         # download chunks of block_size until there is no more to read
         while True:
             buffer = u.read(block_sz)
             if not buffer:
                 break
-            file_size_dl += len(buffer) / mega
+            fsize_dl += len(buffer) / mega
             f.write(buffer)
             if not args.quiet:
                 heading = "Downloading new file:    " + entry['poca_filename']
-                status = heading[0:60].ljust(63) + "%7.2f Mb  [%3.0f%%]" % \
-                    (file_size_dl, file_size_dl * 100. / file_size)
+                status = (heading[0:59] + ' ').ljust(62,'.') + ("%7.2f Mb "
+                    "[%3.0f%%]") % (fsize_dl, fsize_dl * 100. / file_size)
                 status = status + chr(8)*(len(status)+1)
                 print status,
         f.close()
         if not args.quiet:
             print
+        return output.Outcome(True, 'File was successfully downloaded')
     except urllib2.HTTPError, e:
-        # bad url?
-        # use logger
-        print "HTTPError: ", e
+        return output.Outcome(False, "HTTPError: " + e)
     except IOError, e:
-        # bad permissions, bad file path, drive full etc. 
-        print "IOError: ", e
-    # return something something
+        return output.Outcome(False, "IOError: " + e)
 
 def tag_audio_file(sets_dic, entry_dic, sub_dic):
     '''Reintroducing id3 tagging using mutagen'''
@@ -93,7 +86,7 @@ def tag_audio_file(sets_dic, entry_dic, sub_dic):
         id3encoding_dic = {3: 1, 4: 3}
         id3encoding = id3encoding_dic[id3version]
     # overwrite metadata in the present file 
-    localfile = _get_path(entry_dic, sub_dic)
+    localfile = os.path.join(sub_dic['sub_dir'], entry_dic['filename'])
     file_extension = os.path.splitext(localfile)[1].lower()
     if file_extension != '.mp3':
         return
@@ -143,8 +136,4 @@ def restart(paths_dic, subs_list):
         return True
     except OSError:
         return False
-
-def _get_path(entry_dic, sub_dic):
-    '''Joins a directory with a filename to return one complete file path'''
-    return os.path.join(sub_dic['sub_dir'], entry_dic['filename'])
 

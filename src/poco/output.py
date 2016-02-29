@@ -24,6 +24,11 @@ color_codes = {
     'lblue': '\033[1;34m'
     }
 
+class Outcome:
+    def __init__(self, success, msg = ''):
+        self.success = success
+        self.msg = msg
+
 def colorize(_string, color):
     return color_codes[color] + str(_string) + color_codes['reset']
 
