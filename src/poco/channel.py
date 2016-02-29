@@ -104,12 +104,12 @@ class Wanted():
             entry['poca_filename'] = self.get_filename(entry)
             entry['poca_abspath'] = path.join(sub.sub_dir, 
                 entry['poca_filename'])
-            if self.cur_bytes + entry['poca_size'] < self.max_bytes:
-                self.cur_bytes += entry['poca_size']
+            if self.cur_bytes + entry.poca_size < self.max_bytes:
+                self.cur_bytes += entry.poca_size
                 self.lst.append(uid)
                 self.dic[uid] = entry
                 logger.info(' Adding to wanted list:   ' + entry.title + 
-                    ' @ ' + str(round(uid_bytes / mega, 2)) + ' Mb')
+                    ' @ ' + str(round(entry.poca_size / mega, 2)) + ' Mb')
             else:
                 break
         logger.info(' Total size:              ' + 
@@ -122,17 +122,10 @@ class Wanted():
         try:
             size = int(entry.enclosures[0]['length'])
         except KeyError:
-            size = int(self.get_file_info(entry['poca_url'], 'Content-Length'))
+            f = urllib2.urlopen(entry['poca_url'])
+            size = int(f.info()['Content-Length'])
+            f.close()
         return size
-
-    def get_file_info(self, url, info_key):
-        '''Gets stats about the file to be downloaded, such as file size'''
-        # Maybe integrte into get_size seeing as it's the only one to make 
-        # use of it? what other file info can we imagine having a use for?
-        f = urllib2.urlopen(url)
-        value = f.info()[info_key]
-        f.close()
-        return value
 
     def get_filename(self, entry):
         '''Parses URL to find base filename. To be expanded with naming
