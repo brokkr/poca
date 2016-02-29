@@ -33,7 +33,8 @@ class Channel:
         self.wanted = Wanted(self.sub, self.combo, logger)
         #self.unwanted = Unwanted(self.jar, self.wanted)
 
-        for uid in [ uid for uid in jar.lst if uid not in wanted.lst ]:
+        #for uid in list(set(self.jar.lst) - set(self.wanted.lst)):
+        for uid in [ uid for uid in self.jar.lst if uid not in self.wanted.lst ]:
             self.remove(uid, self.jar.dic[uid])
         #for uid in self.unwanted.lst:
         #    self.remove(uid, self.unwanted.dic[uid])
