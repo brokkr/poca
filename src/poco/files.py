@@ -73,10 +73,10 @@ def download_audio_file(args, entry):
             print
     except urllib2.HTTPError, e:
         # bad url?
-        print e
+        print "HTTPError: ", e
     except IOError, e:
         # bad permissions, bad file path, drive full etc. 
-        print e
+        print "IOError: ", e
 
 def tag_audio_file(sets_dic, entry_dic, sub_dic):
     '''Reintroducing id3 tagging using mutagen'''

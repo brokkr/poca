@@ -16,7 +16,8 @@ functionality have been put on hold.
    out entirely.
  * 0.8:  Support for .ogg and other formats
  * 0.9:  Subscription editing via the command line. Default suggestions (i.e.
-   title) are presented to user. Possible [search engine addition](http://stackoverflow.com/questions/3201052/podcast-search-api).
+   title) are presented to user. Possible [search engine addition]
+   (http://stackoverflow.com/questions/3201052/podcast-search-api).
 
 ##Poca
 Poca is a command line podcast client, written in Python. 

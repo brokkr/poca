@@ -8,7 +8,6 @@
 # the Free Software Foundation, either version 3 of the License, 
 # or (at your option) any later version.
 
-import time
 import urllib2
 from os import path
 from urlparse import urlparse
@@ -31,13 +30,9 @@ class Channel:
         self.jar = history.get_jar(config.paths, self.sub)
         self.combo = Combo(self.feed, self.jar)
         self.wanted = Wanted(self.sub, self.combo, logger)
-        #self.unwanted = Unwanted(self.jar, self.wanted)
 
-        #for uid in list(set(self.jar.lst) - set(self.wanted.lst)):
-        for uid in [ uid for uid in self.jar.lst if uid not in self.wanted.lst ]:
+        for uid in list(set(self.jar.lst) - set(self.wanted.lst)):
             self.remove(uid, self.jar.dic[uid])
-        #for uid in self.unwanted.lst:
-        #    self.remove(uid, self.unwanted.dic[uid])
         self.new_jar = history.Jar(config.paths, self.sub)
         for uid in self.wanted.lst:
             entry = self.wanted.dic[uid]
@@ -72,7 +67,7 @@ class Channel:
         the entry from the old jar'''
         self.logger.info(' Checking existing file:  ' + entry['poca_filename'])
         if not path.isfile(entry['poca_abspath']):
-            self.get(uid, args)
+            self.get(uid, self.wanted.dic[uid], args)
         self.jar.lst.remove(uid)
         dummy = self.jar.dic.pop(uid)
 
@@ -153,10 +148,4 @@ class Wanted():
         parsed_url = urlparse(entry['poca_url'])
         filename = path.basename(parsed_url.path)
         return filename
-
-class Unwanted:
-    def __init__(self, jar, wanted):
-        '''Constructs a container for entries to be purged'''
-        self.lst = [ uid for uid in jar.lst if uid not in wanted.lst ]
-        self.dic = { uid : jar.dic[uid] for uid in self.lst }
 

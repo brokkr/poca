@@ -1,4 +1,4 @@
-# Copyright 2010, 2011 Mads Michelsen (madchine@gmail.com)
+# Copyright 2010, 2011, 2016 Mads Michelsen (mail@brokkr.net)
 # 
 # This file is part of Poca.
 # Poca is free software: you can redistribute it and/or modify it under the terms \
@@ -9,17 +9,19 @@ from distutils.core import setup
 
 setup(\
 name='poca', \
-version='0.1.9', \
+version='0.3alpha2', \
 license='GPL3', \
 description='a command line podcast client', \
-long_description='A cron-friendly, disk-space-conscious, command line podcast aggregator, written in Python', \
+long_description='A cron-friendly, disk-space-conscious, command line 
+    podcast aggregator, written in Python', \
 author='Mads Michelsen', \
-author_email='reannual@gmail.com', \
+author_email='mail@brokkr.net', \
 url='https://github.com/brokkr/poca', \
 scripts=['src/poca'], \
 packages=['poco'], \
 package_dir={'poco': 'src/poco'}, \
-data_files=[('share/man/man1', ["man/poca.1"]), ('/etc', ["conf/poca.example.xml"])], \
+data_files=[('share/man/man1', ["man/poca.1"]), 
+    ('/etc', ["conf/poca.example.xml"])], \
 requires=['feedparser', 'requests'], \
 provides=['poco'], \
 platforms=['POSIX'], \
@@ -32,5 +34,4 @@ classifiers=['Development Status :: 4 - Beta', \
 'Programming Language :: Python :: 2.7', \
 'Topic :: Internet'] \
 )
-
 

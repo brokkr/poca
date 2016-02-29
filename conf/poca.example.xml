@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<poca version="0.2">
+<poca version="0.3alpha">
 
 	<settings>
-		<base_directory>/home/user/poca</base_directory>
-        <metadata>
-        <!-- the following values are possible:
-        * id3version: 2.3, 2.4
-        * unicode: yes (use utf16 encoding with 2.3, utf8 encoding with 2.4), 
-          no (use latin1 encoding)
-        * removeid3v1: yes, no
-        -->
-            <id3version>2.3</id3version>
-            <unicode>yes</unicode>
-            <removeid3v1>yes</removeid3v1>
-        </metadata>
+		<base_dir>/home/user/poca</base_dir>
+        <id3version>2.3</id3version>
+        <id3unicode>yes</id3unicode>
+        <id3removev1>yes</id3removev1>
 	</settings>
 	
 	
