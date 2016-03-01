@@ -12,29 +12,21 @@
 import logging
 
 
-color_codes = { 
-    'reset': '\033[0;0m',
-    'bold': '\033[1m',
-    'red': '\033[31m',
-    'green': '\033[32m',
-    'blue': '\033[34m',
-    'lred': '\033[1;31m',
-    'lgreen': '\033[1;32m',
-    'yellow': '\033[1;33m',
-    'lblue': '\033[1;34m'
-    }
-
 class Outcome:
     def __init__(self, success, msg = ''):
         self.success = success
         self.msg = msg
 
-class Out:
+class Output:
     def __init__(self, args):
         self.log = get_logger(args)
 
     def single(self, msg):
         self.log.info(msg)
+
+    def multi(self, msg):
+        for line in msg:
+            self.log.info(line)
 
     def cols(self, msg1, msg2):
         msg = (msg1[0:60] + ' ').ljust(63, '.') + ' ' + msg2
@@ -42,9 +34,6 @@ class Out:
 
     def head(self, msg):
         self.log.info(msg.upper())
-
-def colorize(_string, color):
-    return color_codes[color] + str(_string) + color_codes['reset']
 
 def get_logger(args):
     logger = logging.getLogger('POCA')
@@ -66,4 +55,17 @@ def get_logger(args):
         logger.addHandler(file_handler)
     return logger
 
+def colorize(_string, color):
+    color_codes = { 
+        'reset': '\033[0;0m',
+        'bold': '\033[1m',
+        'red': '\033[31m',
+        'green': '\033[32m',
+        'blue': '\033[34m',
+        'lred': '\033[1;31m',
+        'lgreen': '\033[1;32m',
+        'yellow': '\033[1;33m',
+        'lblue': '\033[1;34m'
+        }
+    return color_codes[color] + str(_string) + color_codes['reset']
 

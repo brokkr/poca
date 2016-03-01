@@ -17,10 +17,11 @@ URL = "https://github.com/brokkr/poca"
 
 
 import args
+import output
 import channel
 import config
 import files
 import id3v23_frames
 import history
-import output
+import xmlconf
 

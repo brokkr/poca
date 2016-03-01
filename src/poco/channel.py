@@ -20,16 +20,16 @@ from poco import files
 
 
 class Channel:
-    def __init__(self, config, out, sub):
+    def __init__(self, config, output, sub):
         '''A class for a single subscription/channel. Creates the containers
         first, then acts on them and updates the db as it goes.'''
-        self.sub, self.out = sub, out
-        self.out.head(sub.title)
+        self.sub, self.output = sub, output
+        self.output.head(sub.title)
 
         self.feed = Feed(self.sub)
         self.jar = history.get_jar(config.paths, self.sub)
         self.combo = Combo(self.feed, self.jar)
-        self.wanted = Wanted(self.sub, self.combo, out)
+        self.wanted = Wanted(self.sub, self.combo, output)
 
         for uid in list(set(self.jar.lst) - set(self.wanted.lst)):
             outcome = self.remove(uid, self.jar.dic[uid])
@@ -43,31 +43,31 @@ class Channel:
             if outcome.success:
                 self.new_jar.lst.append(uid)
                 self.new_jar.dic[uid] = entry
-                self.new_jar.save()
+                outcome = self.new_jar.save()
             else:
-                self.out.single(' Something went wrong. Entry has been skipped')
+                self.output.single(' Something went wrong. Entry has been skipped')
         # should any - by mistake - remain in the old jar (i.e. not have been 
         # either removed or renewed) we dispense with them.
         for uid in self.jar.lst:
             entry = self.jar.dic[uid]
             outcome = self.remove(uid, entry, config.args)
-            self.out.single(' Entry ' + entry.title + 'appears to have fallen ' +
+            self.output.single(' Entry ' + entry.title + 'appears to have fallen ' +
                 'through the cracks. This should not happen. Entry has been ' +
                 'deleted. If this happens repeatedly, please consider ' +
                 'tipping off the developer.')
-        self.out.single('')
+        self.output.single('')
 
     def remove(self, uid, entry):
         '''Deletes the file and removes the entry from the old jar'''
         msg1 = (' Removing existing file:  ' + entry['poca_filename'])
         outcome = files.delete_file(entry['poca_abspath'])
         if outcome.success:
-            self.out.cols(msg1, 'OK')
+            self.output.cols(msg1, 'OK')
         else:
-            self.out.cols(msg1, 'FILE NOT FOUND. Please check manually.')
+            self.output.cols(msg1, 'FILE NOT FOUND. Please check manually.')
         self.jar.lst.remove(uid)
         dummy = self.jar.dic.pop(uid)
-        self.jar.save()
+        outcome2 = self.jar.save()
         return outcome
 
     def check(self, uid, entry, args):
@@ -75,10 +75,10 @@ class Channel:
         the entry from the old jar'''
         msg1 = ' Checking existing file:  ' + entry['poca_filename']
         if path.isfile(entry['poca_abspath']):
-            self.out.cols(msg1, 'OK')
+            self.output.cols(msg1, 'OK')
             outcome = output.Outcome(True, 'file ok')
         else:
-            self.out.cols(msg1, 'FILE NOT FOUND. Attempting download.')
+            self.output.cols(msg1, 'FILE NOT FOUND. Attempting download.')
             outcome = files.download_audio_file(args, entry)
         self.jar.lst.remove(uid)
         dummy = self.jar.dic.pop(uid)
@@ -103,7 +103,7 @@ class Combo:
         self.dic.update(jar.dic)
 
 class Wanted():
-    def __init__(self, sub, combo, out):
+    def __init__(self, sub, combo, output):
         '''Constructs a container for all the entries we have room for, 
         regardless of where they are, internet or local folder.'''
         self.lst, self.dic = ( [], {} )
@@ -115,7 +115,7 @@ class Wanted():
             entry = combo.dic[uid]
             entry['poca_url'] = entry.enclosures[0]['href']
             entry['poca_size'] = self.get_size(entry)
-            entry['poca_mb'] = str(round(entry.poca_size / mega, 2)) + ' Mb'
+            entry['poca_mb'] = round(entry.poca_size / mega, 2)
             entry['poca_filename'] = self.get_filename(entry)
             entry['poca_abspath'] = path.join(sub.sub_dir, 
                 entry['poca_filename'])
@@ -124,13 +124,13 @@ class Wanted():
                 self.lst.append(uid)
                 self.dic[uid] = entry
                 msg1 = ' Adding to wanted list:   ' + entry.title
-                out.cols(msg1, entry['poca_mb'])
+                output.cols(msg1, str(entry['poca_mb']) + ' Mb')
             else:
                 break
         total_mb = str(round(self.cur_bytes / mega, 2)) + ' Mb'
-        out.cols(' Total size:', total_mb)
+        output.cols(' Total size:', total_mb)
         max_mb = str(round(self.max_bytes / mega, 2)) + ' Mb'
-        out.cols(' Allotted space: ', max_mb)
+        output.cols(' Allotted space: ', max_mb)
 
     def get_size(self, entry):
         '''Returns the entrys size in bytes. Tries to get if off of the

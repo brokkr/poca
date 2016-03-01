@@ -9,7 +9,7 @@ from distutils.core import setup
 
 setup(\
 name='poca', \
-version='0.3alpha3', \
+version='0.3alpha4', \
 license='GPL3', \
 description='a command line podcast client', \
 long_description='A cron-friendly, disk-space-conscious, command line 
@@ -20,8 +20,7 @@ url='https://github.com/brokkr/poca', \
 scripts=['src/poca'], \
 packages=['poco'], \
 package_dir={'poco': 'src/poco'}, \
-data_files=[('share/man/man1', ["man/poca.1"]), 
-    ('/etc', ["conf/poca.example.xml"])], \
+data_files=[('share/man/man1', ["man/poca.1"])], \
 requires=['feedparser', 'requests'], \
 provides=['poco'], \
 platforms=['POSIX'], \

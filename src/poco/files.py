@@ -12,34 +12,41 @@
 
 import os
 import shutil
-import logging
 import urllib2
-
-import urllib
 
 import mutagen
 
 from poco.id3v23_frames import frame_dic
-from poco import output
+from poco.output import Outcome
 
 
 def check_path(check_dir):
     '''Create a directory'''
     if os.path.isdir(check_dir):
-        return output.Outcome(True, 'Directory exists already')
+        return Outcome(True, 'Directory exists already')
     try:
         os.makedirs(check_dir)
-        return output.Outcome(True, 'Directory was successfully created')
+        return Outcome(True, 'Directory was successfully created')
     except OSError, e:
-        return output.Outcome(False, e)
+        return Outcome(False, e)
 
-def delete_file(filepath):
+def delete_file(file_path):
     '''Deletes a file'''
     try:
-        os.remove(filepath)
-        return output.Outcome(True, 'File was successfully deleted')
+        os.remove(file_path)
+        return Outcome(True, 'File was successfully deleted')
     except OSError:
-        return output.Outcome(False, e)
+        return Outcome(False, e)
+
+def write_file(file_path, text):
+    '''Writes a string to file'''
+    try:
+        config_file = open(file_path, 'w')
+        config_file.write(text)
+        config_file.close()
+        return Outcome(True, 'New config file successfully created')
+    except:
+        return Outcome(False, '')
 
 def download_audio_file(args, entry):
     '''Downloads one file'''
@@ -49,7 +56,7 @@ def download_audio_file(args, entry):
         f = open(entry['poca_abspath'], 'w')
         meta = u.info()
         mega = 1048576.0
-        file_size = int(meta.getheaders("Content-Length")[0]) / mega
+        #file_size = int(meta.getheaders("Content-Length")[0]) / mega
         fsize_dl = 0
         block_sz = 65536
         # download chunks of block_size until there is no more to read
@@ -62,17 +69,18 @@ def download_audio_file(args, entry):
             if not args.quiet:
                 heading = "Downloading new file:    " + entry['poca_filename']
                 status = (heading[0:59] + ' ').ljust(62,'.') + ("%7.2f Mb "
-                    "[%3.0f%%]") % (fsize_dl, fsize_dl * 100. / file_size)
+                    "[%3.0f%%]") % (fsize_dl, fsize_dl * 100. / entry['poca_mb'])
                 status = status + chr(8)*(len(status)+1)
                 print status,
         f.close()
         if not args.quiet:
             print
-        return output.Outcome(True, 'File was successfully downloaded')
+        return Outcome(True, 'File was successfully downloaded')
     except urllib2.HTTPError, e:
-        return output.Outcome(False, "HTTPError: " + e)
+        return Outcome(False, "HTTPError: " + e)
     except IOError, e:
-        return output.Outcome(False, "IOError: " + e)
+        return Outcome(False, "IOError: " + e)
+
 
 def tag_audio_file(sets_dic, entry_dic, sub_dic):
     '''Reintroducing id3 tagging using mutagen'''
@@ -114,26 +122,4 @@ but you have chosen a non-Unicode encoding.'
             suggest = ['Please change either your Unicode preference or \
 your overrides']
             errors.errors(error, suggest)
-            
-def restart(paths_dic, subs_list):
-    '''Deletes log file and all created directories'''
-    try:
-        sub_dir_list = [sub_dic['sub_dir'] for sub_dic in subs_list]
-        print 'The following directories will be deleted:'
-        for sub_dir in sub_dir_list:
-            if os.path.isdir(sub_dir):
-                print sub_dir
-            else:
-                sub_dir_list.remove(sub_dir)
-        response = raw_input('Proceed? (y/n) ')
-        if response.lower() != 'y':
-            print 'Abandoning restart', '\n'
-            return False
-        print 'Deleting old files...', '\n'
-        for sub_dir in sub_dir_list:
-            shutil.rmtree(sub_dir)
-        os.remove(paths_dic['history_log'])
-        return True
-    except OSError:
-        return False
 
