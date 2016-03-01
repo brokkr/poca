@@ -1,4 +1,6 @@
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
+#
 # Copyright 2010-2016 Mads Michelsen (mail@brokkr.net)
 # 
 # This file is part of Poca.
@@ -15,8 +17,8 @@ name='poca', \
 version='0.3beta1', \
 license='GPL3', \
 description='a command line podcast client', \
-long_description='A cron-friendly, disk-space-conscious, command line 
-    podcast aggregator, written in Python', \
+long_description='A cron-friendly, disk-space-conscious, command line'
+    'podcast aggregator, written in Python', \
 author='Mads Michelsen', \
 author_email='mail@brokkr.net', \
 url='https://github.com/brokkr/poca', \
