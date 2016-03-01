@@ -29,6 +29,21 @@ class Outcome:
         self.success = success
         self.msg = msg
 
+class Out:
+    def __init__(self, config):
+        self.log = get_logger(config)
+
+    def single(self, msg):
+        self.log.info(msg)
+
+    def cols(self, msg1, msg2):
+        msg = (msg1[0:60] + ' ').ljust(63, '.') + ' ' + msg2
+        self.log.info(msg)
+
+    def head(self, msg):
+        self.log.info(msg.upper())
+
+
 def colorize(_string, color):
     return color_codes[color] + str(_string) + color_codes['reset']
 

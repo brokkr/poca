@@ -15,8 +15,9 @@ if __name__ == '__main__':
     try:
         config = poco.config.Config()
         logger = poco.output.get_logger(config)
+        out = poco.output.Out(config)
         for sub in config.subs:
-            channel = poco.channel.Channel(config, logger, sub)
+            channel = poco.channel.Channel(config, out, sub)
         #msg_error = "Oh oh!"
         #msg_suggest = "Do something"
         #logger.error(msg_error)

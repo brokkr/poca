@@ -20,11 +20,11 @@ from poco import files
 
 
 class Channel:
-    def __init__(self, config, logger, sub):
+    def __init__(self, config, out, sub):
         '''A class for a single subscription/channel. Creates the containers
         first, then acts on them and updates the db as it goes.'''
-        self.sub, self.logger = sub, logger
-        self.logger.info(sub.title.upper())
+        self.sub, self.out = sub, out
+        self.out.head(sub.title)
 
         self.feed = Feed(self.sub)
         self.jar = history.get_jar(config.paths, self.sub)
@@ -45,28 +45,26 @@ class Channel:
                 self.new_jar.dic[uid] = entry
                 self.new_jar.save()
             else:
-                logger.info(' Something went wrong. Entry has been skipped')
+                self.out.single(' Something went wrong. Entry has been skipped')
         # should any - by mistake - remain in the old jar (i.e. not have been 
         # either removed or renewed) we dispense with them.
         for uid in self.jar.lst:
             entry = self.jar.dic[uid]
             outcome = self.remove(uid, entry, config.args)
-            logger.info(' Entry ' + entry.title + 'appears to have fallen ' +
+            self.out.single(' Entry ' + entry.title + 'appears to have fallen ' +
                 'through the cracks. This should not happen. Entry has been ' +
                 'deleted. If this happens repeatedly, please consider ' +
                 'tipping off the developer.')
-        logger.info('')
+        self.out.single('')
 
     def remove(self, uid, entry):
         '''Deletes the file and removes the entry from the old jar'''
-        msg = (' Removing existing file:  ' + entry['poca_filename'])[0:60]
-        msg = (msg + ' ').ljust(63, '.') + ' '
+        msg1 = (' Removing existing file:  ' + entry['poca_filename'])
         outcome = files.delete_file(entry['poca_abspath'])
         if outcome.success:
-            msg = msg + 'OK'
+            self.out.cols(msg1, 'OK')
         else:
-            msg = msg + 'FILE NOT FOUND. Please check manually.'
-        self.logger.info(msg)
+            self.out.cols(msg1, 'FILE NOT FOUND. Please check manually.')
         self.jar.lst.remove(uid)
         dummy = self.jar.dic.pop(uid)
         self.jar.save()
