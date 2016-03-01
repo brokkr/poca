@@ -1,24 +1,3 @@
-##Poca 0.3 alpha
-The code is currently being given a major rewrite in the johnpeters branch in
-order to greatly simplify the inner workings. As a result expansions of
-functionality have been put on hold.
-
-####Future plans
- * 0.3: Push to master branch of new architecture. Basic functionality
-   supported (i.e. no metadata manipulation, basic silent and non-silent
-   downloads)
- * 0.4:  ID3 tagging reimplemented using mutagen. Includes id3 version and
-   encoding preferences and extensive frame override support. Improved output.
- * 0.5:  Renaming files from tags and/or podcast metadata.
- * 0.6:  Self-righting: Insuring that the db and the files on disk never get
-   out of sync whatever happens.
- * 0.7:  Maximum can be specified as space and/or number of episodes or left
-   out entirely.
- * 0.8:  Support for .ogg and other formats
- * 0.9:  Subscription editing via the command line. Default suggestions (i.e.
-   title) are presented to user. Possible [search engine addition]
-   (http://stackoverflow.com/questions/3201052/podcast-search-api).
-
 ##Poca
 Poca is a command line podcast client, written in Python. 
 
@@ -32,6 +11,22 @@ As for user interface and design, Poca is intended to be a powerful and
 easy-to-use podcast tool (also in the \*NIX spirit) rather than pre-molded 
 podcast package. This leaves extensive options in the hands of the user, 
 including id3 tagging, cronjob compatibility, error logging prefs, etc.
+
+####Future plans
+ * 0.3.1: Nicer output, colors
+ * 0.3.2: Debug output option, awareness of info-error-critical levels
+ * 0.3.3: Reimplement file logger
+ * 0.4:  ID3 tagging reimplemented using mutagen. Includes id3 version and
+   encoding preferences and extensive frame override support. Improved output.
+ * 0.5:  Renaming files from tags and/or podcast metadata.
+ * 0.6:  Self-righting: Insuring that the db and the files on disk never get
+   out of sync whatever happens.
+ * 0.7:  Maximum can be specified as space and/or number of episodes or left
+   out entirely.
+ * 0.8:  Support for .ogg and other formats
+ * 0.9:  Subscription editing via the command line. Default suggestions (i.e.
+   title) are presented to user. Possible [search engine addition]
+   (http://stackoverflow.com/questions/3201052/podcast-search-api).
 
 ###Installing
 To install to /usr/local simply do
