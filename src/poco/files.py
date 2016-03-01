@@ -1,8 +1,7 @@
-#!/usr/bin/env python2
-# 
-# Copyright 2010-2015 Mads Michelsen (mail@brokkr.net)
-# except functions progress_download and silent_download copyright PabloG 
-# (http://stackoverflow.com/users/394/pablog) and Mads Michelsen 2015
+# -*- coding: utf-8 -*-
+# Copyright 2010-2016 Mads Michelsen (mail@brokkr.net)
+# except download function copyright PabloG 
+# (http://stackoverflow.com/users/394/pablog) and Mads Michelsen 2015, 2016
 # 
 # This file is part of Poca.
 # Poca is free software: you can redistribute it and/or modify it 
