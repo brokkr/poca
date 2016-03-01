@@ -39,9 +39,9 @@ class Paths:
         self.config_file = path.join(self.config_dir, 'poca.xml')
         self.db_dir = path.join(self.config_dir, 'db')
         self.errors = path.join(self.config_dir, 'errors.log')
-        self.test_paths()
+        self.test_paths(output)
 
-    def test_paths(self):
+    def test_paths(self, output):
         '''Checks for presence of ~/.poca and ~/.poca/poca.xml'''
         outcome = files.check_path(self.config_dir)
         if not outcome.success:
