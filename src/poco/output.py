@@ -30,8 +30,8 @@ class Outcome:
         self.msg = msg
 
 class Out:
-    def __init__(self, config):
-        self.log = get_logger(config)
+    def __init__(self, args):
+        self.log = get_logger(args)
 
     def single(self, msg):
         self.log.info(msg)
@@ -43,49 +43,27 @@ class Out:
     def head(self, msg):
         self.log.info(msg.upper())
 
-
 def colorize(_string, color):
     return color_codes[color] + str(_string) + color_codes['reset']
 
-def get_logger(config):
+def get_logger(args):
     logger = logging.getLogger('POCA')
     logger.setLevel(logging.INFO)
     null_handler = logging.NullHandler()
     logger.addHandler(null_handler)
-    if not config.args.quiet:
+    if not args.quiet:
         stream_handler = logging.StreamHandler()
         stream_handler.setLevel(logging.INFO)
         stream_formatter = logging.Formatter("%(message)s")
         stream_handler.setFormatter(stream_formatter)
         logger.addHandler(stream_handler)
-    if config.args.log_errors:
-        file_handler = logging.FileHandler(config.paths.errors)
+    if args.log_errors:
+        file_handler = logging.FileHandler(paths.errors)
         file_handler.setLevel(logging.ERROR)
         file_formatter = logging.Formatter("%(asctime)s - %(message)s", 
             datefmt='%Y-%m-%d %H:%M')
         file_handler.setFormatter(file_formatter)
         logger.addHandler(file_handler)
     return logger
-
-
-def print_heading(args_ns, sub_dic, i):
-    '''Prints heading for each channel'''
-    if not args_ns.quiet:
-        if i > 0: print
-        print _colorize(' '.join(sub_dic['title'].upper()), 'bold')
-
-def print_no_news_is_good_news(args_ns):
-    '''Informs user that no new entries were found in a subscription'''
-    if not args_ns.quiet:
-        print 'No new entries found'
-
-def print_stats(args_ns, sub_dic, entries):
-    '''Prints the categories and their number'''
-    if args_ns.quiet:
-        return
-    for i, category in enumerate(category_synonyms):
-        if i in [3,4,5,8]: continue
-        no_items = len(entries[category[0]])
-        print category[1].ljust(21), _colorize(no_items, category[2])
 
 

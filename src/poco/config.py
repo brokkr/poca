@@ -8,34 +8,29 @@
 # the Free Software Foundation, either version 3 of the License, 
 # or (at your option) any later version.
 
-import argparse
-
 from os import path, makedirs
 from sys import exit
 from shutil import copyfile
 from xml.etree import ElementTree 
 
-from poco import VERSION, DESCRIPTION
 from poco import files
 
 
 class Config:
-    def __init__(self):
+    def __init__(self, args, out):
         self.paths = Paths()
-        self.args = get_args()
-        xml_root = self.get_xml()
+        self.args = args
+        xml_root = self.get_xml(out)
         self.prefs = Prefs(xml_root)
         self.subs = get_subs(self.prefs, xml_root)
 
-    def get_xml(self):
+    def get_xml(self, out):
         '''Returns the XML tree root harvested from the users poca.xml file.'''
         try:
             return ElementTree.parse(self.paths.config_file).getroot()
-        except ParseError:
-            error = "The settings file could not be parsed. "
-            suggest = ["Please check to see that it is wellformed etc."]
-            #errors.errors(error, suggest, fatal=True)
-            print error
+        except ParseError, e:
+            out.single("The settings file could not be parsed. ")
+            exit()
 
 class Paths:
     def __init__(self):
@@ -105,19 +100,4 @@ class Sub:
         for element in xml_metadata.getchildren():
             metadata[element.tag] = element.text
         return metadata
-
-def get_args():
-    '''Returns arguments from a command line argument parser'''
-    about = "Poca " + VERSION + " : " + DESCRIPTION
-    parser = argparse.ArgumentParser(description=about)
-
-    parser.add_argument('-q', '--quiet', action='store_true', 
-        default=False, help='Quiet mode (useful for cron jobs)')
-    parser.add_argument('-e', '--log-errors', action='store_true', 
-        default=False, help='Log errors to file in poca config directory')
-    parser.add_argument('-r', '--restart', action='store_true', 
-        default=False, help=('Delete all created directories with contents '
-        'plus log file and start over'))
-
-    return parser.parse_args()
 

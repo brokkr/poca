@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 # 
-# Copyright 2010-2015 Mads Michelsen (mail@brokkr.net)
+# Copyright 2010-2016 Mads Michelsen (mail@brokkr.net)
 # 
 # This file is part of Poca.
 # Poca is free software: you can redistribute it and/or modify it 
@@ -9,13 +9,14 @@
 # or (at your option) any later version.
 
 
-VERSION = "0.3alpha2"
+VERSION = "0.3alpha3"
 MAINTAINER = "Mads Michelsen <mail@brokkr.net>"
 DESCRIPTION = ("A cron-friendly, disk-space-conscious, command line podcast "
 "aggregator, written in Python")
 URL = "https://github.com/brokkr/poca"
 
 
+import args
 import channel
 import config
 import files

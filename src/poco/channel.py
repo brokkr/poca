@@ -29,7 +29,7 @@ class Channel:
         self.feed = Feed(self.sub)
         self.jar = history.get_jar(config.paths, self.sub)
         self.combo = Combo(self.feed, self.jar)
-        self.wanted = Wanted(self.sub, self.combo, logger)
+        self.wanted = Wanted(self.sub, self.combo, out)
 
         for uid in list(set(self.jar.lst) - set(self.wanted.lst)):
             outcome = self.remove(uid, self.jar.dic[uid])
@@ -73,13 +73,12 @@ class Channel:
     def check(self, uid, entry, args):
         '''Performs a quick check-up on existing keeper-files and removes 
         the entry from the old jar'''
-        msg = (' Checking existing file:  ' + entry['poca_filename'])[0:60]
-        msg = (msg + ' ').ljust(63, '.') + ' '
+        msg1 = ' Checking existing file:  ' + entry['poca_filename']
         if path.isfile(entry['poca_abspath']):
-            self.logger.info(msg + 'OK')
+            self.out.cols(msg1, 'OK')
             outcome = output.Outcome(True, 'file ok')
         else:
-            self.logger.info(msg + 'FILE NOT FOUND. Attempting download.')
+            self.out.cols(msg1, 'FILE NOT FOUND. Attempting download.')
             outcome = files.download_audio_file(args, entry)
         self.jar.lst.remove(uid)
         dummy = self.jar.dic.pop(uid)
@@ -104,7 +103,7 @@ class Combo:
         self.dic.update(jar.dic)
 
 class Wanted():
-    def __init__(self, sub, combo, logger):
+    def __init__(self, sub, combo, out):
         '''Constructs a container for all the entries we have room for, 
         regardless of where they are, internet or local folder.'''
         self.lst, self.dic = ( [], {} )
@@ -124,15 +123,14 @@ class Wanted():
                 self.cur_bytes += entry.poca_size
                 self.lst.append(uid)
                 self.dic[uid] = entry
-                msg = (' Adding to wanted list:   ' + entry.title)[0:60] + ' '
-                msg = msg.ljust(63, '.') + ' ' + entry['poca_mb']
-                logger.info(msg)
+                msg1 = ' Adding to wanted list:   ' + entry.title
+                out.cols(msg1, entry['poca_mb'])
             else:
                 break
         total_mb = str(round(self.cur_bytes / mega, 2)) + ' Mb'
-        logger.info(' Total size: '.ljust(63, '.') + ' ' + total_mb)
+        out.cols(' Total size:', total_mb)
         max_mb = str(round(self.max_bytes / mega, 2)) + ' Mb'
-        logger.info(' Allotted space: '.ljust(63, '.') + ' ' + max_mb + '\n')
+        out.cols(' Allotted space: ', max_mb)
 
     def get_size(self, entry):
         '''Returns the entrys size in bytes. Tries to get if off of the
