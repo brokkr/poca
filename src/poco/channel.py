@@ -9,6 +9,7 @@
 
 import urllib2
 from os import path
+from sys import exit
 
 import feedparser
 
@@ -24,11 +25,19 @@ class Channel:
         self.sub, self.output = sub, output
         self.output.head(sub.title)
 
+        # create containers
         self.feed = Feed(self.sub)
         self.jar = history.get_jar(config.paths, self.sub)
         self.combo = Combo(self.feed, self.jar)
         self.wanted = Wanted(self.sub, self.combo, output)
 
+        # see that we can write to the designated directory
+        outcome = files.check_path(sub.sub_dir)
+        if not outcome.success:
+            self.output.single(' ' + outcome.msg)
+            exit()
+
+        # loop through wanted and unwanted entries to remove, check and dl
         for uid in list(set(self.jar.lst) - set(self.wanted.lst)):
             outcome = self.remove(uid, self.jar.dic[uid])
         self.new_jar = history.Jar(config.paths, self.sub)

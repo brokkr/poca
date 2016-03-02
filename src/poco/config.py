@@ -27,9 +27,9 @@ class Config:
         '''Returns the XML tree root harvested from the users poca.xml file.'''
         try:
             return ElementTree.parse(self.paths.config_file).getroot()
-        except ParseError, e:
+        except ElementTree.ParseError, e:
             output.single("The settings file could not be parsed. ")
-            output.single('Error: ' + e)
+            output.single('Parser said: ' + '\"' + e.message.message + '\"')
             exit()
 
 class Paths:
@@ -45,8 +45,7 @@ class Paths:
         '''Checks for presence of ~/.poca and ~/.poca/poca.xml'''
         outcome = files.check_path(self.config_dir)
         if not outcome.success:
-            output.single('Config directory ' + self.config_dir + \
-            ' could not be created. Quitting.')
+            output.single(outcome.msg)
             exit()
         if not path.isfile(self.config_file):
             outcome = files.write_file(self.config_file, template)

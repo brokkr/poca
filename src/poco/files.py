@@ -22,12 +22,15 @@ from poco.output import Outcome
 def check_path(check_dir):
     '''Create a directory'''
     if os.path.isdir(check_dir):
-        return Outcome(True, 'Directory exists already')
+        if os.access(check_dir, os.W_OK):
+            return Outcome(True, check_dir + ': Directory exists already')
+        else:
+            return Outcome(False, check_dir + ': Lacks permissions to directory')
     try:
         os.makedirs(check_dir)
-        return Outcome(True, 'Directory was successfully created')
+        return Outcome(True, check_dir + ': Directory was successfully created')
     except OSError, e:
-        return Outcome(False, e)
+        return Outcome(False, check_dir + ': Directory could not be created')
 
 def delete_file(file_path):
     '''Deletes a file'''
@@ -49,7 +52,6 @@ def write_file(file_path, text):
 
 def download_audio_file(args, entry):
     '''Downloads one file'''
-    check_path(os.path.dirname(entry['poca_abspath']))
     try:
         u = urllib2.urlopen(entry['poca_url'])
         f = open(entry['poca_abspath'], 'w')
@@ -67,7 +69,7 @@ def download_audio_file(args, entry):
                 dl_percent = dl * 100.0 / entry['poca_size']
                 head = "Downloading new file:    " + entry['poca_filename']
                 head = (head[0:59] + ' ').ljust(62,'.') 
-                progress = ("%7.2f Mb [%3.0f%%]") % (dl_mb, dl_percent)
+                progress = ("%6.2f Mb [%3.0f%%]") % (dl_mb, dl_percent)
                 status = head + progress
                 status = status + chr(8)*(len(status)+1)
                 print status,
