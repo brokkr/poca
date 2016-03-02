@@ -28,8 +28,8 @@ class Config:
         try:
             return ElementTree.parse(self.paths.config_file).getroot()
         except ElementTree.ParseError, e:
-            output.single("The settings file could not be parsed. ")
-            output.single('Parser said: ' + '\"' + e.message.message + '\"')
+            output.multi(['The settings file could not be parsed. ', 
+            'Parser said: ' + '\"' + e.message.message + '\"'])
             exit()
 
 class Paths:
@@ -49,13 +49,14 @@ class Paths:
             exit()
         if not path.isfile(self.config_file):
             outcome = files.write_file(self.config_file, template)
-            msg = ['No config file found. An example/template config file '
-            'has been created for you:', ' ' + self.config_file, 'Please '
-            'edit it to suit your preferences and then run poca again.']
             if outcome.success:
-                output.multi(msg)
+                msg = ['No config file found. An example/template config file '
+                'has been created for you:', ' ' + self.config_file, 'Please '
+                'edit it to suit your preferences and then run poca again.']
             else:
-                output.single('Config file could not be written. Quitting.')
+                msg = ['No config file found. New config file could not be \
+                written. Quitting.']
+            output.multi(msg)
             exit()
 
 class Prefs:

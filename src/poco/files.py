@@ -43,12 +43,12 @@ def delete_file(file_path):
 def write_file(file_path, text):
     '''Writes a string to file'''
     try:
-        config_file = open(file_path, 'w')
-        config_file.write(text)
-        config_file.close()
+        wfile = open(file_path, 'w')
+        wfile.write(text)
+        wfile.close()
         return Outcome(True, 'New config file successfully created')
-    except:
-        return Outcome(False, '')
+    except IOError, e:
+        return Outcome(False, file_path + ': ' + e.strerror)
 
 def download_audio_file(args, entry):
     '''Downloads one file'''
