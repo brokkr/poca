@@ -25,21 +25,26 @@ class Channel:
         self.sub, self.output = sub, output
         self.output.head(sub.title)
 
-        # create containers
-        self.feed = Feed(self.sub)
-        self.jar = history.get_jar(config.paths, self.sub)
-        self.combo = Combo(self.feed, self.jar)
-        self.wanted = Wanted(self.sub, self.combo, output)
-
         # see that we can write to the designated directory
         outcome = files.check_path(sub.sub_dir)
         if not outcome.success:
             self.output.single(' ' + outcome.msg)
             exit()
 
-        # loop through wanted and unwanted entries to remove, check and dl
+        # create containers
+        self.feed = Feed(self.sub)
+        self.jar = history.get_jar(config.paths, self.sub)
+        self.combo = Combo(self.feed, self.jar)
+        self.wanted = Wanted(self.sub, self.combo, output)
+
+        # loop through unwanted entries to remove
         for uid in list(set(self.jar.lst) - set(self.wanted.lst)):
-            outcome = self.remove(uid, self.jar.dic[uid])
+            del_outcome, jar_outcome  = self.remove(uid, self.jar.dic[uid])
+            if not jar_outcome.success:
+                output.single(' ' + outcome.msg)
+                exit()
+
+        # loop through wanted entries to download or check
         self.new_jar = history.Jar(config.paths, self.sub)
         for uid in self.wanted.lst:
             entry = self.wanted.dic[uid]
@@ -50,32 +55,24 @@ class Channel:
             if outcome.success:
                 self.new_jar.lst.append(uid)
                 self.new_jar.dic[uid] = entry
-                outcome = self.new_jar.save()
+                jar_outcome = self.new_jar.save()
+                if not jar_outcome.success:
+                    output.single(' ' + outcome.msg)
+                    exit()
             else:
                 self.output.single(' Something went wrong. Entry has been skipped')
-        # should any - by mistake - remain in the old jar (i.e. not have been 
-        # either removed or renewed) we dispense with them.
-        for uid in self.jar.lst:
-            entry = self.jar.dic[uid]
-            outcome = self.remove(uid, entry, config.args)
-            self.output.single(' Entry ' + entry.title + 'appears to have fallen ' +
-                'through the cracks. This should not happen. Entry has been ' +
-                'deleted. If this happens repeatedly, please consider ' +
-                'tipping off the developer.')
-        self.output.single('')
 
     def remove(self, uid, entry):
         '''Deletes the file and removes the entry from the old jar'''
-        msg1 = (' Removing existing file:  ' + entry['poca_filename'])
-        outcome = files.delete_file(entry['poca_abspath'])
-        if outcome.success:
+        del_outcome = files.delete_file(entry['poca_abspath'])
+        msg1 = ' Removing existing file:  ' + entry['poca_filename']
+        if del_outcome.success:
             self.output.cols(msg1, 'OK')
         else:
-            self.output.cols(msg1, 'FILE NOT FOUND. Please check manually.')
+            self.output.cols(msg1, 'FILE NOT FOUND')
         self.jar.lst.remove(uid)
-        dummy = self.jar.dic.pop(uid)
-        outcome2 = self.jar.save()
-        return outcome
+        jar_outcome = self.jar.save()
+        return (del_outcome, jar_outcome)
 
     def check(self, uid, entry, args):
         '''Performs a quick check-up on existing keeper-files and removes 
@@ -88,15 +85,12 @@ class Channel:
             self.output.cols(msg1, 'FILE NOT FOUND. Attempting download.')
             outcome = files.download_audio_file(args, entry)
         self.jar.lst.remove(uid)
-        dummy = self.jar.dic.pop(uid)
         return outcome
 
 class Feed:
     def __init__(self, sub):
         '''Constructs a container for feed entries'''
         doc = feedparser.parse(sub.url)
-        # note: some feeds do not have entry id's (?) The times bugle (old)
-        # for one failed. Check feedparser documentation.
         self.lst = [ entry.id for entry in doc.entries ]
         self.dic = { entry.id : entry for entry in doc.entries }
 
@@ -122,6 +116,8 @@ class Wanted():
             entry = combo.dic[uid]
             entry['poca_url'] = entry.enclosures[0]['href']
             entry['poca_size'] = self.get_size(entry)
+            if not entry['poca_size']:
+                continue
             entry['poca_mb'] = round(entry.poca_size / mega, 2)
             entry['poca_filename'] = self.get_filename(entry)
             entry['poca_abspath'] = path.join(sub.sub_dir, 
@@ -145,9 +141,12 @@ class Wanted():
         try:
             size = int(entry.enclosures[0]['length'])
         except KeyError:
-            f = urllib2.urlopen(entry['poca_url'])
-            size = int(f.info()['Content-Length'])
-            f.close()
+            try:
+                f = urllib2.urlopen(entry['poca_url'])
+                size = int(f.info()['Content-Length'])
+                f.close()
+            except HTTPError:
+                size = False
         return size
 
     def get_filename(self, entry):

@@ -37,8 +37,8 @@ def delete_file(file_path):
     try:
         os.remove(file_path)
         return Outcome(True, 'File was successfully deleted')
-    except OSError:
-        return Outcome(False, e)
+    except OSError, e:
+        return Outcome(False, e.strerror)
 
 def write_file(file_path, text):
     '''Writes a string to file'''
@@ -80,7 +80,7 @@ def download_audio_file(args, entry):
     except urllib2.HTTPError, e:
         return Outcome(False, "HTTPError: " + e)
     except IOError, e:
-        return Outcome(False, "IOError: " + e)
+        return Outcome(False, "IOError: " + e.strerror)
 
 
 def tag_audio_file(sets_dic, entry_dic, sub_dic):
