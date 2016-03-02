@@ -115,7 +115,10 @@ class Wanted():
 
         for uid in combo.lst:
             entry = combo.dic[uid]
-            entry['poca_url'] = entry.enclosures[0]['href']
+            try:
+                entry['poca_url'] = entry.enclosures[0]['href']
+            except (KeyError, IndexError, AttributeError):
+                continue
             entry['poca_size'] = self.get_size(entry)
             if not entry['poca_size']:
                 continue
