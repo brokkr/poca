@@ -9,7 +9,6 @@
 
 import urllib2
 from os import path
-from urlparse import urlparse
 
 import feedparser
 
@@ -145,7 +144,7 @@ class Wanted():
     def get_filename(self, entry):
         '''Parses URL to find base filename. To be expanded with naming
         options'''
-        parsed_url = urlparse(entry['poca_url'])
+        parsed_url = urllib2.urlparse.urlparse(entry['poca_url'])
         filename = path.basename(parsed_url.path)
         return filename
 

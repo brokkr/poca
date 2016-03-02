@@ -53,23 +53,22 @@ def download_audio_file(args, entry):
     try:
         u = urllib2.urlopen(entry['poca_url'])
         f = open(entry['poca_abspath'], 'w')
-        meta = u.info()
-        mega = 1048576.0
-        #file_size = int(meta.getheaders("Content-Length")[0]) / mega
-        fsize_dl = 0
-        block_sz = 65536
+        dl = 0
+        block_size = 65536
         # download chunks of block_size until there is no more to read
         while True:
-            buffer = u.read(block_sz)
+            buffer = u.read(block_size)
             if not buffer:
                 break
-            fsize_dl += len(buffer) / mega
             f.write(buffer)
             if not args.quiet:
-                heading = "Downloading new file:    " + entry['poca_filename']
-                status = (heading[0:59] + ' ').ljust(62,'.') + ("%7.2f Mb "
-                    "[%3.0f%%]") % (fsize_dl, fsize_dl * 100. / entry['poca_mb'])
-                status = status + chr(8)*(len(status)+1)
+                dl += len(buffer)
+                dl_mb = dl / 1048576.0
+                dl_percent = dl * 100.0 / entry['poca_size']
+                head = "Downloading new file:    " + entry['poca_filename']
+                head = (head[0:59] + ' ').ljust(62,'.') 
+                progress = ("%7.2f Mb [%3.0f%%]") % (dl_mb, dl_percent)
+                status = head + progress + chr(8)*(len(status)+1)
                 print status,
         f.close()
         if not args.quiet:
