@@ -68,7 +68,8 @@ def download_audio_file(args, entry):
                 head = "Downloading new file:    " + entry['poca_filename']
                 head = (head[0:59] + ' ').ljust(62,'.') 
                 progress = ("%7.2f Mb [%3.0f%%]") % (dl_mb, dl_percent)
-                status = head + progress + chr(8)*(len(status)+1)
+                status = head + progress
+                status = status + chr(8)*(len(status)+1)
                 print status,
         f.close()
         if not args.quiet:
