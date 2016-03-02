@@ -57,10 +57,11 @@ class Channel:
                 self.new_jar.dic[uid] = entry
                 jar_outcome = self.new_jar.save()
                 if not jar_outcome.success:
-                    output.single(' ' + outcome.msg)
+                    self.output.single(' ' + outcome.msg)
                     exit()
             else:
                 self.output.single(' Something went wrong. Entry has been skipped')
+        self.output.cr()
 
     def remove(self, uid, entry):
         '''Deletes the file and removes the entry from the old jar'''
@@ -133,7 +134,7 @@ class Wanted():
         total_mb = str(round(self.cur_bytes / mega, 2)) + ' Mb'
         output.cols(' Total size:', total_mb)
         max_mb = str(round(self.max_bytes / mega, 2)) + ' Mb'
-        output.cols(' Allotted space: ', max_mb)
+        output.cols(' Allotted space:', max_mb)
 
     def get_size(self, entry):
         '''Returns the entrys size in bytes. Tries to get if off of the

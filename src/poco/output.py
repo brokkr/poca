@@ -33,6 +33,9 @@ class Output:
     def head(self, msg):
         self.log.info(msg.upper())
 
+    def cr(self):
+        self.log.info('')
+
 def get_logger(args):
     logger = logging.getLogger('POCA')
     logger.setLevel(logging.INFO)
