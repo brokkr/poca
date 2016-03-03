@@ -15,10 +15,10 @@ import poco
 if __name__ == '__main__':
     try:
         args = poco.args.get_args()
-        output = poco.output.Output(args)
-        config = poco.config.Config(args, output)
+        put = poco.output.Output(args)
+        config = poco.config.Config(args, put)
         for sub in config.subs:
-            channel = poco.channel.Channel(config, output, sub)
+            channel = poco.channel.Channel(config, put, sub)
     except KeyboardInterrupt:
         pass
 

@@ -16,36 +16,38 @@ from poco.xmlconf import template
 
 
 class Config:
-    def __init__(self, args, output):
-        self.paths = Paths(output)
+    def __init__(self, args, put):
+        self.paths = Paths(put)
         self.args = args
-        xml_root = self.get_xml(output)
-        self.prefs = Prefs(xml_root, output)
-        self.subs = get_subs(self.prefs, xml_root, output)
+        if self.args.logfile:
+            put.add_filehandler(self.paths.log_file)
+        xml_root = self.get_xml(put)
+        self.prefs = Prefs(xml_root, put)
+        self.subs = get_subs(self.prefs, xml_root, put)
 
-    def get_xml(self, output):
+    def get_xml(self, put):
         '''Returns the XML tree root harvested from the users poca.xml file.'''
         try:
             return ElementTree.parse(self.paths.config_file).getroot()
         except ElementTree.ParseError, e:
-            output.multi(['The settings file could not be parsed. ', 
+            put.multi(['The settings file could not be parsed. ', 
             'Parser said: ' + '\"' + e.message.message + '\"'])
             exit()
 
 class Paths:
-    def __init__(self, output):
+    def __init__(self, put):
         '''Returns a dictionary with path settings'''
         self.config_dir = path.expanduser(path.join('~', '.poca'))
         self.config_file = path.join(self.config_dir, 'poca.xml')
         self.db_dir = path.join(self.config_dir, 'db')
-        self.errors = path.join(self.config_dir, 'errors.log')
-        self.test_paths(output)
+        self.log_file = path.join(self.config_dir, 'poca.log')
+        self.test_paths(put)
 
-    def test_paths(self, output):
+    def test_paths(self, put):
         '''Checks for presence of ~/.poca and ~/.poca/poca.xml'''
         outcome = files.check_path(self.config_dir)
         if not outcome.success:
-            output.single(outcome.msg)
+            put.single(outcome.msg)
             exit()
         if not path.isfile(self.config_file):
             outcome = files.write_file(self.config_file, template)
@@ -56,11 +58,11 @@ class Paths:
             else:
                 msg = ['No config file found. New config file could not be \
                 written. Quitting.']
-            output.multi(msg)
+            put.multi(msg)
             exit()
 
 class Prefs:
-    def __init__(self, xml_root, output):
+    def __init__(self, xml_root, put):
         xml_prefs = xml_root.find('settings')
         for element in xml_prefs.getchildren():
             setattr(self, element.tag, element.text)
@@ -69,19 +71,19 @@ class Prefs:
             for element in required:
                 getattr(self, element)
         except AttributeError, e:
-            output.single('Required setting is missing. Quitting.')
+            put.single('Required setting is missing. Quitting.')
             exit()
 
-def get_subs(prefs, xml_root, output):
+def get_subs(prefs, xml_root, put):
     xml_subs = xml_root.find('subscriptions')
     if xml_subs is None:
-        output.single('No subscriptions found. Quitting.')
+        put.single('No subscriptions found. Quitting.')
         exit()
     else:
-        return [ Sub(prefs, xml_sub, output) for xml_sub in xml_subs.getchildren() ]
+        return [ Sub(prefs, xml_sub, put) for xml_sub in xml_subs.getchildren() ]
 
 class Sub:
-    def __init__(self, prefs, xml_sub, output):
+    def __init__(self, prefs, xml_sub, put):
         xml_metadata = xml_sub.find('metadata')
         self.metadata = self.extract_metadata(xml_metadata)
         if xml_metadata is not None:

@@ -17,7 +17,7 @@ class Outcome:
 
 class Output:
     def __init__(self, args):
-        self.log = get_logger(args)
+        self.log = self.get_logger(args)
 
     def single(self, msg):
         self.log.info(msg)
@@ -36,25 +36,25 @@ class Output:
     def cr(self):
         self.log.info('')
 
-def get_logger(args):
-    logger = logging.getLogger('POCA')
-    logger.setLevel(logging.INFO)
-    null_handler = logging.NullHandler()
-    logger.addHandler(null_handler)
-    if not args.quiet:
-        stream_handler = logging.StreamHandler()
-        stream_handler.setLevel(logging.INFO)
-        stream_formatter = logging.Formatter("%(message)s")
-        stream_handler.setFormatter(stream_formatter)
-        logger.addHandler(stream_handler)
-    if args.log_errors:
-        file_handler = logging.FileHandler(paths.errors)
-        file_handler.setLevel(logging.ERROR)
-        file_formatter = logging.Formatter("%(asctime)s - %(message)s", 
-            datefmt='%Y-%m-%d %H:%M')
+    def get_logger(self, args):
+        logger = logging.getLogger('POCA')
+        logger.setLevel(logging.INFO)
+        null_handler = logging.NullHandler()
+        logger.addHandler(null_handler)
+        if not args.quiet:
+            stream_handler = logging.StreamHandler()
+            stream_handler.setLevel(logging.INFO)
+            stream_formatter = logging.Formatter("%(message)s")
+            stream_handler.setFormatter(stream_formatter)
+            logger.addHandler(stream_handler)
+        return logger
+
+    def add_filehandler(self, log_file_path):
+        file_handler = logging.FileHandler(log_file_path)
+        file_handler.setLevel(logging.INFO)
+        file_formatter = logging.Formatter("%(message)s")
         file_handler.setFormatter(file_formatter)
-        logger.addHandler(file_handler)
-    return logger
+        self.log.addHandler(file_handler)
 
 def colorize(_string, color):
     color_codes = { 

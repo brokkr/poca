@@ -13,35 +13,35 @@ from sys import exit
 
 import feedparser
 
-from poco import output
+from poco.output import Outcome
 from poco import history
 from poco import files
 
 
 class Channel:
-    def __init__(self, config, output, sub):
+    def __init__(self, config, put, sub):
         '''A class for a single subscription/channel. Creates the containers
         first, then acts on them and updates the db as it goes.'''
-        self.sub, self.output = sub, output
-        self.output.head(sub.title)
+        self.sub, self.put = sub, put
+        self.put.head(sub.title)
 
         # see that we can write to the designated directory
         outcome = files.check_path(sub.sub_dir)
         if not outcome.success:
-            self.output.single(' ' + outcome.msg)
+            self.put.single(' ' + outcome.msg)
             exit()
 
         # create containers
         self.feed = Feed(self.sub)
         self.jar = history.get_jar(config.paths, self.sub)
         self.combo = Combo(self.feed, self.jar)
-        self.wanted = Wanted(self.sub, self.combo, output)
+        self.wanted = Wanted(self.sub, self.combo, put)
 
         # loop through unwanted entries to remove
         for uid in list(set(self.jar.lst) - set(self.wanted.lst)):
             del_outcome, jar_outcome  = self.remove(uid, self.jar.dic[uid])
             if not jar_outcome.success:
-                output.single(' ' + outcome.msg)
+                put.single(' ' + outcome.msg)
                 exit()
 
         # loop through wanted entries to download or check
@@ -57,20 +57,20 @@ class Channel:
                 self.new_jar.dic[uid] = entry
                 jar_outcome = self.new_jar.save()
                 if not jar_outcome.success:
-                    self.output.single(' ' + outcome.msg)
+                    self.put.single(' ' + outcome.msg)
                     exit()
             else:
-                self.output.single(' Something went wrong. Entry has been skipped')
-        self.output.cr()
+                self.put.single(' Something went wrong. Entry has been skipped')
+        self.put.cr()
 
     def remove(self, uid, entry):
         '''Deletes the file and removes the entry from the old jar'''
         del_outcome = files.delete_file(entry['poca_abspath'])
         msg1 = ' Removing existing file:  ' + entry['poca_filename']
         if del_outcome.success:
-            self.output.cols(msg1, 'OK')
+            self.put.cols(msg1, 'OK')
         else:
-            self.output.cols(msg1, 'FILE NOT FOUND')
+            self.put.cols(msg1, 'FILE NOT FOUND')
         self.jar.lst.remove(uid)
         jar_outcome = self.jar.save()
         return (del_outcome, jar_outcome)
@@ -80,10 +80,10 @@ class Channel:
         the entry from the old jar'''
         msg1 = ' Checking existing file:  ' + entry['poca_filename']
         if path.isfile(entry['poca_abspath']):
-            self.output.cols(msg1, 'OK')
-            outcome = output.Outcome(True, 'file ok')
+            self.put.cols(msg1, 'OK')
+            outcome = Outcome(True, 'file ok')
         else:
-            self.output.cols(msg1, 'FILE NOT FOUND. Attempting download.')
+            self.put.cols(msg1, 'FILE NOT FOUND. Attempting download.')
             outcome = files.download_audio_file(args, entry)
         self.jar.lst.remove(uid)
         return outcome
@@ -105,7 +105,7 @@ class Combo:
         self.dic.update(jar.dic)
 
 class Wanted():
-    def __init__(self, sub, combo, output):
+    def __init__(self, sub, combo, put):
         '''Constructs a container for all the entries we have room for, 
         regardless of where they are, internet or local folder.'''
         self.lst, self.dic = ( [], {} )
@@ -131,13 +131,13 @@ class Wanted():
                 self.lst.append(uid)
                 self.dic[uid] = entry
                 msg1 = ' Adding to wanted list:   ' + entry.title
-                output.cols(msg1, str(entry['poca_mb']) + ' Mb')
+                put.cols(msg1, str(entry['poca_mb']) + ' Mb')
             else:
                 break
         total_mb = str(round(self.cur_bytes / mega, 2)) + ' Mb'
-        output.cols(' Total size:', total_mb)
+        put.cols(' Total size:', total_mb)
         max_mb = str(round(self.max_bytes / mega, 2)) + ' Mb'
-        output.cols(' Allotted space:', max_mb)
+        put.cols(' Allotted space:', max_mb)
 
     def get_size(self, entry):
         '''Returns the entrys size in bytes. Tries to get if off of the
