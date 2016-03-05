@@ -7,7 +7,7 @@
 # the Free Software Foundation, either version 3 of the License, 
 # or (at your option) any later version.
 
-from os import path, makedirs
+from os import path
 from sys import exit
 from xml.etree import ElementTree 
 
@@ -45,10 +45,11 @@ class Paths:
 
     def test_paths(self, put):
         '''Checks for presence of ~/.poca and ~/.poca/poca.xml'''
-        outcome = files.check_path(self.config_dir)
-        if not outcome.success:
-            put.single(outcome.msg)
-            exit()
+        for check_dir in [self.config_dir, self.db_dir]:
+            outcome = files.check_path(check_dir)
+            if not outcome.success:
+                put.single(outcome.msg)
+                exit()
         if not path.isfile(self.config_file):
             outcome = files.write_file(self.config_file, template)
             if outcome.success:
@@ -64,39 +65,43 @@ class Paths:
 class Prefs:
     def __init__(self, xml_root, put):
         xml_prefs = xml_root.find('settings')
-        for element in xml_prefs.getchildren():
-            setattr(self, element.tag, element.text)
-        required = ['id3removev1', 'id3version', 'id3unicode', 'base_dir']
-        try:
-            for element in required:
-                getattr(self, element)
-        except AttributeError, e:
-            put.single('Required setting is missing. Quitting.')
+        if xml_prefs is None:
+            put.single('No \'settings\' tag found. Quitting.')
             exit()
+        required = {'id3removev1', 'id3version', 'id3unicode', 'base_dir'}
+        elements = [ (e.tag, e.text) for e in xml_prefs.getchildren() ]
+        missing_required = required - { e[0] for e in elements }
+        if missing_required:
+            put.multi(['Missing required settings:'] + list(missing_required))
+            exit()
+        for e in elements:
+            setattr(self, e[0], e[1])
 
 def get_subs(prefs, xml_root, put):
     xml_subs = xml_root.find('subscriptions')
     if xml_subs is None:
-        put.single('No subscriptions found. Quitting.')
+        put.single('No \'subscriptions\' tag found. Quitting.')
         exit()
     else:
-        return [ Sub(prefs, xml_sub, put) for xml_sub in xml_subs.getchildren() ]
+        return [ Sub(prefs, xml_sub, put) for xml_sub 
+            in xml_subs.getchildren() ]
 
 class Sub:
     def __init__(self, prefs, xml_sub, put):
-        xml_metadata = xml_sub.find('metadata')
-        self.metadata = self.extract_metadata(xml_metadata)
-        if xml_metadata is not None:
-            xml_sub.remove(xml_metadata)
-        for element in xml_sub.getchildren():
-            setattr(self, element.tag, element.text)
-            # test if all required attributes are set (and valid?)
+        '''Create a subscription object with metadata in dic if any'''
+        self.metadata = None
+        xml_meta = xml_sub.find('metadata')
+        if xml_meta is not None:
+            xml_sub.remove(xml_meta)
+            self.metadata = { e.tag: e.text for e in xml_meta.getchildren() }
+        required = {'title', 'url', 'max_mb'}
+        elements = [ (e.tag, e.text) for e in xml_sub.getchildren() ]
+        missing_required = required - { e[0] for e in elements }
+        if missing_required:
+            put.multi(['A subscription is missing required settings:'] + 
+                list(missing_required))
+            exit()
+        for e in elements:
+            setattr(self, e[0], e[1])
         self.sub_dir = path.join(prefs.base_dir, self.title)
     
-    def extract_metadata(self, xml_metadata):
-        metadata = {}
-        if xml_metadata is not None:
-            for element in xml_metadata.getchildren():
-                metadata[element.tag] = element.text
-        return metadata
-
