@@ -41,7 +41,7 @@ def delete_file(file_path):
         return Outcome(False, str(e))
 
 def write_file(file_path, text):
-    '''Writes a string to file'''
+    '''Writes a string to file. Currently specific to creating config file.'''
     try:
         wfile = open(file_path, 'w')
         wfile.write(text)
@@ -51,7 +51,7 @@ def write_file(file_path, text):
         return Outcome(False, file_path + ': ' + str(e))
 
 def download_audio_file(args, entry):
-    '''Downloads one file'''
+    '''Downloads one file, either silently or with progress indicator'''
     try:
         u = urllib2.urlopen(entry['poca_url'])
         f = open(entry['poca_abspath'], 'w')
@@ -84,7 +84,7 @@ def download_audio_file(args, entry):
 
 
 def tag_audio_file(sets_dic, entry_dic, sub_dic):
-    '''Reintroducing id3 tagging using mutagen'''
+    '''NOT IN CURRENT USE. Reintroducing id3 tagging using mutagen'''
     # get general metadata settings
     id3version_dic = {'2.3': 3, '2.4': 4}
     id3version = id3version_dic[sets_dic['metadata']['id3version']]
@@ -118,9 +118,9 @@ def tag_audio_file(sets_dic, entry_dic, sub_dic):
         try:
             id3tag.save(v1=id3v1, v2_version=id3version)
         except UnicodeEncodeError:
-            error = 'The metadata overrides contain Unicode characters\n\
-but you have chosen a non-Unicode encoding.'
-            suggest = ['Please change either your Unicode preference or \
-your overrides']
+            error = ('The metadata overrides contain Unicode characters '
+            'but you have chosen a non-Unicode encoding.')
+            suggest = ('Please change either your Unicode preference or '
+            'your overrides')
             errors.errors(error, suggest)
 

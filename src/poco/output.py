@@ -11,6 +11,8 @@ import logging
 
 
 class Outcome:
+    '''A way for modules like files to return outcome of operations in a
+    uniform fashion'''
     def __init__(self, success, msg = ''):
         self.success = success
         self.msg = msg
@@ -61,6 +63,7 @@ class Output:
         self.log.addHandler(file_handler)
 
     def colorize(_string, color):
+        '''Formatting function, adds color codes to string'''
         color_codes = { 
             'reset': '\033[0;0m',
             'bold': '\033[1m',

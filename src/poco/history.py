@@ -15,6 +15,7 @@ from poco.output import Outcome
 
 
 def get_jar(paths, sub):
+    '''Returns existing jar if any, else creates a new one'''
     db_filename = os.path.join(paths.db_dir, sub.title)
     if os.path.isfile(db_filename):
         with open(db_filename, 'r') as f:
@@ -26,6 +27,7 @@ def get_jar(paths, sub):
 
 class Jar:
     def __init__(self, paths, sub):
+        '''Creates standard subscription info container with save method'''
         self.db_filename = os.path.join(paths.db_dir, sub.title)
         self.lst = []
         self.dic = {}

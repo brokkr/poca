@@ -17,6 +17,7 @@ from poco.xmlconf import template
 
 class Config:
     def __init__(self, args, put):
+        '''Collection of all configuration options'''
         self.paths = Paths(put)
         self.args = args
         if self.args.logfile:
@@ -64,6 +65,7 @@ class Paths:
 
 class Prefs:
     def __init__(self, xml_root, put):
+        '''Collection of global preferences, mainly base directory for mp3s'''
         xml_prefs = xml_root.find('settings')
         if xml_prefs is None:
             put.single('No \'settings\' tag found. Quitting.')
@@ -78,6 +80,7 @@ class Prefs:
             setattr(self, e[0], e[1])
 
 def get_subs(prefs, xml_root, put):
+    '''Function to create a list of all subscriptions and their preferences'''
     xml_subs = xml_root.find('subscriptions')
     if xml_subs is None:
         put.single('No \'subscriptions\' tag found. Quitting.')

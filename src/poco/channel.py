@@ -10,7 +10,7 @@
 import urllib2
 from os import path
 from sys import exit
-from time import sleep
+#from time import sleep
 
 import feedparser
 
@@ -66,7 +66,7 @@ class Channel:
                     self.put.single(' ' + outcome.msg)
                     exit()
             else:
-                self.put.single(' Something went wrong. Entry has been skipped')
+                self.put.single(' Something went wrong. Entry skipped')
         self.put.cr()
 
     def remove(self, uid, entry):
