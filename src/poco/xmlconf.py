@@ -9,6 +9,8 @@
 
 template = """<?xml version="1.0" encoding="UTF-8"?>
 <poca version="0.3">
+<!-- Please see detailed configuration documentation online:
+     https://github.com/brokkr/poca/wiki/Configuration -->
 
     <settings>
     <!-- the following settings relate to id3. These values are accepted:
