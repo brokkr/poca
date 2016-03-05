@@ -38,7 +38,7 @@ def delete_file(file_path):
         os.remove(file_path)
         return Outcome(True, 'File was successfully deleted')
     except OSError, e:
-        return Outcome(False, e.strerror)
+        return Outcome(False, str(e))
 
 def write_file(file_path, text):
     '''Writes a string to file'''
@@ -48,7 +48,7 @@ def write_file(file_path, text):
         wfile.close()
         return Outcome(True, 'New config file successfully created')
     except IOError, e:
-        return Outcome(False, file_path + ': ' + e.strerror)
+        return Outcome(False, file_path + ': ' + str(e))
 
 def download_audio_file(args, entry):
     '''Downloads one file'''
@@ -78,9 +78,9 @@ def download_audio_file(args, entry):
             print
         return Outcome(True, 'File was successfully downloaded')
     except urllib2.HTTPError, e:
-        return Outcome(False, "HTTPError: " + e)
+        return Outcome(False, "HTTPError: " + str(e))
     except IOError, e:
-        return Outcome(False, "IOError: " + e.strerror)
+        return Outcome(False, "IOError: " + str(e))
 
 
 def tag_audio_file(sets_dic, entry_dic, sub_dic):

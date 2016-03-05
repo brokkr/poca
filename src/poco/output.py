@@ -55,7 +55,8 @@ class Output:
         '''Adds a filehandler to (presumed) logging instance'''
         file_handler = logging.FileHandler(log_file_path)
         file_handler.setLevel(logging.INFO)
-        file_formatter = logging.Formatter("%(message)s")
+        file_formatter = logging.Formatter("%(asctime)s %(message)s", 
+            datefmt='%Y-%m-%d %H:%M')
         file_handler.setFormatter(file_formatter)
         self.log.addHandler(file_handler)
 

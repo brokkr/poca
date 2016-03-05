@@ -98,8 +98,8 @@ class Feed:
     def __init__(self, sub):
         '''Constructs a container for feed entries'''
         doc = feedparser.parse(sub.url)
-        if doc.bozo:
-            self.outcome = Outcome(False, doc.bozo_exception.reason.strerror)
+        if not doc.feed:
+            self.outcome = Outcome(False, str(doc.bozo_exception))
             return
         self.lst = [ entry.id for entry in doc.entries ]
         self.dic = { entry.id : entry for entry in doc.entries }

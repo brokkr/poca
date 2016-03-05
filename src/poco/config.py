@@ -31,7 +31,7 @@ class Config:
             return ElementTree.parse(self.paths.config_file).getroot()
         except ElementTree.ParseError, e:
             put.multi(['The settings file could not be parsed. ', 
-            'Parser said: ' + '\"' + e.message.message + '\"'])
+            'Parser said: ' + '\"' + str(e) + '\"'])
             exit()
 
 class Paths:
