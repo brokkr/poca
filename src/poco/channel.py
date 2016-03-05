@@ -10,6 +10,7 @@
 import urllib2
 from os import path
 from sys import exit
+from time import sleep
 
 import feedparser
 
@@ -33,6 +34,11 @@ class Channel:
 
         # create containers
         self.feed = Feed(self.sub)
+        if not self.feed.outcome.success:
+            self.put.multi([' Feed could not be parsed. Parser said: ', 
+            ' ' + self.feed.outcome.msg])
+            self.put.cr()
+            return 
         self.jar = history.get_jar(config.paths, self.sub)
         self.combo = Combo(self.feed, self.jar)
         self.wanted = Wanted(self.sub, self.combo, put)
@@ -92,8 +98,12 @@ class Feed:
     def __init__(self, sub):
         '''Constructs a container for feed entries'''
         doc = feedparser.parse(sub.url)
+        if doc.bozo:
+            self.outcome = Outcome(False, doc.bozo_exception.reason.strerror)
+            return
         self.lst = [ entry.id for entry in doc.entries ]
         self.dic = { entry.id : entry for entry in doc.entries }
+        self.outcome = Outcome(True, 'Got feed')
 
 class Combo:
     def __init__(self, feed, jar):
@@ -149,7 +159,7 @@ class Wanted():
                 f = urllib2.urlopen(entry['poca_url'])
                 size = int(f.info()['Content-Length'])
                 f.close()
-            except HTTPError:
+            except (urllib2.HTTPError, urllib2.URLError):
                 size = False
         return size
 
