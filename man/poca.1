@@ -2,7 +2,7 @@
 .SH NAME
 poca \- A command line podcast client written in Python
 .SH SYNOPSIS
-\fBpoca [-h] [-q] [-r] [-f [\fIerrorsfile\fB]] [-m]
+\fBpoca [-h] [-q] [-l]
 \f1
 .SH DESCRIPTION
 \fIPoca\f1 is a command line podcast client, written in Python. It attemps to "do one thing and do it well": Maintaing a number of podcast subscriptions in a user designated directory.
@@ -16,14 +16,8 @@ Show help message and exit.
 \fB-q\f1, \fB--quiet\f1
 Run in quiet mode. This turns off all printing to standard output which is useful when running the program as a cron job. Quiet mode does not conflict with using any of the error logging options (-m/-f).
 .TP
-\fB-r\f1, \fB--restart\f1
-Restart the subscriptions. This will delete the log file (the 'history' of the subscriptions) and all downloaded content so the program can start over afresh. Not much need for it, but a 'last resort' if the log becomes damaged or if a large number of subscriptions have been removed from the subscriptions settings.
-.TP
-\fB-f [\fIerrorsfile\fB]\f1, \fB--errors-file [\fIerrorsfile\fB]\f1
-Specify a file to use for error logging; if none are assigned the default, 'errors.log' in the .poca directory. is used.
-.TP
-\fB-m\f1, \fB--errors-mail\f1
-Use the mail account setup in poca.xml to generate email error logging. One email will be sent per error encountered.
+\fB-l\f1, \fB--logfile\f1
+Enable logging to the file 'poca.log' in the ~/.poca directory.
 .SH FILES
 \fI$HOME/.poca\f1 is the user-specific configuration directory for \fIPoca\f1.
 
@@ -31,13 +25,13 @@ Use the mail account setup in poca.xml to generate email error logging. One emai
 
 \fI/etc/poca.example.xml\f1 is the supplied example configuration file. Copy it to $HOME/.poca/poca.xml and edit it to suit your needs.
 
-\fI$HOME/.poca/history.log\f1 is the program's memory. The program keeps track of what files it has seen before in order to quickly conclude which are new, which need to be downloaded, etc.
+\fI$HOME/.poca/db/*\f1 is the program's memory. These files - one for each subscription - keep track of what files are currently held.
 
-\fI$HOME/.poca/errors.log\f1 is the default error log file (plaintext). The program writes error messages to this file, if the -f switch is used and no alternative error log file is supplied by the user.
+\fI$HOME/.poca/poca.log\f1 is the log file (plaintext). The program writes all output to this file, if the -l switch is used.
 .SH AUTHOR
-\fIPoca\f1 was written by Mads Michelsen <reannual@gmail.com>. For more information go to \fBhttps://github.com/brokkr/poca\f1
+\fIPoca\f1 was written by Mads Michelsen <mail@brokkr.net>. For more information go to \fBhttps://github.com/brokkr/poca\f1
 .SH COPYRIGHT
-Copyright 2010, 2011, 2015 Mads Michelsen
+Copyright 2010-2016 Mads Michelsen
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

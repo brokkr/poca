@@ -5,7 +5,7 @@
 <manpage name="poca" section="1" desc="A command line podcast client written in Python">
 
 <synopsis>
-<cmd>poca [-h] [-q] [-r] [-f [<arg>errorsfile</arg>]] [-m]</cmd>
+<cmd>poca [-h] [-q] [-l]</cmd>
 </synopsis>
 
 <description>
@@ -26,18 +26,8 @@
 </option>
 
 <option>
-<p><opt>-r</opt>, <opt>--restart</opt></p>
-<optdesc><p>Restart the subscriptions. This will delete the log file (the 'history' of the subscriptions) and all downloaded content so the program can start over afresh. Not much need for it, but a 'last resort' if the log becomes damaged or if a large number of subscriptions have been removed from the subscriptions settings.</p></optdesc>
-</option>
-
-<option>
-<p><opt>-f [<arg>errorsfile</arg>]</opt>, <opt>--errors-file [<arg>errorsfile</arg>]</opt></p>
-<optdesc><p>Specify a file to use for error logging; if none are assigned the default, 'errors.log' in the .poca directory. is used.</p></optdesc>
-</option>
-
-<option>
-<p><opt>-m</opt>, <opt>--errors-mail</opt></p>
-<optdesc><p>Use the mail account setup in poca.xml to generate email error logging. One email will be sent per error encountered.</p></optdesc>
+<p><opt>-l</opt>, <opt>--logfile</opt></p>
+<optdesc><p>Enable logging to the file 'poca.log' in the ~/.poca directory.</p></optdesc>
 </option>
 
 </options>
@@ -46,18 +36,18 @@
 <p><file>$HOME/.poca</file> is the user-specific configuration directory for <arg>Poca</arg>.</p>
 <p><file>$HOME/.poca/poca.xml</file> is the configuration file. It is written in a custom XML format, designed to be fairly intuitive. The 'settings' section has options such as where to download the audio files and optional id3 tagging and email account options. The subscriptions section contains all the subscriptions, with info about the desired title, the drive space allocated to the subscription and optional id3 tags (for supplanting or supplementing that contained in the downloaded file). <br/>For more information on the configuration file, please see <url href="http://code.google.com/p/poca/wiki/Configuration"/>.</p>
 <p><file>/etc/poca.example.xml</file> is the supplied example configuration file. Copy it to $HOME/.poca/poca.xml and edit it to suit your needs.</p>
-<p><file>$HOME/.poca/history.log</file> is the program's memory. The program keeps track of what files it has seen before in order to quickly conclude which are new, which need to be downloaded, etc.</p>
-<p><file>$HOME/.poca/errors.log</file> is the default error log file (plaintext). The program writes error messages to this file, if the -f switch is used and no alternative error log file is supplied by the user.</p>
+<p><file>$HOME/.poca/db/*</file> is the program's memory. These files - one for each subscription - keep track of what files are currently held.</p>
+<p><file>$HOME/.poca/poca.log</file> is the log file (plaintext). The program writes all output to this file, if the -l switch is used.</p>
 </section>
 
 
 <section name = "Author">
-<p><arg>Poca</arg> was written by Mads Michelsen &lt;reannual@gmail.com&gt;.
+<p><arg>Poca</arg> was written by Mads Michelsen &lt;mail@brokkr.net&gt;.
 For more information go to <url href="https://github.com/brokkr/poca"/></p>
 </section>
 
 <section name = "Copyright">
-<p>Copyright 2010, 2011, 2015 Mads Michelsen</p>
+<p>Copyright 2010-2016 Mads Michelsen</p>
 
 <p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</p>
 
