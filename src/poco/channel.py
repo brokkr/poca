@@ -144,17 +144,17 @@ class Wanted():
                 put.cols(msg1, str(entry['poca_mb']) + ' Mb')
             else:
                 break
-        total_mb = str(round(self.cur_bytes / mega, 2)) + ' Mb'
-        put.cols(' Total size:', total_mb)
-        max_mb = str(round(self.max_bytes / mega, 2)) + ' Mb'
-        put.cols(' Allotted space:', max_mb)
+        put.cols(' Total size:', "%6.2f Mb" % (self.cur_bytes / mega))
+        put.cols(' Allotted space:', "%6.2f Mb" % int(sub.max_mb))
 
     def get_size(self, entry):
         '''Returns the entrys size in bytes. Tries to get if off of the
         enclosure, otherwise pokes url for info.'''
         try:
             size = int(entry.enclosures[0]['length'])
-        except KeyError:
+            if size == 0:
+                raise ValueError
+        except (KeyError, ValueError):
             try:
                 f = urllib2.urlopen(entry['poca_url'])
                 size = int(f.info()['Content-Length'])

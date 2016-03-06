@@ -7,7 +7,7 @@
 # the Free Software Foundation, either version 3 of the License, 
 # or (at your option) any later version.
 
-VERSION = "0.3beta4"
+VERSION = "0.3"
 MAINTAINER = "Mads Michelsen <mail@brokkr.net>"
 DESCRIPTION = ("A cron-friendly, disk-space-conscious, command line podcast "
 "aggregator, written in Python")
