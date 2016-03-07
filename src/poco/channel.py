@@ -7,7 +7,7 @@
 # the Free Software Foundation, either version 3 of the License, 
 # or (at your option) any later version.
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 from os import path
 from sys import exit
 #from time import sleep
@@ -97,7 +97,14 @@ class Channel:
 class Feed:
     def __init__(self, sub):
         '''Constructs a container for feed entries'''
-        doc = feedparser.parse(sub.url)
+        try:
+            doc = feedparser.parse(sub.url)
+        except TypeError:
+            if 'drv_libxml2' in feedparser.PREFERRED_XML_PARSERS:
+                feedparser.PREFERRED_XML_PARSERS.remove('drv_libxml2')
+                doc = feedparser.parse(sub.url)
+            else:
+                raise
         if not doc.feed:
             self.outcome = Outcome(False, str(doc.bozo_exception))
             return
@@ -156,17 +163,17 @@ class Wanted():
                 raise ValueError
         except (KeyError, ValueError):
             try:
-                f = urllib2.urlopen(entry['poca_url'])
+                f = urllib.request.urlopen(entry['poca_url'])
                 size = int(f.info()['Content-Length'])
                 f.close()
-            except (urllib2.HTTPError, urllib2.URLError):
+            except (urllib.error.HTTPError, urllib.error.URLError):
                 size = False
         return size
 
     def get_filename(self, entry):
         '''Parses URL to find base filename. To be expanded with naming
         options'''
-        parsed_url = urllib2.urlparse.urlparse(entry['poca_url'])
+        parsed_url = urllib.parse.urlparse(entry['poca_url'])
         filename = path.basename(parsed_url.path)
         return filename
 

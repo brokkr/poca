@@ -30,7 +30,7 @@ class Config:
         '''Returns the XML tree root harvested from the users poca.xml file.'''
         try:
             return ElementTree.parse(self.paths.config_file).getroot()
-        except ElementTree.ParseError, e:
+        except ElementTree.ParseError as e:
             put.multi(['The settings file could not be parsed. ', 
             'Parser said: ' + '\"' + str(e) + '\"'])
             exit()

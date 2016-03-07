@@ -11,7 +11,7 @@
 
 import os
 import shutil
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 import mutagen
 
@@ -29,7 +29,7 @@ def check_path(check_dir):
     try:
         os.makedirs(check_dir)
         return Outcome(True, check_dir + ': Directory was successfully created')
-    except OSError, e:
+    except OSError as e:
         return Outcome(False, check_dir + ': Directory could not be created')
 
 def delete_file(file_path):
@@ -37,24 +37,24 @@ def delete_file(file_path):
     try:
         os.remove(file_path)
         return Outcome(True, 'File was successfully deleted')
-    except OSError, e:
+    except OSError as e:
         return Outcome(False, str(e))
 
 def write_file(file_path, text):
     '''Writes a string to file. Currently specific to creating config file.'''
     try:
-        wfile = open(file_path, 'w')
+        wfile = open(file_path, mode='wt', encoding='utf-8')
         wfile.write(text)
         wfile.close()
         return Outcome(True, 'New config file successfully created')
-    except IOError, e:
+    except IOError as e:
         return Outcome(False, file_path + ': ' + str(e))
 
 def download_audio_file(args, entry):
     '''Downloads one file, either silently or with progress indicator'''
     try:
-        u = urllib2.urlopen(entry['poca_url'])
-        f = open(entry['poca_abspath'], 'w')
+        u = urllib.request.urlopen(entry['poca_url'])
+        f = open(entry['poca_abspath'], 'wb')
         dl = 0
         block_size = 65536
         # download chunks of block_size until there is no more to read
@@ -72,14 +72,14 @@ def download_audio_file(args, entry):
                 progress = ("%6.2f Mb [%3.0f%%]") % (dl_mb, dl_percent)
                 status = head + progress
                 status = status + chr(8)*(len(status)+1)
-                print status,
+                print(status, end=' ')
         f.close()
         if not args.quiet:
-            print
+            print()
         return Outcome(True, 'File was successfully downloaded')
-    except urllib2.HTTPError, e:
+    except urllib.error.HTTPError as e:
         return Outcome(False, "HTTPError: " + str(e))
-    except IOError, e:
+    except IOError as e:
         return Outcome(False, "IOError: " + str(e))
 
 
@@ -99,7 +99,7 @@ def tag_audio_file(sets_dic, entry_dic, sub_dic):
     file_extension = os.path.splitext(localfile)[1].lower()
     if file_extension != '.mp3':
         return
-    if not sub_dic.has_key('metadata'):
+    if 'metadata' not in sub_dic:
         return
     try:
         id3tag = mutagen.id3.ID3(localfile)

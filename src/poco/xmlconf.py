@@ -8,7 +8,7 @@
 # or (at your option) any later version.
 
 template = """<?xml version="1.0" encoding="UTF-8"?>
-<poca version="0.3">
+<poca version="0.4">
 
     <!-- Please see detailed configuration documentation online:
      https://github.com/brokkr/poca/wiki/Configuration -->

@@ -1,5 +1,7 @@
 ##Poca
-Poca is a command line podcast client, written in Python. 
+Poca is a command line podcast client, written in Python. Up until release 0.3
+it is written in Python 2. The upcoming 0.4 release aims to port it to python
+3 with no backwards compatibility.
 
 Functionality-wise, the focus is - as the name hints at - to reign in its 
 appetite: Subscribing to a feed should not mean downloading each new episode 
@@ -13,17 +15,17 @@ leaves extensive options in the hands of the user, including id3 tagging,
 cronjob compatibility, error logging prefs, etc.
 
 ####Future plans
-* 0.3: Push to master branch of new architecture. Basic functionality supported
-  (i.e. no metadata manipulation, basic silent and non-silent downloads, file
-  logging)
-* 0.3.1: Revised output handling, debug output option, awareness of info-
+* 0.4: Python 3 port
+* 0.4.1: Revised output handling, debug output option, awareness of info-
   error-critical levels
-* 0.4: ID3 tagging reimplemented using mutagen. 
+* 0.5: ID3 tagging reimplemented using mutagen. 
 
 ###Installing
-To install to /usr/local simply do
+To install to simply do
 
-    sudo python2 ./setup.py install
+    sudo python3 ./setup.py install (on 0.4 or later)
+    or
+    sudo python2 ./setup.py install (on 0.3 or earlier)
 
 Running 'poca' on a fresh install (no configuration) will place a copy of the 
 example configuration in ~/.poca. The man page is put in 'share/man/man1', 

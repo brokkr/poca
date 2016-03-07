@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright 2010-2016 Mads Michelsen (mail@brokkr.net)
@@ -14,7 +14,7 @@ from distutils.core import setup
 
 setup(\
 name='poca', \
-version='0.3', \
+version='0.4beta1', \
 license='GPL3', \
 description='a command line podcast client', \
 long_description='A cron-friendly, disk-space-conscious, command line'
@@ -35,7 +35,7 @@ classifiers=['Development Status :: 4 - Beta', \
 'License :: OSI Approved :: GNU General Public License (GPL)', \
 'Natural Language :: English', \
 'Operating System :: POSIX', \
-'Programming Language :: Python :: 2.7', \
+'Programming Language :: Python :: 3.4', \
 'Topic :: Internet'] \
 )
 
