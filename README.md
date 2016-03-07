@@ -24,7 +24,9 @@ cronjob compatibility, error logging prefs, etc.
 To install to simply do
 
     sudo python3 ./setup.py install (on 0.4 or later)
+
 or
+
     sudo python2 ./setup.py install (on 0.3 or earlier)
 
 Running 'poca' on a fresh install (no configuration) will place a copy of the 
