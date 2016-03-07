@@ -24,7 +24,7 @@ cronjob compatibility, error logging prefs, etc.
 To install to simply do
 
     sudo python3 ./setup.py install (on 0.4 or later)
-    or
+or
     sudo python2 ./setup.py install (on 0.3 or earlier)
 
 Running 'poca' on a fresh install (no configuration) will place a copy of the 
@@ -33,8 +33,8 @@ inside of the installation prefix (usually '/usr' or '/usr/local'). If this
 is unacceptable, please patch the setup.py file.
 
 ###Dependencies
-* You will need to use Python2 (not Python3) for both setup and running the program.
-* In order for XML parsing to work (elementTree), Python 2.5 or higher is required.
+* You will need Python 3 for setup and running the program.
 * The following third-party modules are required: feedparser, mutagen.
-* Pip can install all of these using 'pip install [name of module]'
+* Pip can install all of these using 'pip3 install [name of module]' (or pip2
+  as the case may be)
 
