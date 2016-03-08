@@ -99,6 +99,7 @@ class Feed:
         '''Constructs a container for feed entries'''
         try:
             doc = feedparser.parse(sub.url)
+        # https://github.com/kurtmckee/feedparser/issues/30#issuecomment-183714444            
         except TypeError:
             if 'drv_libxml2' in feedparser.PREFERRED_XML_PARSERS:
                 feedparser.PREFERRED_XML_PARSERS.remove('drv_libxml2')
