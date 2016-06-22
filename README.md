@@ -14,12 +14,6 @@ easy-to-use podcast tool rather than pre-molded podcast package. This
 leaves extensive options in the hands of the user, including id3 tagging, 
 cronjob compatibility, error logging prefs, etc.
 
-####Future plans
-* 0.4: Python 3 port
-* 0.4.1: Revised output handling, debug output option, awareness of info-
-  error-critical levels
-* 0.5: ID3 tagging reimplemented using mutagen. 
-
 ###Installing
 To install to simply do
 
