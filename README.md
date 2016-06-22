@@ -1,7 +1,7 @@
 ##Poca
 Poca is a command line podcast client, written in Python. Up until release 0.3
-it is written in Python 2. The upcoming 0.4 release aims to port it to python
-3 with no backwards compatibility.
+it is written in Python 2. The 0.4 release is a port to python 3 with no 
+backwards compatibility.
 
 Functionality-wise, the focus is - as the name hints at - to reign in its 
 appetite: Subscribing to a feed should not mean downloading each new episode 
@@ -29,7 +29,6 @@ inside of the installation prefix (usually '/usr' or '/usr/local'). If this
 is unacceptable, please patch the setup.py file.
 
 ###Dependencies
-* You will need Python 3 for setup and running the program.
 * The following third-party modules are required: feedparser, mutagen.
 * Pip can install all of these using 'pip3 install [name of module]' (or pip2
   as the case may be)
