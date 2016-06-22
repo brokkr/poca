@@ -58,8 +58,8 @@ class Paths:
                 'has been created for you:', ' ' + self.config_file, 'Please '
                 'edit it to suit your preferences and then run poca again.']
             else:
-                msg = ['No config file found. New config file could not be \
-                written. Quitting.']
+                msg = ['No config file found. New config file could not be '
+                'written. Quitting.']
             put.multi(msg)
             exit()
 
