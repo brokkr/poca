@@ -70,7 +70,9 @@ class Channel:
         self.put.cr()
 
     def remove(self, uid, entry):
-        '''Deletes the file and removes the entry from the old jar'''
+        '''Deletes the file and removes the entry from the old jar
+        (in the event that the program is interrupted in between
+        deletion and writing a new jar to the db file)'''
         del_outcome = files.delete_file(entry['poca_abspath'])
         msg1 = ' Removing existing file:  ' + entry['poca_filename']
         if del_outcome.success:
