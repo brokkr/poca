@@ -19,17 +19,17 @@ from poco import history
 from poco import files
 
 
+logger = logging.getLogger('POCA')
+
 class Channel:
     def __init__(self, config, put, sub):
         '''A class for a single subscription/channel. Creates the containers
         first, then acts on them and updates the db as it goes.'''
-        self.sub, self.put = sub, put
-        self.put.head(sub.title)
 
         # see that we can write to the designated directory
         outcome = files.check_path(sub.sub_dir)
         if not outcome.success:
-            self.put.single(' ' + outcome.msg)
+            logger.error(sub.title + ': ' + outcome.msg)
             exit()
 
         # create containers
