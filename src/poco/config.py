@@ -25,7 +25,7 @@ class Config:
         self.paths = Paths()
         self.args = args
         if self.args.logfile:
-            filehandler(self.paths.log_file, logger)
+            add_filehandler(self.paths.log_file, logger)
         xml_root = self.get_xml()
         self.prefs = Prefs(xml_root)
         self.subs = get_subs(self.prefs, xml_root)
