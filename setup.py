@@ -9,33 +9,33 @@
 # the Free Software Foundation, either version 3 of the License, 
 # or (at your option) any later version.
 
-
 from distutils.core import setup
 
-setup(\
-name='poca', \
-version='0.4beta1', \
-license='GPL3', \
-description='a command line podcast client', \
-long_description='A cron-friendly, disk-space-conscious, command line'
-    'podcast aggregator, written in Python', \
-author='Mads Michelsen', \
-author_email='mail@brokkr.net', \
-url='https://github.com/brokkr/poca', \
-scripts=['src/poca'], \
-packages=['poco'], \
-package_dir={'poco': 'src/poco'}, \
-data_files=[('share/man/man1', ["man/poca.1"])], \
-requires=['feedparser', 'mutagen'], \
-provides=['poco'], \
-platforms=['POSIX'], \
-classifiers=['Development Status :: 4 - Beta', \
-'Environment :: Console', \
-'Intended Audience :: End Users/Desktop', \
-'License :: OSI Approved :: GNU General Public License (GPL)', \
-'Natural Language :: English', \
-'Operating System :: POSIX', \
-'Programming Language :: Python :: 3.4', \
-'Topic :: Internet'] \
+
+setup(
+name = 'poca', 
+version = 'rev116',
+license = 'GPL3', 
+description = 'a command line podcast client', 
+long_description = 'A cron-friendly, disk-space-conscious, command line'
+    'podcast aggregator, written in Python', 
+author = 'Mads Michelsen', 
+author_email = 'mail@brokkr.net', 
+url = 'https://github.com/brokkr/poca', 
+scripts = ['src/poca'], 
+packages = ['poco'], 
+package_dir = {'poco': 'src/poco'}, 
+data_files = [('share/man/man1', ["man/poca.1"])], 
+requires = ['feedparser', 'mutagen'], 
+provides = ['poco'],
+platforms = ['POSIX'], 
+classifiers = ['Development Status :: 4 - Beta', 
+'Environment :: Console', 
+'Intended Audience :: End Users/Desktop', 
+'License :: OSI Approved :: GNU General Public License (GPL)', 
+'Natural Language :: English', 
+'Operating System :: POSIX', 
+'Programming Language :: Python :: 3.4', 
+'Topic :: Internet'] 
 )
 

@@ -8,12 +8,12 @@
 # or (at your option) any later version.
 
 import argparse
-from poco import VERSION, DESCRIPTION
+from poco import version, DESCRIPTION
 
 
 def get_args():
     '''Returns arguments from a command line argument parser'''
-    about = "Poca " + VERSION + " : " + DESCRIPTION
+    about = "Poca " + version.__version__ + " : " + DESCRIPTION
     parser = argparse.ArgumentParser(description=about)
 
     parser.add_argument('-q', '--quiet', action='store_true', 

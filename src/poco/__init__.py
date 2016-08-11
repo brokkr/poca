@@ -7,12 +7,12 @@
 # the Free Software Foundation, either version 3 of the License, 
 # or (at your option) any later version.
 
-VERSION = "0.4beta1"
 MAINTAINER = "Mads Michelsen <mail@brokkr.net>"
 DESCRIPTION = ("A cron-friendly, disk-space-conscious, command line podcast "
 "aggregator, written in Python")
 URL = "https://github.com/brokkr/poca"
 
+from . import version
 from . import args
 from . import output
 from . import channel
