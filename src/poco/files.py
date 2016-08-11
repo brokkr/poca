@@ -12,6 +12,7 @@
 import os
 import shutil
 import urllib.request, urllib.error, urllib.parse
+from urllib.request import urlretrieve
 
 import mutagen
 
@@ -51,31 +52,9 @@ def write_file(file_path, text):
         return Outcome(False, file_path + ': ' + str(e))
 
 def download_audio_file(args, entry):
-    '''Downloads one file, either silently or with progress indicator'''
+    '''Downloads one file'''
     try:
-        u = urllib.request.urlopen(entry['poca_url'])
-        f = open(entry['poca_abspath'], 'wb')
-        dl = 0
-        block_size = 65536
-        # download chunks of block_size until there is no more to read
-        while True:
-            buffer = u.read(block_size)
-            if not buffer:
-                break
-            f.write(buffer)
-            if not args.quiet:
-                dl += len(buffer)
-                dl_mb = dl / 1048576.0
-                dl_percent = dl * 100.0 / entry['poca_size']
-                head = "Downloading new file:    " + entry['poca_filename']
-                head = (head[0:59] + ' ').ljust(62,'.') 
-                progress = ("%6.2f Mb [%3.0f%%]") % (dl_mb, dl_percent)
-                status = head + progress
-                status = status + chr(8)*(len(status)+1)
-                print(status, end=' ')
-        f.close()
-        if not args.quiet:
-            print()
+        dummy, response = urlretrieve(entry['poca_url'], entry['poca_abspath'])
         return Outcome(True, 'File was successfully downloaded')
     except urllib.error.HTTPError as e:
         return Outcome(False, "HTTPError: " + str(e))

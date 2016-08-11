@@ -58,18 +58,14 @@ class Paths:
         if not path.isfile(self.config_file):
             outcome = files.write_file(self.config_file, template)
             if outcome.success:
-                msg = [
-                    'No config file found.', 
-                    'New template config file created: ' + self.config_file,
-                    'Please customize and run POCA again.'
-                    ]
+                logger.error('No config file found.\n'
+                    'New template config file created:\n'
+                    '  ' + self.config_file + '\n'
+                    'Please customize and run POCA again.')
             else:
-                msg = [
-                    'No config file found.',
-                    'Failed creating config file: ' + self.config_file
-                    ]
-            for line in msg:
-                logger.error(line)
+                logger.error('No config file found.'
+                    'Failed creating config file:'
+                    '  ' + self.config_file)
             exit()
 
 class Prefs:
@@ -83,7 +79,8 @@ class Prefs:
         elements = [ (e.tag, e.text) for e in xml_prefs.getchildren() ]
         missing_required = required - { e[0] for e in elements }
         if missing_required:
-            logger.error('Missing required settings:' + list(missing_required))
+            logger.error('Missing required settings: ')
+            logger.error('\n'.join(missing_required))
             exit()
         for e in elements:
             setattr(self, e[0], e[1])
@@ -109,8 +106,8 @@ class Sub:
         elements = [ (e.tag, e.text) for e in xml_sub.getchildren() ]
         missing_required = required - { e[0] for e in elements }
         if missing_required:
-            logger.error('A subscription is missing required settings: ' + 
-                list(missing_required))
+            logger.error('A subscription is missing required settings: ')
+            logger.error('\n'.join(missing_required))
             exit()
         for e in elements:
             setattr(self, e[0], e[1])
