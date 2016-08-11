@@ -44,7 +44,7 @@ def get_logger(args):
         stream_handler.setFormatter(stream_formatter)
         logger.addHandler(stream_handler)
 
-def add_filehandler(self, log_file_path, logger):
+def add_filehandler(log_file_path, logger):
     '''Adds a filehandler to (presumed) logging instance'''
     file_handler = logging.FileHandler(log_file_path)
     file_handler.setLevel(logging.INFO)
