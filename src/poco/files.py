@@ -37,9 +37,9 @@ def delete_file(file_path):
     '''Deletes a file'''
     try:
         os.remove(file_path)
-        return Outcome(True, 'File was successfully deleted')
+        return Outcome(True, file_path + ': File was successfully deleted')
     except OSError as e:
-        return Outcome(False, str(e))
+        return Outcome(False, file_path + ': ' + str(e))
 
 def write_file(file_path, text):
     '''Writes a string to file. Currently specific to creating config file.'''

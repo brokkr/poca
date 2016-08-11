@@ -16,12 +16,14 @@ from poco.output import Outcome
 
 def get_jar(paths, sub):
     '''Returns existing jar if any, else creates a new one'''
+    # NB: Currently there are no checks on a failed pickle
     db_filename = os.path.join(paths.db_dir, sub.title)
     if os.path.isfile(db_filename):
-    # a crash created a zero sized db file - test for this or avoid crashing?
-    # maybe it's best to try the following and catch exception?
-        with open(db_filename, mode='rb') as f:
-            jar = pickle.load(f)
+        try:
+            with open(db_filename, mode='rb') as f:
+                jar = pickle.load(f)
+        except (UnpicklingError, EOFError) as e:
+            outcome = Outcome(False, e)
     else:
         jar = Jar(paths, sub)
         outcome = jar.save()

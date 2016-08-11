@@ -29,26 +29,33 @@ class Channel:
         # see that we can write to the designated directory
         outcome = files.check_path(sub.sub_dir)
         if not outcome.success:
-            logger.error(sub.title + ': ' + outcome.msg)
+            logger.error(outcome.msg)
             exit()
 
-        # create containers
+        # create containers: feed, jar, combo, wanted
         self.feed = Feed(self.sub)
         if not self.feed.outcome.success:
-            self.put.multi([' Feed could not be parsed. Parser said: ', 
-            ' ' + self.feed.outcome.msg])
-            self.put.cr()
+            logger.error(sub.title + ': ' + self.feed.outcome.msg)
             return 
         self.jar = history.get_jar(config.paths, self.sub)
         self.combo = Combo(self.feed, self.jar)
-        self.wanted = Wanted(self.sub, self.combo, put)
+        self.wanted = Wanted(self.sub, self.combo)
+        self.unwanted = list(set(self.jar.lst) - set(self.wanted.lst))
+        self.lacking = list(set(self.wanted.lst) - set(self.jar.lst))
+        logger.info(sub.title.upper() + '. ' +
+            len(self.unwanted) + ' to be removed. ' +
+            len(self.lacking) + ' to be downloaded.')
+        self.removed, self.downloaded = [], []
 
         # loop through unwanted entries to remove
-        for uid in list(set(self.jar.lst) - set(self.wanted.lst)):
-            del_outcome, jar_outcome  = self.remove(uid, self.jar.dic[uid])
+        for uid in self.unwanted:
+            entry = self.jar.dic[uid]
+            del_outcome, jar_outcome  = self.remove(uid, entry)
             if not jar_outcome.success:
-                put.single(' ' + outcome.msg)
+                logger.error(outcome.msg)
                 exit()
+            logger.debug('  -- ' + entry['poca_filename'])
+            self.removed.append(entry['poca_filename'])
 
         # loop through wanted entries to download or check
         self.new_jar = history.Jar(config.paths, self.sub)
@@ -101,8 +108,8 @@ class Feed:
         '''Constructs a container for feed entries'''
         try:
             doc = feedparser.parse(sub.url)
-        # https://github.com/kurtmckee/feedparser/issues/30#issuecomment-183714444            
         except TypeError:
+            # https://github.com/kurtmckee/feedparser/issues/30#issuecomment-183714444            
             if 'drv_libxml2' in feedparser.PREFERRED_XML_PARSERS:
                 feedparser.PREFERRED_XML_PARSERS.remove('drv_libxml2')
                 doc = feedparser.parse(sub.url)
@@ -125,7 +132,7 @@ class Combo:
         self.dic.update(jar.dic)
 
 class Wanted():
-    def __init__(self, sub, combo, put):
+    def __init__(self, sub, combo):
         '''Constructs a container for all the entries we have room for, 
         regardless of where they are, internet or local folder.'''
         self.lst, self.dic = ( [], {} )
@@ -134,6 +141,8 @@ class Wanted():
         self.cur_bytes = 0
 
         for uid in combo.lst:
+            # looks like we're re-doing old data entries as well as new
+            # why? can't we just tag new ones? or old ones?
             entry = combo.dic[uid]
             try:
                 entry['poca_url'] = entry.enclosures[0]['href']
@@ -150,12 +159,8 @@ class Wanted():
                 self.cur_bytes += entry.poca_size
                 self.lst.append(uid)
                 self.dic[uid] = entry
-                msg1 = ' Adding to wanted list:   ' + entry.title
-                put.cols(msg1, str(entry['poca_mb']) + ' Mb')
             else:
                 break
-        put.cols(' Total size:', "%6.2f Mb" % (self.cur_bytes / mega))
-        put.cols(' Allotted space:', "%6.2f Mb" % int(sub.max_mb))
 
     def get_size(self, entry):
         '''Returns the entrys size in bytes. Tries to get if off of the
