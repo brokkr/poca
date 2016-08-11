@@ -30,7 +30,7 @@ class Outcome:
         self.success = success
         self.msg = msg
 
-def get_logger(self, args):
+def get_logger(args):
     '''Gets stream logging instance and sticks it on Output instance'''
     logger = logging.getLogger('POCA')
     logger.setLevel(logging.INFO)
