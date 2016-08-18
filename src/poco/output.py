@@ -10,30 +10,16 @@
 import logging
 
 
-# Issue: Too much output, not relevant to user
-# Issue: Cumbersome construction
-# Issue: No colors in output
-# Options
-# * Only-logging, reduce amount of output, create verbose option, remove 
-#   non-logging output (progress meter)
-#   One advantage would be to be able to use logger as globally accessible
-#   object (right?) rather than having to pass output object around.
-#   Also: Shouldn't you stick new methods on logger rather than the 
-#   other way around?
-# * Create non-logging-based stream outputter
-# * ?
-
 class Outcome:
-    '''A way for modules like files to return outcome of operations in a
-    uniform fashion'''
+    '''A way to return outcome of operations in a uniform fashion'''
     def __init__(self, success, msg = ''):
         self.success = success
         self.msg = msg
 
 def get_logger(args):
-    '''Gets stream logging instance and sticks it on Output instance'''
+    '''Gets stream logging instance'''
     logger = logging.getLogger('POCA')
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
     # nullhandler receives output in case of no cli or log handler
     null_handler = logging.NullHandler()
     logger.addHandler(null_handler)

@@ -73,6 +73,15 @@ class Channel:
                 logger.debug('  ++ ' + entry['poca_filename'])
                 self.downloaded.append(entry['poca_filename'])
 
+        # print summary
+        if self.downloaded:
+            logger.info(self.sub.title.upper() + '. ' + 
+                'Downloaded: ' + ', '.join(self.downloaded))
+        if self.removed:
+            logger.info(self.sub.title.upper() + '. ' + 
+                'Removed: ' + ', '.join(self.removed))
+
+
     def add_to_jar(self, uid):
         '''Add keeper/getter to new jar (do we need to test for
         outcome? Isn't success guaranteed at this point?)'''
