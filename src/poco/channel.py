@@ -56,26 +56,27 @@ class Channel:
         # loop through unwanted (set) entries to remove
         for uid in self.unwanted:
             entry = self.jar.dic[uid]
-            del_outcome, jar_outcome  = self.remove(uid, entry)
-            if not jar_outcome.success and del_outcome.success:
-                logger.error(jar_outcome.msg + ' ' + del_outcome.msg)
-                exit()
+            self.remove(uid, entry)
             logger.debug('  -  ' + entry['poca_filename'])
             self.removed.append(entry['poca_filename'])
 
-        # loop through wanted entries (list) to download or check
+        # loop through wanted entries (list) to download or note
+        # NOTE: We should abandon reqriting the jar file from scratch and build 
+        # on the old one instead, updating it with each succesful file 
+        # operation.
         self.new_jar = history.Jar(config.paths, self.sub)
         for uid in self.wanted.lst:
             entry = self.wanted.dic[uid]
             if uid not in self.lacking:
-                self.add_to_jar(uid)
+                self.add_to_jar(uid, entry)
             else:
                 outcome = files.download_audio_file(entry)
                 if outcome.success:
-                    self.add_to_jar(uid)
+                    self.add_to_jar(uid, entry)
                     logger.debug('  +  ' + entry['poca_filename'])
                     self.downloaded.append(entry['poca_filename'])
                 else:
+                    # ought we add this to jar but with a note of not dl'ed?
                     logger.debug('  %  ' + entry['poca_filename'])
                     self.failed.append(entry['poca_filename'])
 
@@ -90,14 +91,12 @@ class Channel:
             logger.warn(self.sub.title.upper() + '. ' + 
                 'Removed: ' + ', '.join(self.removed))
 
-    def add_to_jar(self, uid):
-        '''Add keeper/getter to new jar (do we need to test for
-        outcome? Isn't success guaranteed at this point?)'''
-        entry = self.wanted.dic[uid]
+    def add_to_jar(self, uid, entry):
+        '''Add keeper/getter to new jar'''
         self.new_jar.lst.append(uid)
         self.new_jar.dic[uid] = entry
-        jar_outcome = self.new_jar.save()
-        if not jar_outcome.success:
+        outcome = self.new_jar.save()
+        if not outcome.success:
             logger.error(outcome.msg)
             exit()
 
@@ -105,23 +104,16 @@ class Channel:
         '''Deletes the file and removes the entry from the old jar
         (in the event that the program is interrupted in between
         deletion and writing a new jar to the db file)'''
-        del_outcome = files.delete_file(entry['poca_abspath'])
+        outcome = files.delete_file(entry['poca_abspath'])
+        if not outcome.success:
+            logger.error(outcome.msg)
+            exit()
         self.jar.lst.remove(uid)
-        jar_outcome = self.jar.save()
-        return (del_outcome, jar_outcome)
+        outcome = self.jar.save()
+        if not outcome.success:
+            logger.error(outcome.msg)
+            exit()
 
-    def check(self, uid, entry, args):
-        '''Performs a quick check-up on existing keeper-files and removes 
-        the entry from the old jar'''
-        msg1 = ' Checking existing file:  ' + entry['poca_filename']
-        if path.isfile(entry['poca_abspath']):
-            self.put.cols(msg1, 'OK')
-            outcome = Outcome(True, 'file ok')
-        else:
-            self.put.cols(msg1, 'FILE NOT FOUND. Attempting download.')
-            outcome = files.download_audio_file(args, entry)
-        self.jar.lst.remove(uid)
-        return outcome
 
 class Feed:
     def __init__(self, sub):
