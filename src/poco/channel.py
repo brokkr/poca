@@ -7,6 +7,7 @@
 # the Free Software Foundation, either version 3 of the License, 
 # or (at your option) any later version.
 
+import logging
 import urllib.request, urllib.error, urllib.parse
 from os import path
 from sys import exit
@@ -22,9 +23,11 @@ from poco import files
 logger = logging.getLogger('POCA')
 
 class Channel:
-    def __init__(self, config, put, sub):
+    def __init__(self, config, sub):
         '''A class for a single subscription/channel. Creates the containers
         first, then acts on them and updates the db as it goes.'''
+        
+        self.sub = sub
 
         # see that we can write to the designated directory
         outcome = files.check_path(sub.sub_dir)
@@ -35,57 +38,57 @@ class Channel:
         # create containers: feed, jar, combo, wanted
         self.feed = Feed(self.sub)
         if not self.feed.outcome.success:
-            logger.error(sub.title + ': ' + self.feed.outcome.msg)
+            logger.error(self.sub.title + ': ' + self.feed.outcome.msg)
             return 
         self.jar = history.get_jar(config.paths, self.sub)
         self.combo = Combo(self.feed, self.jar)
         self.wanted = Wanted(self.sub, self.combo)
         self.unwanted = list(set(self.jar.lst) - set(self.wanted.lst))
         self.lacking = list(set(self.wanted.lst) - set(self.jar.lst))
-        logger.info(sub.title.upper() + '. ' +
-            len(self.unwanted) + ' to be removed. ' +
-            len(self.lacking) + ' to be downloaded.')
+        self.keeping = list(set(self.wanted.lst) - set(self.lacking))
+        logger.info(self.sub.title.upper() + '. ' +
+            str(len(self.unwanted)) + ' to be removed. ' +
+            str(len(self.lacking)) + ' to be downloaded.')
         self.removed, self.downloaded = [], []
 
         # loop through unwanted entries to remove
         for uid in self.unwanted:
             entry = self.jar.dic[uid]
             del_outcome, jar_outcome  = self.remove(uid, entry)
-            if not jar_outcome.success:
-                logger.error(outcome.msg)
+            if not jar_outcome.success and del_outcome.success:
+                logger.error(jar_outcome.msg + ' ' + del_outcome.msg)
                 exit()
             logger.debug('  -- ' + entry['poca_filename'])
             self.removed.append(entry['poca_filename'])
 
         # loop through wanted entries to download or check
         self.new_jar = history.Jar(config.paths, self.sub)
-        for uid in self.wanted.lst:
+        for uid in self.keeping:
+            self.add_to_jar(uid)
+        for uid in self.lacking:
             entry = self.wanted.dic[uid]
-            if uid not in self.jar.lst:
-                outcome = files.download_audio_file(config.args, entry)
-            else:
-                outcome = self.check(uid, entry, config.args)
+            outcome = files.download_audio_file(entry)
             if outcome.success:
-                self.new_jar.lst.append(uid)
-                self.new_jar.dic[uid] = entry
-                jar_outcome = self.new_jar.save()
-                if not jar_outcome.success:
-                    self.put.single(' ' + outcome.msg)
-                    exit()
-            else:
-                self.put.single(' Something went wrong. Entry skipped')
-        self.put.cr()
+                self.add_to_jar(uid)
+                logger.debug('  ++ ' + entry['poca_filename'])
+                self.downloaded.append(entry['poca_filename'])
+
+    def add_to_jar(self, uid):
+        '''Add keeper/getter to new jar (do we need to test for
+        outcome? Isn't success guaranteed at this point?)'''
+        entry = self.wanted.dic[uid]
+        self.new_jar.lst.append(uid)
+        self.new_jar.dic[uid] = entry
+        jar_outcome = self.new_jar.save()
+        if not jar_outcome.success:
+            logger.error(outcome.msg)
+            exit()
 
     def remove(self, uid, entry):
         '''Deletes the file and removes the entry from the old jar
         (in the event that the program is interrupted in between
         deletion and writing a new jar to the db file)'''
         del_outcome = files.delete_file(entry['poca_abspath'])
-        msg1 = ' Removing existing file:  ' + entry['poca_filename']
-        if del_outcome.success:
-            self.put.cols(msg1, 'OK')
-        else:
-            self.put.cols(msg1, 'FILE NOT FOUND')
         self.jar.lst.remove(uid)
         jar_outcome = self.jar.save()
         return (del_outcome, jar_outcome)

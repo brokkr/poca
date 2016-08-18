@@ -51,7 +51,7 @@ def write_file(file_path, text):
     except IOError as e:
         return Outcome(False, file_path + ': ' + str(e))
 
-def download_audio_file(args, entry):
+def download_audio_file(entry):
     '''Downloads one file'''
     try:
         dummy, response = urlretrieve(entry['poca_url'], entry['poca_abspath'])

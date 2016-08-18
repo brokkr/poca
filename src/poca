@@ -17,8 +17,8 @@ if __name__ == '__main__':
         args = poco.args.get_args()
         poco.output.get_logger(args)
         config = poco.config.Config(args)
-        #for sub in config.subs:
-        #    channel = poco.channel.Channel(config, put, sub)
+        for sub in config.subs:
+            channel = poco.channel.Channel(config, sub)
     except KeyboardInterrupt:
         pass
 
