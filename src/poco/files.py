@@ -24,14 +24,14 @@ def check_path(check_dir):
     '''Create a directory'''
     if os.path.isdir(check_dir):
         if os.access(check_dir, os.W_OK):
-            return Outcome(True, check_dir + ': Directory exists already')
+            return Outcome(True, check_dir + ': Directory exists already.')
         else:
-            return Outcome(False, check_dir + ': Lacks permissions to directory')
+            return Outcome(False, check_dir + ': Lacks permissions to directory.')
     try:
         os.makedirs(check_dir)
-        return Outcome(True, check_dir + ': Directory was successfully created')
+        return Outcome(True, check_dir + ': Directory was successfully created.')
     except OSError as e:
-        return Outcome(False, check_dir + ': Directory could not be created')
+        return Outcome(False, check_dir + ': Directory could not be created.')
 
 def delete_file(file_path):
     '''Deletes a file'''

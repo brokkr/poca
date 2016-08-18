@@ -28,32 +28,33 @@ class Channel:
         first, then acts on them and updates the db as it goes.'''
         
         self.sub = sub
+        self.title = sub.title.upper() + '. '
 
         # see that we can write to the designated directory
         outcome = files.check_path(sub.sub_dir)
         if not outcome.success:
-            logger.error(outcome.msg)
+            logger.error(self.title + outcome.msg)
             exit()
 
         # create containers: feed, jar, combo, wanted
         self.feed = Feed(self.sub)
         if not self.feed.outcome.success:
-            logger.error(self.sub.title + ': ' + self.feed.outcome.msg)
+            logger.error(self.title + self.feed.outcome.msg)
             return 
         self.jar = history.get_jar(config.paths, self.sub)
         self.combo = Combo(self.feed, self.jar)
         self.wanted = Wanted(self.sub, self.combo)
         self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
         self.lacking = set(self.wanted.lst) - set(self.jar.lst)
-        msg = self.sub.title.upper() + '. '
+        msg = self.title
         if len(self.unwanted) > 0:
             msg = msg + str(len(self.unwanted)) + ' to be removed. ' 
         if len(self.lacking) > 0:
             msg = msg + str(len(self.lacking)) + ' to be downloaded.'
         if len(self.unwanted) == 0 and len(self.lacking) == 0:
-            msg = msg + 'No changes'
+            msg = msg + 'No changes.'
         logger.info(msg)
-        self.removed, self.downloaded, self.failed = [], [], []
+        self.removed, self.downed, self.failed = [], [], []
 
         # loop through unwanted (set) entries to remove
         for uid in self.unwanted:
@@ -76,22 +77,18 @@ class Channel:
                 if outcome.success:
                     self.add_to_jar(uid, entry)
                     logger.debug('  +  ' + entry['poca_filename'])
-                    self.downloaded.append(entry['poca_filename'])
+                    self.downed.append(entry['poca_filename'])
                 else:
-                    # ought we add this to jar but with a note of not dl'ed?
                     logger.debug('  %  ' + entry['poca_filename'])
                     self.failed.append(entry['poca_filename'])
 
-        # print summary
-        if self.downloaded:
-            logger.warn(self.sub.title.upper() + '. ' + 
-                'Downloaded: ' + ', '.join(self.downloaded))
+        # print summary to log ('warn' is filtered out in stream)
+        if self.downed:
+            logger.warn(self.title + 'Downloaded: ' + ', '.join(self.downed))
         if self.failed:
-            logger.warn(self.sub.title.upper() + '. ' + 
-                'Failed: ' + ', '.join(self.downloaded))
+            logger.warn(self.title + 'Failed: ' + ', '.join(self.failed))
         if self.removed:
-            logger.warn(self.sub.title.upper() + '. ' + 
-                'Removed: ' + ', '.join(self.removed))
+            logger.warn(self.title + 'Removed: ' + ', '.join(self.removed))
 
     def add_to_jar(self, uid, entry):
         '''Add keeper/getter to new jar'''
@@ -99,7 +96,7 @@ class Channel:
         self.new_jar.dic[uid] = entry
         outcome = self.new_jar.save()
         if not outcome.success:
-            logger.error(outcome.msg)
+            logger.error(self.title + outcome.msg)
             exit()
 
     def remove(self, uid, entry):
@@ -108,12 +105,12 @@ class Channel:
         deletion and writing a new jar to the db file)'''
         outcome = files.delete_file(entry['poca_abspath'])
         if not outcome.success:
-            logger.error(outcome.msg)
+            logger.error(self.title + outcome.msg)
             exit()
         self.jar.lst.remove(uid)
         outcome = self.jar.save()
         if not outcome.success:
-            logger.error(outcome.msg)
+            logger.error(self.title + outcome.msg)
             exit()
 
 
@@ -132,9 +129,11 @@ class Feed:
         if not doc.feed:
             self.outcome = Outcome(False, str(doc.bozo_exception))
             return
+        # doc.feed.pubdate is sadly not universal so we skip it here
+        # (as coding around the cases that leave it out is too bothersome)
         self.lst = [ entry.id for entry in doc.entries ]
         self.dic = { entry.id : entry for entry in doc.entries }
-        self.outcome = Outcome(True, 'Got feed')
+        self.outcome = Outcome(True, 'Got feed.')
 
 class Combo:
     def __init__(self, feed, jar):
@@ -149,32 +148,39 @@ class Wanted():
     def __init__(self, sub, combo):
         '''Constructs a container for all the entries we have room for, 
         regardless of where they are, internet or local folder.'''
-        self.lst, self.dic = ( [], {} )
+        self.lst, self.dic = [], {}
         mega = 1048576.0
         self.max_bytes = int(sub.max_mb) * mega
         self.cur_bytes = 0
-
         for uid in combo.lst:
-            # looks like we're re-doing old data entries as well as new
-            # why? can't we just tag new ones? or old ones?
             entry = combo.dic[uid]
-            try:
-                entry['poca_url'] = entry.enclosures[0]['href']
-            except (KeyError, IndexError, AttributeError):
-                continue
-            entry['poca_size'] = self.get_size(entry)
-            if not entry['poca_size']:
-                continue
-            entry['poca_mb'] = round(entry.poca_size / mega, 2)
-            entry['poca_filename'] = self.get_filename(entry)
-            entry['poca_abspath'] = path.join(sub.sub_dir, 
-                entry['poca_filename'])
+            if 'poca' not in entry:
+                entry = self.get_data(entry, sub, mega)
+                if not entry:
+                    break
             if self.cur_bytes + entry.poca_size < self.max_bytes:
                 self.cur_bytes += entry.poca_size
                 self.lst.append(uid)
                 self.dic[uid] = entry
             else:
                 break
+
+    def get_data(self, entry, sub, mega):
+        try:
+            entry['poca_url'] = entry.enclosures[0]['href']
+        except (KeyError, IndexError, AttributeError):
+            return False
+        entry['poca_size'] = self.get_size(entry)
+        if not entry['poca_size']:
+            return False
+        entry['poca_mb'] = round(entry.poca_size / mega, 2)
+        # missing exception?
+        parsed_url = urllib.parse.urlparse(entry['poca_url'])
+        entry['poca_filename'] = path.basename(parsed_url.path)
+        entry['poca_abspath'] = path.join(sub.sub_dir, 
+            entry['poca_filename'])
+        entry['poca'] = True
+        return entry
 
     def get_size(self, entry):
         '''Returns the entrys size in bytes. Tries to get if off of the
@@ -192,10 +198,4 @@ class Wanted():
                 size = False
         return size
 
-    def get_filename(self, entry):
-        '''Parses URL to find base filename. To be expanded with naming
-        options'''
-        parsed_url = urllib.parse.urlparse(entry['poca_url'])
-        filename = path.basename(parsed_url.path)
-        return filename
 
