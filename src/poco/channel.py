@@ -45,12 +45,14 @@ class Channel:
         self.wanted = Wanted(self.sub, self.combo)
         self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
         self.lacking = set(self.wanted.lst) - set(self.jar.lst)
-        if len(self.unwanted) > 0 or len(self.lacking) > 0:
-            logger.info(self.sub.title.upper() + '. ' +
-                str(len(self.unwanted)) + ' to be removed. ' +
-                str(len(self.lacking)) + ' to be downloaded.')
-        else:
-            logger.info(self.sub.title.upper() + '. No changes')
+        msg = self.sub.title.upper() + '. '
+        if len(self.unwanted) > 0:
+            msg = msg + str(len(self.unwanted)) + ' to be removed. ' 
+        if len(self.lacking) > 0:
+            msg = msg + str(len(self.lacking)) + ' to be downloaded.'
+        if len(self.unwanted) == 0 and len(self.lacking) == 0:
+            msg = msg + 'No changes'
+        logger.info(msg)
         self.removed, self.downloaded, self.failed = [], [], []
 
         # loop through unwanted (set) entries to remove
