@@ -43,44 +43,52 @@ class Channel:
         self.jar = history.get_jar(config.paths, self.sub)
         self.combo = Combo(self.feed, self.jar)
         self.wanted = Wanted(self.sub, self.combo)
-        self.unwanted = list(set(self.jar.lst) - set(self.wanted.lst))
-        self.lacking = list(set(self.wanted.lst) - set(self.jar.lst))
-        self.keeping = list(set(self.wanted.lst) - set(self.lacking))
-        logger.info(self.sub.title.upper() + '. ' +
-            str(len(self.unwanted)) + ' to be removed. ' +
-            str(len(self.lacking)) + ' to be downloaded.')
-        self.removed, self.downloaded = [], []
+        self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
+        self.lacking = set(self.wanted.lst) - set(self.jar.lst)
+        if len(self.unwanted) > 0 or len(self.lacking) > 0:
+            logger.info(self.sub.title.upper() + '. ' +
+                str(len(self.unwanted)) + ' to be removed. ' +
+                str(len(self.lacking)) + ' to be downloaded.')
+        else:
+            logger.info(self.sub.title.upper() + '. No changes')
+        self.removed, self.downloaded, self.failed = [], [], []
 
-        # loop through unwanted entries to remove
+        # loop through unwanted (set) entries to remove
         for uid in self.unwanted:
             entry = self.jar.dic[uid]
             del_outcome, jar_outcome  = self.remove(uid, entry)
             if not jar_outcome.success and del_outcome.success:
                 logger.error(jar_outcome.msg + ' ' + del_outcome.msg)
                 exit()
-            logger.debug('  -- ' + entry['poca_filename'])
+            logger.debug('  -  ' + entry['poca_filename'])
             self.removed.append(entry['poca_filename'])
 
-        # loop through wanted entries to download or check
+        # loop through wanted entries (list) to download or check
         self.new_jar = history.Jar(config.paths, self.sub)
-        for uid in self.keeping:
-            self.add_to_jar(uid)
-        for uid in self.lacking:
+        for uid in self.wanted.lst:
             entry = self.wanted.dic[uid]
-            outcome = files.download_audio_file(entry)
-            if outcome.success:
+            if uid not in self.lacking:
                 self.add_to_jar(uid)
-                logger.debug('  ++ ' + entry['poca_filename'])
-                self.downloaded.append(entry['poca_filename'])
+            else:
+                outcome = files.download_audio_file(entry)
+                if outcome.success:
+                    self.add_to_jar(uid)
+                    logger.debug('  +  ' + entry['poca_filename'])
+                    self.downloaded.append(entry['poca_filename'])
+                else:
+                    logger.debug('  %  ' + entry['poca_filename'])
+                    self.failed.append(entry['poca_filename'])
 
         # print summary
         if self.downloaded:
-            logger.info(self.sub.title.upper() + '. ' + 
+            logger.warn(self.sub.title.upper() + '. ' + 
                 'Downloaded: ' + ', '.join(self.downloaded))
+        if self.failed:
+            logger.warn(self.sub.title.upper() + '. ' + 
+                'Failed: ' + ', '.join(self.downloaded))
         if self.removed:
-            logger.info(self.sub.title.upper() + '. ' + 
+            logger.warn(self.sub.title.upper() + '. ' + 
                 'Removed: ' + ', '.join(self.removed))
-
 
     def add_to_jar(self, uid):
         '''Add keeper/getter to new jar (do we need to test for

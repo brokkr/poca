@@ -23,11 +23,15 @@ def get_logger(args):
     # nullhandler receives output in case of no cli or log handler
     null_handler = logging.NullHandler()
     logger.addHandler(null_handler)
+    class WarnFilter(logging.Filter):
+        def filter(self, rec):
+            return rec.levelno != logging.WARN
     if not args.quiet:
         stream_handler = logging.StreamHandler()
         stream_handler.setLevel(logging.DEBUG)
         stream_formatter = logging.Formatter("%(message)s")
         stream_handler.setFormatter(stream_formatter)
+        stream_handler.addFilter(WarnFilter())
         logger.addHandler(stream_handler)
 
 def add_filehandler(log_file_path, logger):
