@@ -41,7 +41,10 @@ class Channel:
         if not self.feed.outcome.success:
             logger.error(self.title + self.feed.outcome.msg)
             return 
-        self.jar = history.get_jar(config.paths, self.sub)
+        self.jar, outcome = history.get_jar(config.paths, self.sub)
+        if not outcome.success:
+            logger.error(self.title + outcome.msg)
+            exit()
         self.combo = Combo(self.feed, self.jar)
         self.wanted = Wanted(self.sub, self.combo)
         self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
@@ -130,7 +133,7 @@ class Feed:
             self.outcome = Outcome(False, str(doc.bozo_exception))
             return
         # doc.feed.pubdate is sadly not universal so we skip it here
-        # (as coding around the cases that leave it out is too bothersome)
+        # (coding around the cases that leave it out gets too convoluted)
         self.lst = [ entry.id for entry in doc.entries ]
         self.dic = { entry.id : entry for entry in doc.entries }
         self.outcome = Outcome(True, 'Got feed.')
@@ -157,7 +160,7 @@ class Wanted():
             if 'poca' not in entry:
                 entry = self.get_data(entry, sub, mega)
                 if not entry:
-                    break
+                    continue
             if self.cur_bytes + entry.poca_size < self.max_bytes:
                 self.cur_bytes += entry.poca_size
                 self.lst.append(uid)
