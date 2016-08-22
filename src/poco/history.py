@@ -22,8 +22,9 @@ def get_jar(paths, sub):
             with open(db_filename, mode='rb') as f:
                 jar = pickle.load(f)
                 outcome = Outcome(True, 'Pickle loaded')
-        except (UnpicklingError, EOFError) as e:
-            outcome = Outcome(False, e)
+        except (PermissionError, pickle.UnpicklingError, EOFError) as e:
+            outcome = Outcome(False, str(e))
+            jar = None
     else:
         jar = Jar(paths, sub)
         outcome = jar.save()
