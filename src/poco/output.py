@@ -43,18 +43,3 @@ def add_filehandler(log_file_path, logger):
     file_handler.setFormatter(file_formatter)
     logger.addHandler(file_handler)
 
-def colorize(_string, color):
-    '''Formatting function, adds color codes to string'''
-    color_codes = { 
-        'reset': '\033[0;0m',
-        'bold': '\033[1m',
-        'red': '\033[31m',
-        'green': '\033[32m',
-        'blue': '\033[34m',
-        'lred': '\033[1;31m',
-        'lgreen': '\033[1;32m',
-        'yellow': '\033[1;33m',
-        'lblue': '\033[1;34m'
-        }
-    return color_codes[color] + str(_string) + color_codes['reset']
-
