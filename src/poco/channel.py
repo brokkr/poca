@@ -78,6 +78,8 @@ class Channel:
             wantedindex = self.wanted.lst.index(uid)
             outcome = files.download_audio_file(entry)
             if outcome.success:
+                # this is where we override the downloaded file's metadata:
+                # files.tag_audio_file
                 self.add_to_jar(uid, entry, wantedindex)
                 logger.debug('  +  ' + entry['poca_filename'])
                 self.downed.append(entry['poca_filename'])
@@ -165,6 +167,8 @@ class Wanted():
                     continue
             if self.cur_bytes + entry.poca_size < self.max_bytes:
                 self.cur_bytes += entry.poca_size
+                # run metadata calculation function, add to entry
+                # run get_data2 function, add to entry
                 self.lst.append(uid)
                 self.dic[uid] = entry
             else:
@@ -181,6 +185,8 @@ class Wanted():
             return False
         entry['poca_mb'] = round(entry.poca_size / mega, 2)
         # missing exception?
+        # below is only needed (and meaningful) for wanted files
+        # should be moved to separate get_data2 function
         parsed_url = urllib.parse.urlparse(entry['poca_url'])
         entry['poca_filename'] = path.basename(parsed_url.path)
         entry['poca_abspath'] = path.join(sub.sub_dir, 

@@ -33,13 +33,6 @@ def check_path(check_dir):
     except OSError as e:
         return Outcome(False, check_dir + ': Directory could not be created.')
 
-def delete_file(file_path):
-    '''Deletes a file'''
-    try:
-        os.remove(file_path)
-        return Outcome(True, file_path + ': File was successfully deleted')
-    except OSError as e:
-        return Outcome(False, file_path + ': ' + str(e))
 
 def write_file(file_path, text):
     '''Writes a string to file. Currently specific to creating config file.'''
@@ -49,6 +42,17 @@ def write_file(file_path, text):
         wfile.close()
         return Outcome(True, 'New config file successfully created')
     except IOError as e:
+        return Outcome(False, file_path + ': ' + str(e))
+
+
+def delete_file(file_path):
+    '''Deletes a file'''
+    # standardise on the dataunit being passed around?
+    # this should be a entry not a filename
+    try:
+        os.remove(file_path)
+        return Outcome(True, file_path + ': File was successfully deleted')
+    except OSError as e:
         return Outcome(False, file_path + ': ' + str(e))
 
 def download_audio_file(entry):
@@ -77,8 +81,10 @@ def tag_audio_file(sets_dic, entry_dic, sub_dic):
     localfile = os.path.join(sub_dic['sub_dir'], entry_dic['filename'])
     file_extension = os.path.splitext(localfile)[1].lower()
     if file_extension != '.mp3':
+        # outcome = ...
         return
     if 'metadata' not in sub_dic:
+        # outcome = ...
         return
     try:
         id3tag = mutagen.id3.ID3(localfile)
