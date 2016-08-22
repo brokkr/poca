@@ -66,24 +66,22 @@ class Channel:
             logger.debug('  -  ' + entry['poca_filename'])
             self.removed.append(entry['poca_filename'])
 
-        # loop through wanted entries (list) to download or note
-        # NOTE: We should abandon reqriting the jar file from scratch and build 
-        # on the old one instead, updating it with each succesful file 
-        # operation.
-        self.new_jar = history.Jar(config.paths, self.sub)
-        for uid in self.wanted.lst:
-            entry = self.wanted.dic[uid]
+        # loop through wanted entries (list) to download
+        # note that we go backwards through the list and insert
+        # at the front to keep order with jar.lst
+        while self.wanted.lst:
+            uid = self.wanted.lst.pop()
             if uid not in self.lacking:
+                continue
+            entry = self.wanted.dic[uid]
+            outcome = files.download_audio_file(entry)
+            if outcome.success:
                 self.add_to_jar(uid, entry)
+                logger.debug('  +  ' + entry['poca_filename'])
+                self.downed.insert(0, entry['poca_filename'])
             else:
-                outcome = files.download_audio_file(entry)
-                if outcome.success:
-                    self.add_to_jar(uid, entry)
-                    logger.debug('  +  ' + entry['poca_filename'])
-                    self.downed.append(entry['poca_filename'])
-                else:
-                    logger.debug('  %  ' + entry['poca_filename'])
-                    self.failed.append(entry['poca_filename'])
+                logger.debug('  %  ' + entry['poca_filename'])
+                self.failed.insert(0, entry['poca_filename'])
 
         # print summary to log ('warn' is filtered out in stream)
         if self.downed:
@@ -95,9 +93,9 @@ class Channel:
 
     def add_to_jar(self, uid, entry):
         '''Add keeper/getter to new jar'''
-        self.new_jar.lst.append(uid)
-        self.new_jar.dic[uid] = entry
-        outcome = self.new_jar.save()
+        self.jar.lst.insert(0, uid)
+        self.jar.dic[uid] = entry
+        outcome = self.jar.save()
         if not outcome.success:
             logger.error(self.title + outcome.msg)
             exit()
