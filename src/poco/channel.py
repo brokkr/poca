@@ -36,14 +36,14 @@ class Channel:
             exit()
 
         # create containers: feed, jar, combo, wanted
-        self.feed = Feed(self.sub)
-        if not self.feed.outcome.success:
-            logger.error(self.title + self.feed.outcome.msg)
-            return 
         self.jar, outcome = history.get_jar(config.paths, self.sub)
         if not outcome.success:
             logger.error(self.title + outcome.msg)
             exit()
+        self.feed = Feed(self.sub, self.jar)
+        if not self.feed.outcome.success:
+            logger.error(self.title + self.feed.outcome.msg)
+            return 
         self.combo = Combo(self.feed, self.jar)
         self.wanted = Wanted(self.sub, self.combo)
         self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
@@ -66,10 +66,11 @@ class Channel:
             self.removed.append(entry['poca_filename'])
 
         # loop through wanted entries (list) to download
-        # Looping trhough the lacking entries, we insert them at the
-        # index they have in wanted. This has been found to be preferable
-        # to a) starting a new list based on wanted and b) inserting 
-        # all new entries at the front.
+        # Looping through the lacking entries, we insert them at the
+        # index they have in wanted.lst. By the time we get to old ones,
+        # they will have the correct index. This has been found to 
+        # be preferable to a) starting a new list based on wanted 
+        # and b) inserting all new entries at the front.
         for uid in self.wanted.lst:
             if uid not in self.lacking:
                 continue
@@ -93,7 +94,7 @@ class Channel:
             logger.warn(self.title + 'Removed: ' + ', '.join(self.removed))
 
     def add_to_jar(self, uid, entry, wantedindex):
-        '''Add keeper/getter to new jar'''
+        '''Add new entry to jar'''
         self.jar.lst.insert(wantedindex, uid)
         self.jar.dic[uid] = entry
         outcome = self.jar.save()
@@ -102,9 +103,7 @@ class Channel:
             exit()
 
     def remove(self, uid, entry):
-        '''Deletes the file and removes the entry from the old jar
-        (in the event that the program is interrupted in between
-        deletion and writing a new jar to the db file)'''
+        '''Deletes the file and removes the entry from the jar'''
         outcome = files.delete_file(entry['poca_abspath'])
         if not outcome.success:
             logger.error(self.title + outcome.msg)
@@ -118,7 +117,7 @@ class Channel:
 
 
 class Feed:
-    def __init__(self, sub):
+    def __init__(self, sub, jar):
         '''Constructs a container for feed entries'''
         try:
             doc = feedparser.parse(sub.url)
@@ -129,11 +128,14 @@ class Feed:
                 doc = feedparser.parse(sub.url)
             else:
                 raise
-        if not doc.feed:
-            self.outcome = Outcome(False, str(doc.bozo_exception))
+        # only bozo for actual errors
+        if doc.bozo and not doc.entries and doc.status != 304:            
+            self.outcome = Outcome(False, 'Error: ' + str(doc.bozo_exception))
             return
-        # pubdate is optional (https://validator.w3.org/feed/docs/rss2.html)
-        # so we can't depend on it. 
+        # if etag is 304, doc.entries is empty and we proceed as normal
+        if doc.has_key('etag'):
+            jar.etag = doc.etag
+            jar.save()
         self.lst = [ entry.id for entry in doc.entries ]
         self.dic = { entry.id : entry for entry in doc.entries }
         self.outcome = Outcome(True, 'Got feed.')
@@ -169,6 +171,7 @@ class Wanted():
                 break
 
     def get_data(self, entry, sub, mega):
+        '''Sort relevant data under memorable keys'''
         try:
             entry['poca_url'] = entry.enclosures[0]['href']
         except (KeyError, IndexError, AttributeError):

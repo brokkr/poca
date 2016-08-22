@@ -33,6 +33,7 @@ class Jar:
     def __init__(self, paths, sub):
         '''Creates standard subscription info container with save method'''
         self.db_filename = os.path.join(paths.db_dir, sub.title)
+        self.etag = None
         self.lst = []
         self.dic = {}
 
