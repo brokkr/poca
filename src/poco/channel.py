@@ -111,6 +111,7 @@ class Channel:
             logger.error(self.title + outcome.msg)
             exit()
         self.jar.lst.remove(uid)
+        del(self.jar.dic(uid))
         outcome = self.jar.save()
         if not outcome.success:
             logger.error(self.title + outcome.msg)
@@ -132,8 +133,10 @@ class Feed:
         if not doc.feed:
             self.outcome = Outcome(False, str(doc.bozo_exception))
             return
-        # doc.feed.pubdate is sadly not universal so we skip it here
-        # (coding around the cases that leave it out gets too convoluted)
+        # pubdate is optional (https://validator.w3.org/feed/docs/rss2.html)
+        # so we can't depend on it. But we could check to see if the 
+        # most recent entry is the same as last time? But that leaves out 
+        # the possibility that the space allocation has changed.
         self.lst = [ entry.id for entry in doc.entries ]
         self.dic = { entry.id : entry for entry in doc.entries }
         self.outcome = Outcome(True, 'Got feed.')
