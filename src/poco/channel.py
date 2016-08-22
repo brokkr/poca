@@ -11,7 +11,6 @@ import logging
 import urllib.request, urllib.error, urllib.parse
 from os import path
 from sys import exit
-#from time import sleep
 
 import feedparser
 
@@ -67,21 +66,23 @@ class Channel:
             self.removed.append(entry['poca_filename'])
 
         # loop through wanted entries (list) to download
-        # note that we go backwards through the list and insert
-        # at the front to keep order with jar.lst
-        while self.wanted.lst:
-            uid = self.wanted.lst.pop()
+        # Looping trhough the lacking entries, we insert them at the
+        # index they have in wanted. This has been found to be preferable
+        # to a) starting a new list based on wanted and b) inserting 
+        # all new entries at the front.
+        for uid in self.wanted.lst:
             if uid not in self.lacking:
                 continue
             entry = self.wanted.dic[uid]
+            wantedindex = self.wanted.lst.index(uid)
             outcome = files.download_audio_file(entry)
             if outcome.success:
-                self.add_to_jar(uid, entry)
+                self.add_to_jar(uid, entry, wantedindex)
                 logger.debug('  +  ' + entry['poca_filename'])
-                self.downed.insert(0, entry['poca_filename'])
+                self.downed.append(entry['poca_filename'])
             else:
                 logger.debug('  %  ' + entry['poca_filename'])
-                self.failed.insert(0, entry['poca_filename'])
+                self.failed.append(entry['poca_filename'])
 
         # print summary to log ('warn' is filtered out in stream)
         if self.downed:
@@ -91,9 +92,9 @@ class Channel:
         if self.removed:
             logger.warn(self.title + 'Removed: ' + ', '.join(self.removed))
 
-    def add_to_jar(self, uid, entry):
+    def add_to_jar(self, uid, entry, wantedindex):
         '''Add keeper/getter to new jar'''
-        self.jar.lst.insert(0, uid)
+        self.jar.lst.insert(wantedindex, uid)
         self.jar.dic[uid] = entry
         outcome = self.jar.save()
         if not outcome.success:
@@ -109,7 +110,7 @@ class Channel:
             logger.error(self.title + outcome.msg)
             exit()
         self.jar.lst.remove(uid)
-        del(self.jar.dic(uid))
+        del(self.jar.dic[uid])
         outcome = self.jar.save()
         if not outcome.success:
             logger.error(self.title + outcome.msg)
@@ -132,9 +133,7 @@ class Feed:
             self.outcome = Outcome(False, str(doc.bozo_exception))
             return
         # pubdate is optional (https://validator.w3.org/feed/docs/rss2.html)
-        # so we can't depend on it. But we could check to see if the 
-        # most recent entry is the same as last time? But that leaves out 
-        # the possibility that the space allocation has changed.
+        # so we can't depend on it. 
         self.lst = [ entry.id for entry in doc.entries ]
         self.dic = { entry.id : entry for entry in doc.entries }
         self.outcome = Outcome(True, 'Got feed.')
