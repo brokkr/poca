@@ -66,46 +66,42 @@ def download_audio_file(entry):
         return Outcome(False, "IOError: " + str(e))
 
 
-def tag_audio_file(sets_dic, entry_dic, sub_dic):
-    '''NOT IN CURRENT USE. Reintroducing id3 tagging using mutagen'''
+def tag_audio_file(prefs, sub, entry):
+    '''Reintroducing id3 tagging using mutagen'''
     # get general metadata settings
-    id3version_dic = {'2.3': 3, '2.4': 4}
-    id3version = id3version_dic[sets_dic['metadata']['id3version']]
     id3v1_dic = {'yes': 0, 'no': 2}
-    id3v1 = id3v1_dic[sets_dic['metadata']['removeid3v1']] 
-    id3encoding = 0
-    if sets_dic['metadata']['unicode'] == 'yes':
-        id3encoding_dic = {3: 1, 4: 3}
-        id3encoding = id3encoding_dic[id3version]
-    # overwrite metadata in the present file 
-    localfile = os.path.join(sub_dic['sub_dir'], entry_dic['filename'])
-    file_extension = os.path.splitext(localfile)[1].lower()
-    if file_extension != '.mp3':
-        # outcome = ...
-        return
-    if 'metadata' not in sub_dic:
-        # outcome = ...
-        return
+    id3v1 = id3v1_dic[prefs.id3removev1]
+    id3encoding_dic = {'latin1': 0, 'utf8': 3}
+    id3encoding = id3encoding_dic[prefs.id3encoding]
+    # check for proper header and metadata to apply
+    if entry['poca_ext'] != '.mp3':
+        return Outcome(True, 'Not an mp3')
+    if not sub.metadata:
+        return Outcome(True, 'No metadata overrides to apply')
     try:
-        id3tag = mutagen.id3.ID3(localfile)
-    except mutagen.id3.ID3NoHeaderError:
-        easytag = mutagen.File(localfile, easy=True)
+        id3tag = mutagen.id3.ID3(entry['poca_abspath'])
+    except mutagen.id3._util.ID3NoHeaderError:
+        easytag = mutagen.File(entry['poca_abspath'], easy=True)
         easytag.add_tags()
-        easytag['title'] = os.path.basename(localfile).split('.')[0]
+        easytag['title'] = entry['poca_basename']
         easytag.save()
-        id3tag = mutagen.id3.ID3(localfile)
-    if id3version == 3:
-        id3tag.update_to_v23()
-    for override in sub_dic['metadata']:
-        frame = frame_dic[override]
-        ftext = sub_dic['metadata'][override]
-        id3tag.add(frame(encoding=id3encoding, text=ftext))
+        id3tag = mutagen.id3.ID3(entry['poca_abspath'])
+    id3tag.update_to_v24()
+    # apply overrides to header and save file with chosen encoding
+    for override in sub.metadata:
+        failure_lst = []
         try:
-            id3tag.save(v1=id3v1, v2_version=id3version)
-        except UnicodeEncodeError:
-            error = ('The metadata overrides contain Unicode characters '
-            'but you have chosen a non-Unicode encoding.')
-            suggest = ('Please change either your Unicode preference or '
-            'your overrides')
-            errors.errors(error, suggest)
+            frame = frame_dic[override]
+        except KeyError:
+            failure_lst.append(override)
+        ftext = sub.metadata[override]
+        id3tag.add(frame(encoding=id3encoding, text=ftext))
+    try:
+        id3tag.save(v1=id3v1, v2_version=4)
+    except UnicodeEncodeError:
+        return Outcome(False, 'Unicode overrides in non-Unicode encoding')
+    if failure_lst:
+        return Outcome(False, 'Bad overrides: ' + str(failure_lst))
+    else:
+        return Outcome(True, 'Metadata successfully updated')
 

@@ -42,7 +42,7 @@ class Channel:
             sys.exit()
         self.feed = Feed(self.sub, self.jar)
         if not self.feed.outcome.success:
-            logger.error(self.title + '( error )' + self.feed.outcome.msg)
+            logger.error(self.title + '( error ) ' + self.feed.outcome.msg)
             return 
         self.combo = Combo(self.feed, self.jar)
         self.wanted = Wanted(self.sub, self.combo)
@@ -50,9 +50,9 @@ class Channel:
         self.lacking = set(self.wanted.lst) - set(self.jar.lst)
         msg = self.title
         if len(self.unwanted) > 0:
-            msg = msg + str(len(self.unwanted)) + ' to be removed. ' 
+            msg = msg + str(len(self.unwanted)) + ' files to be removed. ' 
         if len(self.lacking) > 0:
-            msg = msg + str(len(self.lacking)) + ' to be downloaded.'
+            msg = msg + str(len(self.lacking)) + ' files to be downloaded.'
         if len(self.unwanted) == 0 and len(self.lacking) == 0:
             msg = msg + 'No changes.'
         logger.info(msg)
@@ -76,16 +76,19 @@ class Channel:
                 continue
             entry = self.wanted.dic[uid]
             wantedindex = self.wanted.lst.index(uid)
-            outcome = files.download_audio_file(entry)
             logger.debug('  +  ' + entry['poca_filename'] + 
                 '  [ ' + str(entry['poca_mb']) + ' Mb ]  ...')
+            outcome = files.download_audio_file(entry)
             if outcome.success:
-                # this is where we override the downloaded file's metadata:
-                # files.tag_audio_file
+                outcome = files.tag_audio_file(config.prefs, self.sub, entry)
+                if not outcome.success:
+                    logger.debug('     Tagging failed. ' + outcome.msg)
                 self.add_to_jar(uid, entry, wantedindex)
                 self.downed.append(entry['poca_filename'])
             else:
-                logger.debug('     Download failed.' + entry['poca_filename'])
+                # NB: when a download fails, the wantedindex of the
+                # following files becomes problematic (read: wrong)
+                logger.debug('     Download failed.')
                 self.failed.append(entry['poca_filename'])
 
         # print summary to log ('warn' is filtered out in stream)
@@ -168,7 +171,6 @@ class Wanted():
                     continue
             if self.cur_bytes + entry.poca_size < self.max_bytes:
                 self.cur_bytes += entry.poca_size
-                # run metadata adjustment method on entry
                 entry.attach_path(sub)
                 self.lst.append(uid)
                 self.dic[uid] = entry

@@ -8,7 +8,7 @@
 # or (at your option) any later version.
 
 template = """<?xml version="1.0" encoding="UTF-8"?>
-<poca version="0.4">
+<poca version="0.5">
 
     <!-- Please see detailed configuration documentation online:
      https://github.com/brokkr/poca/wiki/Configuration -->
@@ -17,15 +17,12 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
 
         <base_dir>/tmp/poca</base_dir>
 
-        <!-- NOT CURRENTLY IN USE! 
+        <!-- 
         The following settings relate to id3. These values are accepted:
-        * id3version: 2.3, 2.4
-        * id3unicode: yes (use utf16 encoding with 2.3, utf8 encoding with 2.4), 
-          no (use latin1 encoding)
+        * id3encoding: utf8, latin1
         * id3removev1: yes, no -->
 
-        <id3version>2.3</id3version>
-        <id3unicode>yes</id3unicode>
+        <id3encoding>utf8</id3encoding>
         <id3removev1>yes</id3removev1>
 
     </settings>
@@ -48,8 +45,7 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
             <max_mb>150</max_mb>
             <metadata>
 
-                <!-- NOT CURRENTLY IN USE! 
-                These settings will be used to overwrite the mp3 file's
+                <!-- These settings will be used to overwrite the mp3 file's
                 id3 metadata. The metadata tag and all subtags are optional. 
                 All valid tags can be seen on the project wiki at
                 https://github.com/brokkr/poca/wiki/ID3-frames -->

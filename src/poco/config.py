@@ -56,15 +56,14 @@ class Paths:
                 logger.fatal(outcome.msg)
                 sys.exit()
         if not path.isfile(self.config_file):
+            logger.error('No config file found.')
             outcome = files.write_file(self.config_file, template)
             if outcome.success:
-                logger.error('No config file found.\n'
-                    'New template config file created:\n'
+                logger.error('New template config file created:\n'
                     '  ' + self.config_file + '\n'
                     'Please customize and run POCA again.')
             else:
-                logger.fatal('No config file found.'
-                    'Failed creating config file:'
+                logger.fatal('Failed creating config file:\n'
                     '  ' + self.config_file)
             sys.exit()
 
@@ -75,7 +74,7 @@ class Prefs:
         if xml_prefs is None:
             logger.fatal('No \'settings\' tag found. Quitting.')
             sys.exit()
-        required = {'id3removev1', 'id3version', 'id3unicode', 'base_dir'}
+        required = {'id3removev1', 'id3encoding', 'base_dir'}
         elements = [ (e.tag, e.text) for e in xml_prefs.getchildren() ]
         missing_required = required - { e[0] for e in elements }
         if missing_required:

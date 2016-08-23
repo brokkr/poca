@@ -20,9 +20,6 @@ def get_args():
         default=False, help='Quiet mode (useful for cron jobs)')
     parser.add_argument('-l', '--logfile', action='store_true', 
         default=False, help='Output to file in poca config directory')
-    #parser.add_argument('-r', '--restart', action='store_true', 
-    #    default=False, help=('Delete all created directories with contents '
-    #    'plus log file and start over'))
 
     return parser.parse_args()
 
