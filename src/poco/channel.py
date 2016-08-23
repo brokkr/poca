@@ -13,6 +13,7 @@ from os import path
 from sys import exit
 
 import feedparser
+import time
 
 from poco.output import Outcome
 from poco import history
@@ -20,6 +21,39 @@ from poco import files
 
 
 logger = logging.getLogger('POCA')
+
+
+def attach_size(self, mega):
+    '''Expands entry with url and size'''
+    self['valid'] = True
+    try:
+        self['poca_url'] = self.enclosures[0]['href']
+    except (KeyError, IndexError, AttributeError):
+        self['valid'] = False
+        return
+    try:
+        self['poca_size'] = int(self.enclosures[0]['length'])
+        if self['poca_size'] == 0:
+            raise ValueError
+    except (KeyError, ValueError):
+        try:
+            f = urllib.request.urlopen(self['poca_url'])
+            self['poca_size'] = int(f.info()['Content-Length'])
+            f.close()
+        except (urllib.error.HTTPError, urllib.error.URLError):
+            self['valid'] = False
+    if self['valid']:
+        self['poca_mb'] = round(self.poca_size / mega, 2)
+
+def attach_path(self, sub):
+    '''Expands entry with file name and path'''
+    parsed_url = urllib.parse.urlparse(self['poca_url'])
+    self['poca_filename'] = path.basename(parsed_url.path)
+    self['poca_abspath'] = path.join(sub.sub_dir, self['poca_filename'])
+
+feedparser.FeedParserDict.attach_size = attach_size
+feedparser.FeedParserDict.attach_path = attach_path
+
 
 class Channel:
     def __init__(self, config, sub):
@@ -161,53 +195,16 @@ class Wanted():
         self.cur_bytes = 0
         for uid in combo.lst:
             entry = combo.dic[uid]
-            if 'poca' not in entry:
-                entry = self.get_data(entry, sub, mega)
-                if not entry:
+            if 'valid' not in entry:
+                entry.attach_size(mega)
+                if not entry.valid:
                     continue
             if self.cur_bytes + entry.poca_size < self.max_bytes:
                 self.cur_bytes += entry.poca_size
-                # run metadata calculation function, add to entry
-                # run get_data2 function, add to entry
+                # run metadata adjustment method on entry
+                entry.attach_path(sub)
                 self.lst.append(uid)
                 self.dic[uid] = entry
             else:
                 break
-
-    def get_data(self, entry, sub, mega):
-        '''Sort relevant data under memorable keys'''
-        try:
-            entry['poca_url'] = entry.enclosures[0]['href']
-        except (KeyError, IndexError, AttributeError):
-            return False
-        entry['poca_size'] = self.get_size(entry)
-        if not entry['poca_size']:
-            return False
-        entry['poca_mb'] = round(entry.poca_size / mega, 2)
-        # missing exception?
-        # below is only needed (and meaningful) for wanted files
-        # should be moved to separate get_data2 function
-        parsed_url = urllib.parse.urlparse(entry['poca_url'])
-        entry['poca_filename'] = path.basename(parsed_url.path)
-        entry['poca_abspath'] = path.join(sub.sub_dir, 
-            entry['poca_filename'])
-        entry['poca'] = True
-        return entry
-
-    def get_size(self, entry):
-        '''Returns the entrys size in bytes. Tries to get if off of the
-        enclosure, otherwise pokes url for info.'''
-        try:
-            size = int(entry.enclosures[0]['length'])
-            if size == 0:
-                raise ValueError
-        except (KeyError, ValueError):
-            try:
-                f = urllib.request.urlopen(entry['poca_url'])
-                size = int(f.info()['Content-Length'])
-                f.close()
-            except (urllib.error.HTTPError, urllib.error.URLError):
-                size = False
-        return size
-
 
