@@ -7,52 +7,18 @@
 # the Free Software Foundation, either version 3 of the License, 
 # or (at your option) any later version.
 
+import sys
 import logging
-import urllib.request, urllib.error, urllib.parse
-from os import path
-from sys import exit
 
 import feedparser
-import time
 
+from poco import files, history, entry
 from poco.output import Outcome
-from poco import history
-from poco import files
 
 
 logger = logging.getLogger('POCA')
-
-
-def attach_size(self, mega):
-    '''Expands entry with url and size'''
-    self['valid'] = True
-    try:
-        self['poca_url'] = self.enclosures[0]['href']
-    except (KeyError, IndexError, AttributeError):
-        self['valid'] = False
-        return
-    try:
-        self['poca_size'] = int(self.enclosures[0]['length'])
-        if self['poca_size'] == 0:
-            raise ValueError
-    except (KeyError, ValueError):
-        try:
-            f = urllib.request.urlopen(self['poca_url'])
-            self['poca_size'] = int(f.info()['Content-Length'])
-            f.close()
-        except (urllib.error.HTTPError, urllib.error.URLError):
-            self['valid'] = False
-    if self['valid']:
-        self['poca_mb'] = round(self.poca_size / mega, 2)
-
-def attach_path(self, sub):
-    '''Expands entry with file name and path'''
-    parsed_url = urllib.parse.urlparse(self['poca_url'])
-    self['poca_filename'] = path.basename(parsed_url.path)
-    self['poca_abspath'] = path.join(sub.sub_dir, self['poca_filename'])
-
-feedparser.FeedParserDict.attach_size = attach_size
-feedparser.FeedParserDict.attach_path = attach_path
+feedparser.FeedParserDict.attach_size = entry.attach_size
+feedparser.FeedParserDict.attach_path = entry.attach_path
 
 
 class Channel:
@@ -61,22 +27,22 @@ class Channel:
         first, then acts on them and updates the db as it goes.'''
         
         self.sub = sub
-        self.title = sub.title.upper() + '. '
+        self.title = sub.title.upper() + ' || '
 
         # see that we can write to the designated directory
         outcome = files.check_path(sub.sub_dir)
         if not outcome.success:
-            logger.error(self.title + outcome.msg)
-            exit()
+            logger.fatal(self.title + '( fatal ) ' + outcome.msg)
+            sys.exit()
 
         # create containers: feed, jar, combo, wanted
         self.jar, outcome = history.get_jar(config.paths, self.sub)
         if not outcome.success:
-            logger.error(self.title + outcome.msg)
-            exit()
+            logger.fatal(self.title + '( fatal ) ' + outcome.msg)
+            sys.exit()
         self.feed = Feed(self.sub, self.jar)
         if not self.feed.outcome.success:
-            logger.error(self.title + self.feed.outcome.msg)
+            logger.error(self.title + '( error )' + self.feed.outcome.msg)
             return 
         self.combo = Combo(self.feed, self.jar)
         self.wanted = Wanted(self.sub, self.combo)
@@ -111,14 +77,15 @@ class Channel:
             entry = self.wanted.dic[uid]
             wantedindex = self.wanted.lst.index(uid)
             outcome = files.download_audio_file(entry)
+            logger.debug('  +  ' + entry['poca_filename'] + 
+                '  [ ' + str(entry['poca_mb']) + ' Mb ]  ...')
             if outcome.success:
                 # this is where we override the downloaded file's metadata:
                 # files.tag_audio_file
                 self.add_to_jar(uid, entry, wantedindex)
-                logger.debug('  +  ' + entry['poca_filename'])
                 self.downed.append(entry['poca_filename'])
             else:
-                logger.debug('  %  ' + entry['poca_filename'])
+                logger.debug('     Download failed.' + entry['poca_filename'])
                 self.failed.append(entry['poca_filename'])
 
         # print summary to log ('warn' is filtered out in stream)
@@ -135,21 +102,21 @@ class Channel:
         self.jar.dic[uid] = entry
         outcome = self.jar.save()
         if not outcome.success:
-            logger.error(self.title + outcome.msg)
-            exit()
+            logger.fatal(self.title + '( fatal ) ' + outcome.msg)
+            sys.exit()
 
     def remove(self, uid, entry):
         '''Deletes the file and removes the entry from the jar'''
         outcome = files.delete_file(entry['poca_abspath'])
         if not outcome.success:
-            logger.error(self.title + outcome.msg)
-            exit()
+            logger.fatal(self.title + '( fatal ) ' + outcome.msg)
+            sys.exit()
         self.jar.lst.remove(uid)
         del(self.jar.dic[uid])
         outcome = self.jar.save()
         if not outcome.success:
-            logger.error(self.title + outcome.msg)
-            exit()
+            logger.fatal(self.title + '( fatal ) ' + outcome.msg)
+            sys.exit()
 
 
 class Feed:

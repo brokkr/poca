@@ -17,6 +17,7 @@ from . import args
 from . import output
 from . import channel
 from . import config
+from . import entry
 from . import files
 from . import id3v23_frames
 from . import history
