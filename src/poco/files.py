@@ -16,7 +16,7 @@ from urllib.request import urlretrieve
 
 import mutagen
 
-from poco.id3v23_frames import frame_dic
+from poco.id3v24_frames import frame_dic
 from poco.output import Outcome
 
 

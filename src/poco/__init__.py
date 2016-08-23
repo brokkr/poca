@@ -19,7 +19,7 @@ from . import channel
 from . import config
 from . import entry
 from . import files
-from . import id3v23_frames
+from . import id3v24_frames
 from . import history
 from . import xmlconf
 
