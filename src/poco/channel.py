@@ -133,7 +133,7 @@ class Feed:
                 raise
         # only bozo for actual errors
         if doc.bozo and not doc.entries and doc.status != 304:            
-            self.outcome = Outcome(False, 'Error: ' + str(doc.bozo_exception))
+            self.outcome = Outcome(False, str(doc.bozo_exception))
             return
         # if etag is 304, doc.entries is empty and we proceed as normal
         if doc.has_key('etag'):

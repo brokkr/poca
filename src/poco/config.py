@@ -8,7 +8,7 @@
 # or (at your option) any later version.
 
 from os import path
-from sys import exit
+import sys
 import logging
 from xml.etree import ElementTree 
 
@@ -35,9 +35,9 @@ class Config:
         try:
             return ElementTree.parse(self.paths.config_file).getroot()
         except ElementTree.ParseError as e:
-            logger.error('The settings file could not be parsed.') 
-            logger.error('Parser said: ' + str(e))
-            exit()
+            logger.fatal('The settings file could not be parsed.') 
+            logger.fatal('Parser said: ' + str(e))
+            sys.exit()
 
 class Paths:
     def __init__(self):
@@ -53,8 +53,8 @@ class Paths:
         for check_dir in [self.config_dir, self.db_dir]:
             outcome = files.check_path(check_dir)
             if not outcome.success:
-                logger.error(outcome.msg)
-                exit()
+                logger.fatal(outcome.msg)
+                sys.exit()
         if not path.isfile(self.config_file):
             outcome = files.write_file(self.config_file, template)
             if outcome.success:
@@ -63,25 +63,25 @@ class Paths:
                     '  ' + self.config_file + '\n'
                     'Please customize and run POCA again.')
             else:
-                logger.error('No config file found.'
+                logger.fatal('No config file found.'
                     'Failed creating config file:'
                     '  ' + self.config_file)
-            exit()
+            sys.exit()
 
 class Prefs:
     def __init__(self, xml_root):
         '''Collection of global preferences, mainly base directory for mp3s'''
         xml_prefs = xml_root.find('settings')
         if xml_prefs is None:
-            logger.error('No \'settings\' tag found. Quitting.')
-            exit()
+            logger.fatal('No \'settings\' tag found. Quitting.')
+            sys.exit()
         required = {'id3removev1', 'id3version', 'id3unicode', 'base_dir'}
         elements = [ (e.tag, e.text) for e in xml_prefs.getchildren() ]
         missing_required = required - { e[0] for e in elements }
         if missing_required:
-            logger.error('Missing required settings: ')
-            logger.error('\n'.join(missing_required))
-            exit()
+            logger.fatal('Missing required settings: ')
+            logger.fatal('\n'.join(missing_required))
+            sys.exit()
         for e in elements:
             setattr(self, e[0], e[1])
 
@@ -89,8 +89,8 @@ def get_subs(prefs, xml_root):
     '''Function to create a list of all subscriptions and their preferences'''
     xml_subs = xml_root.find('subscriptions')
     if xml_subs is None:
-        logger.error('No \'subscriptions\' tag found. Quitting.')
-        exit()
+        logger.fatal('No \'subscriptions\' tag found. Quitting.')
+        sys.exit()
     else:
         return [ Sub(prefs, xml_sub) for xml_sub in xml_subs.getchildren() ]
 
@@ -106,9 +106,9 @@ class Sub:
         elements = [ (e.tag, e.text) for e in xml_sub.getchildren() ]
         missing_required = required - { e[0] for e in elements }
         if missing_required:
-            logger.error('A subscription is missing required settings: ')
-            logger.error('\n'.join(missing_required))
-            exit()
+            logger.fatal('A subscription is missing required settings: ')
+            logger.fatal('\n'.join(missing_required))
+            sys.exit()
         for e in elements:
             setattr(self, e[0], e[1])
         self.sub_dir = path.join(prefs.base_dir, self.title)
