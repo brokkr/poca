@@ -53,7 +53,9 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
                 <artist>Linux Voice</artist>
                 <album>Linux Voice</album>
                 <genre>podcast</genre>
+
             </metadata>
+
         </subscription>
 
     </subscriptions>
