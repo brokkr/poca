@@ -50,9 +50,9 @@ class Channel:
         self.lacking = set(self.wanted.lst) - set(self.jar.lst)
         msg = self.title
         if len(self.unwanted) > 0:
-            msg = msg + str(len(self.unwanted)) + ' files to be removed. ' 
+            msg = msg + str(len(self.unwanted)) + ' file(s) to be removed. ' 
         if len(self.lacking) > 0:
-            msg = msg + str(len(self.lacking)) + ' files to be downloaded.'
+            msg = msg + str(len(self.lacking)) + ' file(s) to be downloaded.'
         if len(self.unwanted) == 0 and len(self.lacking) == 0:
             msg = msg + 'No changes.'
         logger.info(msg)
@@ -75,7 +75,7 @@ class Channel:
             if uid not in self.lacking:
                 continue
             entry = self.wanted.dic[uid]
-            wantedindex = self.wanted.lst.index(uid)
+            wantedindex = self.wanted.lst.index(uid) - len(self.failed)
             logger.debug('  +  ' + entry['poca_filename'] + 
                 '  [ ' + str(entry['poca_mb']) + ' Mb ]  ...')
             outcome = files.download_audio_file(entry)
@@ -86,9 +86,9 @@ class Channel:
                 self.add_to_jar(uid, entry, wantedindex)
                 self.downed.append(entry['poca_filename'])
             else:
-                # NB: when a download fails, the wantedindex of the
-                # following files becomes problematic (read: wrong)
-                logger.debug('     Download failed.')
+                # if a download fails, len(self.failed) is subtracted
+                # from wanted index of following files to keep order
+                logger.debug('     Download failed. ' + outcome.msg)
                 self.failed.append(entry['poca_filename'])
 
         # print summary to log ('warn' is filtered out in stream)
@@ -142,8 +142,17 @@ class Feed:
         if doc.has_key('etag'):
             jar.etag = doc.etag
             jar.save()
-        self.lst = [ entry.id for entry in doc.entries ]
-        self.dic = { entry.id : entry for entry in doc.entries }
+        try:
+            self.lst = [ entry.id for entry in doc.entries ]
+            self.dic = { entry.id : entry for entry in doc.entries }
+        except (KeyError, AttributeError):
+            try:
+                self.lst = [ entry.enclosures[0]['href'] 
+                    for entry in doc.entries ]
+                self.dic = { entry.enclosures[0]['href'] : entry 
+                    for entry in doc.entries }
+            except (KeyError, AttributeError):
+                self.outcome = Outcome(False, 'Cant find entries in feed.')
         self.outcome = Outcome(True, 'Got feed.')
 
 class Combo:
