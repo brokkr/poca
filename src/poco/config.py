@@ -14,7 +14,7 @@ from xml.etree import ElementTree
 
 from poco import files
 from poco.xmlconf import template
-from poco.output import add_filehandler
+from poco.plogging import add_filehandler
 
 
 logger = logging.getLogger('POCA')

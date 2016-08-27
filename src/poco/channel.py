@@ -8,15 +8,13 @@
 # or (at your option) any later version.
 
 import sys
-import logging
 
 import feedparser
 
-from poco import files, history, entry
-from poco.output import Outcome
+from poco import files, history, entry, output
+from poco.outcome import Outcome
 
 
-logger = logging.getLogger('POCA')
 feedparser.FeedParserDict.attach_size = entry.attach_size
 feedparser.FeedParserDict.attach_path = entry.attach_path
 
@@ -32,37 +30,30 @@ class Channel:
         # see that we can write to the designated directory
         outcome = files.check_path(sub.sub_dir)
         if not outcome.success:
-            logger.fatal(self.title + '( fatal ) ' + outcome.msg)
+            output.fatal(self.title, outcome)
             sys.exit()
 
-        # create containers: feed, jar, combo, wanted
+        # get feed and jar and create collections (wanted, unwanted, etc.)
         self.jar, outcome = history.get_jar(config.paths, self.sub)
         if not outcome.success:
-            logger.fatal(self.title + '( fatal ) ' + outcome.msg)
+            output.fatal(self.title, outcome)
             sys.exit()
         self.feed = Feed(self.sub, self.jar)
         if not self.feed.outcome.success:
-            logger.error(self.title + '( error ) ' + self.feed.outcome.msg)
+            output.error(self.title, outcome)
             return 
         self.combo = Combo(self.feed, self.jar)
         self.wanted = Wanted(self.sub, self.combo)
         self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
         self.lacking = set(self.wanted.lst) - set(self.jar.lst)
-        msg = self.title
-        if len(self.unwanted) > 0:
-            msg = msg + str(len(self.unwanted)) + ' file(s) to be removed. ' 
-        if len(self.lacking) > 0:
-            msg = msg + str(len(self.lacking)) + ' file(s) to be downloaded.'
-        if len(self.unwanted) == 0 and len(self.lacking) == 0:
-            msg = msg + 'No changes.'
-        logger.info(msg)
+        output.plans(self.title, len(self.unwanted), len(self.lacking))
         self.removed, self.downed, self.failed = [], [], []
 
         # loop through unwanted (set) entries to remove
         for uid in self.unwanted:
             entry = self.jar.dic[uid]
+            output.removing(entry)
             self.remove(uid, entry)
-            logger.debug('  -  ' + entry['poca_filename'])
             self.removed.append(entry['poca_filename'])
 
         # loop through wanted entries (list) to download
@@ -76,28 +67,22 @@ class Channel:
                 continue
             entry = self.wanted.dic[uid]
             wantedindex = self.wanted.lst.index(uid) - len(self.failed)
-            logger.debug('  +  ' + entry['poca_filename'] + 
-                '  [ ' + str(entry['poca_mb']) + ' Mb ]  ...')
+            output.downloading(entry)
             outcome = files.download_audio_file(entry)
             if outcome.success:
                 outcome = files.tag_audio_file(config.prefs, self.sub, entry)
                 if not outcome.success:
-                    logger.debug('     Tagging failed. ' + outcome.msg)
+                    output.tag_fail(outcome)
                 self.add_to_jar(uid, entry, wantedindex)
                 self.downed.append(entry['poca_filename'])
             else:
                 # if a download fails, len(self.failed) is subtracted
                 # from wanted index of following files to keep order
-                logger.debug('     Download failed. ' + outcome.msg)
+                output.dl_fail(outcome)
                 self.failed.append(entry['poca_filename'])
 
-        # print summary to log ('warn' is filtered out in stream)
-        if self.downed:
-            logger.warn(self.title + 'Downloaded: ' + ', '.join(self.downed))
-        if self.failed:
-            logger.warn(self.title + 'Failed: ' + ', '.join(self.failed))
-        if self.removed:
-            logger.warn(self.title + 'Removed: ' + ', '.join(self.removed))
+        # print summary of perations in file log
+        output.summary(self.title, self.downed, self.removed, self.failed)
 
     def add_to_jar(self, uid, entry, wantedindex):
         '''Add new entry to jar'''
@@ -105,20 +90,20 @@ class Channel:
         self.jar.dic[uid] = entry
         outcome = self.jar.save()
         if not outcome.success:
-            logger.fatal(self.title + '( fatal ) ' + outcome.msg)
+            output.fatal(self.title, outcome)
             sys.exit()
 
     def remove(self, uid, entry):
         '''Deletes the file and removes the entry from the jar'''
         outcome = files.delete_file(entry['poca_abspath'])
         if not outcome.success:
-            logger.fatal(self.title + '( fatal ) ' + outcome.msg)
+            output.fatal(self.title, outcome)
             sys.exit()
         self.jar.lst.remove(uid)
         del(self.jar.dic[uid])
         outcome = self.jar.save()
         if not outcome.success:
-            logger.fatal(self.title + '( fatal ) ' + outcome.msg)
+            output.fatal(self.title, outcome)
             sys.exit()
 
 

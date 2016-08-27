@@ -7,39 +7,53 @@
 # the Free Software Foundation, either version 3 of the License, 
 # or (at your option) any later version.
 
+
 import logging
 
 
-class Outcome:
-    '''A way to return outcome of operations in a uniform fashion'''
-    def __init__(self, success, msg = ''):
-        self.success = success
-        self.msg = msg
+logger = logging.getLogger('POCA')
 
-def get_logger(args):
-    '''Gets stream logging instance'''
-    logger = logging.getLogger('POCA')
-    logger.setLevel(logging.DEBUG)
-    # nullhandler receives output in case of no cli or log handler
-    null_handler = logging.NullHandler()
-    logger.addHandler(null_handler)
-    class WarnFilter(logging.Filter):
-        def filter(self, rec):
-            return rec.levelno != logging.WARN
-    if not args.quiet:
-        stream_handler = logging.StreamHandler()
-        stream_handler.setLevel(logging.DEBUG)
-        stream_formatter = logging.Formatter("%(message)s")
-        stream_handler.setFormatter(stream_formatter)
-        stream_handler.addFilter(WarnFilter())
-        logger.addHandler(stream_handler)
 
-def add_filehandler(log_file_path, logger):
-    '''Adds a filehandler to (presumed) logging instance'''
-    file_handler = logging.FileHandler(log_file_path)
-    file_handler.setLevel(logging.INFO)
-    file_formatter = logging.Formatter("%(asctime)s %(message)s", 
-        datefmt='%Y-%m-%d %H:%M')
-    file_handler.setFormatter(file_formatter)
-    logger.addHandler(file_handler)
+# error reporting
+def fatal(title, outcome):
+    logger.fatal(title + '( fatal ) ' + outcome.msg)
+
+def error(title, outcome):
+    logger.error(title + '( error ) ' + outcome.msg)
+
+# report on intentions based on analysis
+def plans(title, no_unwanted, no_lacking):
+    msg = title
+    if no_unwanted > 0:
+        msg = msg + str(no_unwanted) + ' file(s) to be removed. ' 
+    if no_lacking > 0:
+        msg = msg + str(no_lacking) + ' file(s) to be downloaded.'
+    if no_unwanted == 0 and no_lacking == 0:
+        msg = msg + 'No changes.'
+    logger.info(msg)
+
+# file operations individually (for stdout)
+def removing(entry):
+    logger.debug('  -  ' + entry['poca_filename'] + 
+        '  [ ' + str(entry['poca_mb']) + ' Mb ] ...')
+
+def downloading(entry):
+    logger.debug('  +  ' + entry['poca_filename'] + 
+        '  [ ' + str(entry['poca_mb']) + ' Mb ] ...')
+
+def dl_fail(outcome):
+    logger.debug('     Download failed. ' + outcome.msg)
+
+def tag_fail(outcome):
+    logger.debug('     Tagging failed. ' + outcome.msg)
+
+# file operations summary (for file log)
+def summary(title, downed, removed, failed):
+    '''print summary to log ('warn' is filtered out in stream)'''
+    if downed:
+        logger.warn(title + 'Downloaded: ' + ', '.join(downed))
+    if failed:
+        logger.warn(title + 'Failed: ' + ', '.join(failed))
+    if removed:
+        logger.warn(title + 'Removed: ' + ', '.join(removed))
 

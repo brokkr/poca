@@ -11,7 +11,7 @@ import os
 import pickle
 
 from poco import files
-from poco.output import Outcome
+from poco.outcome import Outcome
 
 
 def get_jar(paths, sub):

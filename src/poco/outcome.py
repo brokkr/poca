@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# 
 # Copyright 2010-2016 Mads Michelsen (mail@brokkr.net)
 # 
 # This file is part of Poca.
@@ -9,16 +7,10 @@
 # the Free Software Foundation, either version 3 of the License, 
 # or (at your option) any later version.
 
-import poco 
 
-
-if __name__ == '__main__':
-    try:
-        args = poco.args.get_args()
-        poco.plogging.get_logger(args)
-        config = poco.config.Config(args)
-        for sub in config.subs:
-            channel = poco.channel.Channel(config, sub)
-    except KeyboardInterrupt:
-        pass
+class Outcome:
+    '''A way to return outcome of operations in a uniform fashion'''
+    def __init__(self, success, msg = ''):
+        self.success = success
+        self.msg = msg
 

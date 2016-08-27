@@ -17,7 +17,7 @@ from urllib.request import urlretrieve
 import mutagen
 
 from poco.id3v24_frames import frame_dic
-from poco.output import Outcome
+from poco.outcome import Outcome
 
 
 def check_path(check_dir):

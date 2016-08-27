@@ -14,6 +14,7 @@ URL = "https://github.com/brokkr/poca"
 
 from . import version
 from . import args
+from . import outcome
 from . import output
 from . import channel
 from . import config
