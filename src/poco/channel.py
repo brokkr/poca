@@ -30,17 +30,17 @@ class Channel:
         # see that we can write to the designated directory
         outcome = files.check_path(sub.sub_dir)
         if not outcome.success:
-            output.fatal(self.title, outcome)
+            output.subfatal(self.title, outcome)
             sys.exit()
 
         # get feed and jar and create collections (wanted, unwanted, etc.)
         self.jar, outcome = history.get_jar(config.paths, self.sub)
         if not outcome.success:
-            output.fatal(self.title, outcome)
+            output.subfatal(self.title, outcome)
             sys.exit()
         self.feed = Feed(self.sub, self.jar)
         if not self.feed.outcome.success:
-            output.error(self.title, outcome)
+            output.suberror(self.title, outcome)
             return 
         self.combo = Combo(self.feed, self.jar)
         self.wanted = Wanted(self.sub, self.combo)
@@ -63,6 +63,7 @@ class Channel:
         # be preferable to a) starting a new list based on wanted 
         # and b) inserting all new entries at the front.
         for uid in self.wanted.lst:
+            # this should be a function similar to remove
             if uid not in self.lacking:
                 continue
             entry = self.wanted.dic[uid]
@@ -90,20 +91,20 @@ class Channel:
         self.jar.dic[uid] = entry
         outcome = self.jar.save()
         if not outcome.success:
-            output.fatal(self.title, outcome)
+            output.subfatal(self.title, outcome)
             sys.exit()
 
     def remove(self, uid, entry):
         '''Deletes the file and removes the entry from the jar'''
         outcome = files.delete_file(entry['poca_abspath'])
         if not outcome.success:
-            output.fatal(self.title, outcome)
+            output.subfatal(self.title, outcome)
             sys.exit()
         self.jar.lst.remove(uid)
         del(self.jar.dic[uid])
         outcome = self.jar.save()
         if not outcome.success:
-            output.fatal(self.title, outcome)
+            output.subfatal(self.title, outcome)
             sys.exit()
 
 

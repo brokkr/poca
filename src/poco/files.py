@@ -40,7 +40,7 @@ def write_file(file_path, text):
         wfile = open(file_path, mode='wt', encoding='utf-8')
         wfile.write(text)
         wfile.close()
-        return Outcome(True, 'New config file successfully created')
+        return Outcome(True, file_path + ': Config template created.')
     except IOError as e:
         return Outcome(False, file_path + ': ' + str(e))
 

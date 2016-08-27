@@ -13,12 +13,18 @@ import logging
 
 logger = logging.getLogger('POCA')
 
+# config reporting
+def conffatal(msg):
+    logger.fatal(msg)
 
-# error reporting
-def fatal(title, outcome):
+def confinfo(msg):
+    logger.info(msg)
+
+# subscription error reporting
+def subfatal(title, outcome):
     logger.fatal(title + '( fatal ) ' + outcome.msg)
 
-def error(title, outcome):
+def suberror(title, outcome):
     logger.error(title + '( error ) ' + outcome.msg)
 
 # report on intentions based on analysis
