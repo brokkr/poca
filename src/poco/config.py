@@ -7,14 +7,12 @@
 # the Free Software Foundation, either version 3 of the License, 
 # or (at your option) any later version.
 
-from os import path
 import sys
 import logging
+from os import path
 from xml.etree import ElementTree 
 
-from poco import files, output
-from poco.xmlconf import template
-from poco.plogging import add_filehandler
+from poco import files, output, xmlconf, plogging
 
 
 logger = logging.getLogger('POCA')
@@ -25,7 +23,7 @@ class Config:
         self.paths = Paths()
         self.args = args
         if self.args.logfile:
-            add_filehandler(self.paths.log_file, logger)
+            plogging.add_filehandler(self.paths.log_file, logger)
         xml_root = self.get_xml()
         self.prefs = Prefs(xml_root)
         self.subs = get_subs(self.prefs, xml_root)
@@ -57,8 +55,8 @@ class Paths:
                 output.conffatal(outcome.msg)
                 sys.exit()
         if not path.isfile(self.config_file):
-            output.info('No config file found. Writing one...')
-            outcome = files.write_file(self.config_file, template)
+            output.confinfo('No config file found. Writing one...')
+            outcome = xmlconf.write_template(self.config_file)
             if outcome.success:
                 output.confinfo(outcome.msg)
             else:

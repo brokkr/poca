@@ -7,6 +7,10 @@
 # the Free Software Foundation, either version 3 of the License, 
 # or (at your option) any later version.
 
+
+from poco.outcome import Outcome
+
+
 template = """<?xml version="1.0" encoding="UTF-8"?>
 <poca version="0.5">
 
@@ -62,4 +66,14 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
 
 </poca>
 """
+
+def write_template(file_path):
+    '''Writes a string to file. Currently specific to creating config file.'''
+    try:
+        wfile = open(file_path, mode='wt', encoding='utf-8')
+        wfile.write(template)
+        wfile.close()
+        return Outcome(True, file_path + ': Config template created.')
+    except IOError as e:
+        return Outcome(False, file_path + ': ' + str(e))
 

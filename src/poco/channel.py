@@ -11,7 +11,7 @@ import sys
 
 import feedparser
 
-from poco import files, history, entry, output
+from poco import files, history, entry, output, tag
 from poco.outcome import Outcome
 
 
@@ -26,6 +26,7 @@ class Channel:
         
         self.sub = sub
         self.title = sub.title.upper()
+        self.config = config
 
         # see that we can write to the designated directory
         outcome = files.check_path(sub.sub_dir)
@@ -52,38 +53,40 @@ class Channel:
         # loop through unwanted (set) entries to remove
         for uid in self.unwanted:
             entry = self.jar.dic[uid]
-            output.removing(entry)
             self.remove(uid, entry)
-            self.removed.append(entry['poca_filename'])
 
+        # loop through wanted (list) entries to acquire
+        for uid in self.wanted.lst:
+            if uid not in self.lacking:
+                continue
+            entry = self.wanted.dic[uid]
+            self.acquire(uid, entry)
+
+        # print summary of perations in file log
+        output.summary(self.title, self.downed, self.removed, self.failed)
+
+    def acquire(self, uid, entry):
+        '''Get new entries, tag them and add to history'''
         # loop through wanted entries (list) to download
         # Looping through the lacking entries, we insert them at the
         # index they have in wanted.lst. By the time we get to old ones,
         # they will have the correct index. This has been found to 
         # be preferable to a) starting a new list based on wanted 
         # and b) inserting all new entries at the front.
-        for uid in self.wanted.lst:
-            # this should be a function similar to remove
-            if uid not in self.lacking:
-                continue
-            entry = self.wanted.dic[uid]
-            wantedindex = self.wanted.lst.index(uid) - len(self.failed)
-            output.downloading(entry)
-            outcome = files.download_audio_file(entry)
-            if outcome.success:
-                outcome = files.tag_audio_file(config.prefs, self.sub, entry)
-                if not outcome.success:
-                    output.tag_fail(outcome)
-                self.add_to_jar(uid, entry, wantedindex)
-                self.downed.append(entry['poca_filename'])
-            else:
-                # if a download fails, len(self.failed) is subtracted
-                # from wanted index of following files to keep order
-                output.dl_fail(outcome)
-                self.failed.append(entry['poca_filename'])
-
-        # print summary of perations in file log
-        output.summary(self.title, self.downed, self.removed, self.failed)
+        output.downloading(entry)
+        wantedindex = self.wanted.lst.index(uid) - len(self.failed)
+        outcome = files.download_audio_file(entry)
+        if outcome.success:
+            outcome = tag.tag_audio_file(self.config.prefs, self.sub, entry)
+            if not outcome.success:
+                output.tag_fail(outcome)
+            self.add_to_jar(uid, entry, wantedindex)
+            self.downed.append(entry['poca_filename'])
+        else:
+            # if a download fails, len(self.failed) is subtracted
+            # from wanted index of following files to keep order
+            output.dl_fail(outcome)
+            self.failed.append(entry['poca_filename'])
 
     def add_to_jar(self, uid, entry, wantedindex):
         '''Add new entry to jar'''
@@ -96,6 +99,7 @@ class Channel:
 
     def remove(self, uid, entry):
         '''Deletes the file and removes the entry from the jar'''
+        output.removing(entry)
         outcome = files.delete_file(entry['poca_abspath'])
         if not outcome.success:
             output.subfatal(self.title, outcome)
@@ -106,6 +110,7 @@ class Channel:
         if not outcome.success:
             output.subfatal(self.title, outcome)
             sys.exit()
+        self.removed.append(entry['poca_filename'])
 
 
 class Feed:
@@ -123,13 +128,13 @@ class Feed:
         # only bozo for actual errors
         if doc.bozo and not doc.entries:
             if 'status' in doc:
+                # if etag is 304 doc.entries is empty and we proceed as normal
                 if doc.status != 304:
                     self.outcome = Outcome(False, str(doc.bozo_exception))
                     return
             else:
                 self.outcome = Outcome(False, str(doc.bozo_exception))
                 return
-        # if etag is 304, doc.entries is empty and we proceed as normal
         if doc.has_key('etag'):
             jar.etag = doc.etag
             jar.save()

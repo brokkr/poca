@@ -23,4 +23,5 @@ from . import files
 from . import id3v24_frames
 from . import history
 from . import xmlconf
+from . import tag
 
