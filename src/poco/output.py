@@ -22,10 +22,12 @@ def confinfo(msg):
 
 # subscription error reporting
 def subfatal(title, outcome):
-    logger.fatal(title + '. ( FATAL ) ' + outcome.msg)
+    err = "\N{Heavy Exclamation Mark Symbol}"
+    logger.fatal(title + '. ' + err + 'FATAL' + err + ' ' + outcome.msg)
 
 def suberror(title, outcome):
-    logger.error(title + '. ( ERROR ) ' + outcome.msg)
+    err = "\N{Heavy Exclamation Mark Symbol}"
+    logger.error(title + '. ' + err + 'ERROR' + err + ' ' + outcome.msg)
 
 # report on intentions based on analysis
 def plans(title, no_unwanted, no_lacking):

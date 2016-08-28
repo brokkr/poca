@@ -40,7 +40,7 @@ class Channel:
             sys.exit()
         self.feed = Feed(self.sub, self.jar)
         if not self.feed.outcome.success:
-            output.suberror(self.title, outcome)
+            output.suberror(self.title, self.feed.outcome)
             return 
         self.combo = Combo(self.feed, self.jar)
         self.wanted = Wanted(self.sub, self.combo)
@@ -121,9 +121,14 @@ class Feed:
             else:
                 raise
         # only bozo for actual errors
-        if doc.bozo and not doc.entries and doc.status != 304:            
-            self.outcome = Outcome(False, str(doc.bozo_exception))
-            return
+        if doc.bozo and not doc.entries:
+            if 'status' in doc:
+                if doc.status != 304:
+                    self.outcome = Outcome(False, str(doc.bozo_exception))
+                    return
+            else:
+                self.outcome = Outcome(False, str(doc.bozo_exception))
+                return
         # if etag is 304, doc.entries is empty and we proceed as normal
         if doc.has_key('etag'):
             jar.etag = doc.etag

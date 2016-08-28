@@ -94,6 +94,7 @@ def tag_audio_file(prefs, sub, entry):
             frame = frame_dic[override]
         except KeyError:
             failure_lst.append(override)
+            continue
         ftext = sub.metadata[override]
         id3tag.add(frame(encoding=id3encoding, text=ftext))
     try:
