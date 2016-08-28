@@ -25,7 +25,7 @@ class Channel:
         first, then acts on them and updates the db as it goes.'''
         
         self.sub = sub
-        self.title = sub.title.upper() + ' || '
+        self.title = sub.title.upper()
 
         # see that we can write to the designated directory
         outcome = files.check_path(sub.sub_dir)

@@ -22,44 +22,48 @@ def confinfo(msg):
 
 # subscription error reporting
 def subfatal(title, outcome):
-    logger.fatal(title + '( fatal ) ' + outcome.msg)
+    logger.fatal(title + '. ( FATAL ) ' + outcome.msg)
 
 def suberror(title, outcome):
-    logger.error(title + '( error ) ' + outcome.msg)
+    logger.error(title + '. ( ERROR ) ' + outcome.msg)
 
 # report on intentions based on analysis
 def plans(title, no_unwanted, no_lacking):
     msg = title
+    if no_unwanted > 0 or no_lacking > 0:
+        msg = msg + '. '
     if no_unwanted > 0:
-        msg = msg + str(no_unwanted) + ' file(s) to be removed. ' 
+        msg = msg + str(no_unwanted) + ' ' + "\N{HEAVY MINUS SIGN}" 
+    if no_unwanted > 0 and no_lacking > 0:
+        msg = msg + ' / '
     if no_lacking > 0:
-        msg = msg + str(no_lacking) + ' file(s) to be downloaded.'
-    if no_unwanted == 0 and no_lacking == 0:
-        msg = msg + 'No changes.'
+        msg = msg + str(no_lacking) + ' ' + "\N{HEAVY PLUS SIGN}" 
     logger.info(msg)
 
 # file operations individually (for stdout)
 def removing(entry):
-    logger.debug('  -  ' + entry['poca_filename'] + 
-        '  [ ' + str(entry['poca_mb']) + ' Mb ] ...')
+    msg = ' ' + "\N{CANCELLATION X}" + ' ' + entry['poca_filename'] + \
+        ' [' + str(round(entry['poca_mb'])) + ' Mb]'
+    logger.debug(msg)
 
 def downloading(entry):
-    logger.debug('  +  ' + entry['poca_filename'] + 
-        '  [ ' + str(entry['poca_mb']) + ' Mb ] ...')
+    msg = ' ' + "\N{DOWNWARDS ARROW LEFTWARDS OF UPWARDS ARROW}" + ' ' + \
+        entry['poca_filename'] + ' [' + str(round(entry['poca_mb'])) + ' Mb]'
+    logger.debug(msg)
 
 def dl_fail(outcome):
-    logger.debug('     Download failed. ' + outcome.msg)
+    logger.debug('   Download failed. ' + outcome.msg)
 
 def tag_fail(outcome):
-    logger.debug('     Tagging failed. ' + outcome.msg)
+    logger.debug('   Tagging failed. ' + outcome.msg)
 
 # file operations summary (for file log)
 def summary(title, downed, removed, failed):
     '''print summary to log ('warn' is filtered out in stream)'''
     if downed:
-        logger.warn(title + 'Downloaded: ' + ', '.join(downed))
+        logger.warn(title + '. Downloaded: ' + ', '.join(downed))
     if failed:
-        logger.warn(title + 'Failed: ' + ', '.join(failed))
+        logger.warn(title + '. Failed: ' + ', '.join(failed))
     if removed:
-        logger.warn(title + 'Removed: ' + ', '.join(removed))
+        logger.warn(title + '. Removed: ' + ', '.join(removed))
 
