@@ -37,8 +37,6 @@ def handler(signum, frame):
 def download_audio_file(entry):
     '''Download function with block time outs'''
     signal.signal(signal.SIGALRM, handler)
-    signal.alarm(180)
-    block_size = 8192
 
     try:
         u = urllib.request.urlopen(entry['poca_url'])
@@ -48,7 +46,11 @@ def download_audio_file(entry):
         return Outcome(False, "Unknown error")
     f = open(entry['poca_abspath'], "wb")
 
+    block_size = 8192
     while True:
+        # "Any previously scheduled alarm is canceled 
+        # (only one alarm can be scheduled at any time)"
+        signal.alarm(20)
         try:
             download_block(u, f, block_size)
         except NoMoreBufferException as e:
@@ -57,6 +59,8 @@ def download_audio_file(entry):
         except TimesUpException as e:
             outcome = Outcome(False, str(e))
             break
+
+    signal.signal(signal.SIGALRM, signal.SIG_DFL)
 
     f.close()
     return outcome
