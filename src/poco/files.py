@@ -50,7 +50,7 @@ def download_audio_file(entry):
     while True:
         # "Any previously scheduled alarm is canceled 
         # (only one alarm can be scheduled at any time)"
-        signal.alarm(20)
+        signal.alarm(5)
         try:
             download_block(u, f, block_size)
         except NoMoreBufferException as e:

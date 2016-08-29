@@ -75,7 +75,7 @@ class Prefs:
         elements = [ (e.tag, e.text) for e in xml_prefs.getchildren() ]
         missing_required = required - { e[0] for e in elements }
         if missing_required:
-            msg = 'Missing required settings:' + '\n'.join(missing_required)
+            msg = 'Missing required settings: ' + '\n'.join(missing_required)
             output.conffatal(msg)
             sys.exit()
         for e in elements:
