@@ -2,6 +2,8 @@
 Poca is a command line podcast client, written in Python 3. It is developed for
 stability, hardiness and ease of use.
 
+[![asciicast](https://asciinema.org/a/cwf8k4e154s6dkw2hiohqxj68.png)](https://asciinema.org/a/cwf8k4e154s6dkw2hiohqxj68)
+
 With Poca you can set custom options for each individual subscription. 
 
  * Specify how much harddisk space the subscription should use before deleting
