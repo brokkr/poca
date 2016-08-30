@@ -50,26 +50,29 @@ def download_audio_file(entry):
     while True:
         # "Any previously scheduled alarm is canceled 
         # (only one alarm can be scheduled at any time)"
-        signal.alarm(5)
+        signal.alarm(60)
         try:
             download_block(u, f, block_size)
         except NoMoreBufferException as e:
+            f.close()
             outcome = Outcome(True, str(e))
             break
         except TimesUpException as e:
+            f.close()
             outcome = Outcome(False, str(e))
+            del_outcome = delete_file(entry['poca_abspath')
             break
 
+    signal.alarm(0)
     signal.signal(signal.SIGALRM, signal.SIG_DFL)
 
-    f.close()
     return outcome
 
 # delete
 def delete_file(file_path):
     '''Deletes a file'''
     # standardise on the dataunit being passed around?
-    # this should be a entry not a filename
+    # this should be a entry not a filename?
     try:
         os.remove(file_path)
         return Outcome(True, file_path + ': File was successfully deleted')
