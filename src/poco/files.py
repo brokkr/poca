@@ -60,7 +60,7 @@ def download_audio_file(entry):
         except TimesUpException as e:
             outcome = Outcome(False, str(e))
             f.close()
-            del_outcome = delete_file(entry['poca_abspath')
+            del_outcome = delete_file(entry['poca_abspath'])
             break
 
     signal.alarm(0)
