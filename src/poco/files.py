@@ -36,40 +36,43 @@ def handler(signum, frame):
 
 def download_audio_file(entry):
     '''Download function with block time outs'''
-    signal.signal(signal.SIGALRM, handler)
-
     try:
         u = urllib.request.urlopen(entry['poca_url'])
     except urllib.error.HTTPError as e:
         return Outcome(False, "HTTPError: " + str(e))
     except:
         return Outcome(False, "Unknown error")
+
+    signal.signal(signal.SIGALRM, handler)
     f = open(entry['poca_abspath'], "wb")
 
     block_size = 8192
     while True:
         # "Any previously scheduled alarm is canceled 
         # (only one alarm can be scheduled at any time)"
-        signal.alarm(5)
+        signal.alarm(60)
         try:
             download_block(u, f, block_size)
         except NoMoreBufferException as e:
             outcome = Outcome(True, str(e))
+            f.close()
             break
         except TimesUpException as e:
             outcome = Outcome(False, str(e))
+            f.close()
+            del_outcome = delete_file(entry['poca_abspath')
             break
 
+    signal.alarm(0)
     signal.signal(signal.SIGALRM, signal.SIG_DFL)
 
-    f.close()
     return outcome
 
 # delete
 def delete_file(file_path):
     '''Deletes a file'''
     # standardise on the dataunit being passed around?
-    # this should be a entry not a filename
+    # this should be a entry not a filename?
     try:
         os.remove(file_path)
         return Outcome(True, file_path + ': File was successfully deleted')
