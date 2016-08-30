@@ -36,14 +36,14 @@ def handler(signum, frame):
 
 def download_audio_file(entry):
     '''Download function with block time outs'''
-    signal.signal(signal.SIGALRM, handler)
-
     try:
         u = urllib.request.urlopen(entry['poca_url'])
     except urllib.error.HTTPError as e:
         return Outcome(False, "HTTPError: " + str(e))
     except:
         return Outcome(False, "Unknown error")
+
+    signal.signal(signal.SIGALRM, handler)
     f = open(entry['poca_abspath'], "wb")
 
     block_size = 8192
@@ -54,12 +54,12 @@ def download_audio_file(entry):
         try:
             download_block(u, f, block_size)
         except NoMoreBufferException as e:
-            f.close()
             outcome = Outcome(True, str(e))
+            f.close()
             break
         except TimesUpException as e:
-            f.close()
             outcome = Outcome(False, str(e))
+            f.close()
             del_outcome = delete_file(entry['poca_abspath')
             break
 
