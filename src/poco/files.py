@@ -26,6 +26,7 @@ class TimesUpException(Exception):
     pass
 
 def download_block(u, f, block_size):
+    '''Download until there's no more to download'''
     buffer = u.read(block_size)
     if not buffer:
         raise NoMoreBufferException("No more to download")
@@ -39,18 +40,16 @@ def download_audio_file(entry):
     try:
         u = urllib.request.urlopen(entry['poca_url'])
     except urllib.error.HTTPError as e:
-        return Outcome(False, "HTTPError: " + str(e))
-    except:
-        return Outcome(False, "Unknown error")
+        return Outcome(False, str(e))
+    except socket.error as e:
+        return Outcome(False, str(e))
 
     signal.signal(signal.SIGALRM, handler)
     f = open(entry['poca_abspath'], "wb")
 
     block_size = 8192
     while True:
-        # "Any previously scheduled alarm is canceled 
-        # (only one alarm can be scheduled at any time)"
-        signal.alarm(60)
+        signal.alarm(90)
         try:
             download_block(u, f, block_size)
         except NoMoreBufferException as e:
@@ -71,8 +70,6 @@ def download_audio_file(entry):
 # delete
 def delete_file(file_path):
     '''Deletes a file'''
-    # standardise on the dataunit being passed around?
-    # this should be a entry not a filename?
     try:
         os.remove(file_path)
         return Outcome(True, file_path + ': File was successfully deleted')
