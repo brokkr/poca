@@ -49,7 +49,7 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
             <max_mb>150</max_mb>
             <metadata>
 
-                <!-- These settings will be used to overwrite the mp3 file's
+                <!-- These settings will be used to overwrite the mp3 files'
                 id3 metadata. The metadata tag and all subtags are optional. 
                 All valid tags can be seen on the project wiki at
                 https://github.com/brokkr/poca/wiki/ID3-frames -->
