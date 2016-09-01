@@ -20,7 +20,7 @@ feedparser.FeedParserDict.attach_path = entry.attach_path
 
 
 class Channel:
-    def __init__(self, config, sub):
+    def __init__(self, config, sub, args):
         '''A class for a single subscription/channel. Creates the containers
         first, then acts on them and updates the db as it goes.'''
         
@@ -43,8 +43,8 @@ class Channel:
         if not self.feed.outcome.success:
             output.suberror(self.title, self.feed.outcome)
             return 
-        self.combo = Combo(self.feed, self.jar)
-        self.wanted = Wanted(self.sub, self.combo)
+        self.combo = Combo(self.feed, self.jar, self.sub)
+        self.wanted = Wanted(self.sub, self.combo, args, self.jar)
         self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
         self.lacking = set(self.wanted.lst) - set(self.jar.lst)
         output.plans(self.title, len(self.unwanted), len(self.lacking))
@@ -62,7 +62,7 @@ class Channel:
             entry = self.wanted.dic[uid]
             self.acquire(uid, entry)
 
-        # print summary of perations in file log
+        # print summary of operations in file log
         output.summary(self.title, self.downed, self.removed, self.failed)
 
     def acquire(self, uid, entry):
@@ -92,6 +92,8 @@ class Channel:
         '''Add new entry to jar'''
         self.jar.lst.insert(wantedindex, uid)
         self.jar.dic[uid] = entry
+        if hasattr(self.sub, 'from_the_top'):
+            self.jar.bookmark += 1
         outcome = self.jar.save()
         if not outcome.success:
             output.subfatal(self.title, outcome)
@@ -117,12 +119,16 @@ class Feed:
     def __init__(self, sub, jar):
         '''Constructs a container for feed entries'''
         try:
-            doc = feedparser.parse(sub.url)
+            old_etag = jar.etag
+        except AttributeError:
+            old_etag = None
+        try:
+            doc = feedparser.parse(sub.url, etag=old_etag)
         except TypeError:
             # https://github.com/kurtmckee/feedparser/issues/30#issuecomment-183714444            
             if 'drv_libxml2' in feedparser.PREFERRED_XML_PARSERS:
                 feedparser.PREFERRED_XML_PARSERS.remove('drv_libxml2')
-                doc = feedparser.parse(sub.url)
+                doc = feedparser.parse(sub.url, etag=old_etag)
             else:
                 raise
         # only bozo for actual errors
@@ -149,25 +155,33 @@ class Feed:
                     for entry in doc.entries }
             except (KeyError, AttributeError):
                 self.outcome = Outcome(False, 'Cant find entries in feed.')
+        if hasattr(sub, 'from_the_top'):
+            self.lst.reverse()
         self.outcome = Outcome(True, 'Got feed.')
 
 class Combo:
-    def __init__(self, feed, jar):
+    def __init__(self, feed, jar, sub):
         '''Constructs a container holding all combined feed and jar 
         entries. Copies feed then adds non-duplicates from jar'''
-        self.lst = list(feed.lst)
-        self.lst.extend(x for x in jar.lst if x not in feed.lst)
+        if hasattr(sub, 'from_the_top'):
+            self.lst = list(jar.lst)
+            self.lst.extend(x for x in feed.lst if x not in jar.lst)
+        else:
+            self.lst = list(feed.lst)
+            self.lst.extend(x for x in jar.lst if x not in feed.lst)
         self.dic = feed.dic.copy()
         self.dic.update(jar.dic)
 
 class Wanted():
-    def __init__(self, sub, combo):
+    def __init__(self, sub, combo, args, jar):
         '''Constructs a container for all the entries we have room for, 
         regardless of where they are, internet or local folder.'''
         self.lst, self.dic = [], {}
         mega = 1048576.0
         self.max_bytes = int(sub.max_mb) * mega
         self.cur_bytes = 0
+        if hasattr(sub, 'from_the_top') and args.bump:
+            combo.lst = combo.lst[jar.bookmark:]
         for uid in combo.lst:
             entry = combo.dic[uid]
             if 'valid' not in entry:

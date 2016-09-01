@@ -20,6 +20,8 @@ def get_args():
         default=False, help='Quiet mode (useful for cron jobs)')
     parser.add_argument('-l', '--logfile', action='store_true', 
         default=False, help='Output to file in poca config directory')
+    parser.add_argument('-b', '--bump', action='store_true', 
+        default=False, help='Move from the top subs on to the next batch')
 
     return parser.parse_args()
 

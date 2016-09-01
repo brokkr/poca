@@ -35,6 +35,7 @@ class Jar:
         '''Creates standard subscription info container with save method'''
         self.db_filename = os.path.join(paths.db_dir, sub.title)
         self.etag = None
+        self.bookmark = 0
         self.lst = []
         self.dic = {}
 
