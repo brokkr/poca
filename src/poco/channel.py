@@ -20,7 +20,7 @@ feedparser.FeedParserDict.attach_path = entry.attach_path
 
 
 class Channel:
-    def __init__(self, config, sub, args):
+    def __init__(self, config, sub, bump=False):
         '''A class for a single subscription/channel. Creates the containers
         first, then acts on them and updates the db as it goes.'''
         
@@ -44,7 +44,7 @@ class Channel:
             output.suberror(self.title, self.feed.outcome)
             return 
         self.combo = Combo(self.feed, self.jar, self.sub)
-        self.wanted = Wanted(self.sub, self.combo, args, self.jar)
+        self.wanted = Wanted(self.sub, self.combo, self.jar, bump)
         self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
         self.lacking = set(self.wanted.lst) - set(self.jar.lst)
         output.plans(self.title, len(self.unwanted), len(self.lacking))
@@ -173,14 +173,14 @@ class Combo:
         self.dic.update(jar.dic)
 
 class Wanted():
-    def __init__(self, sub, combo, args, jar):
+    def __init__(self, sub, combo, jar, bump):
         '''Constructs a container for all the entries we have room for, 
         regardless of where they are, internet or local folder.'''
         self.lst, self.dic = [], {}
         mega = 1048576.0
         self.max_bytes = int(sub.max_mb) * mega
         self.cur_bytes = 0
-        if hasattr(sub, 'from_the_top') and args.bump:
+        if hasattr(sub, 'from_the_top') and bump:
             combo.lst = combo.lst[jar.bookmark:]
         for uid in combo.lst:
             entry = combo.dic[uid]
