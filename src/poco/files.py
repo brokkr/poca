@@ -10,6 +10,7 @@
 # or (at your option) any later version.
 
 import os
+import sys
 import signal
 import socket
 import urllib.request
@@ -61,6 +62,10 @@ def download_audio_file(entry):
             f.close()
             del_outcome = delete_file(entry['poca_abspath'])
             break
+        except KeyboardInterrupt:
+            f.close()
+            del_outcome = delete_file(entry['poca_abspath'])
+            sys.exit()
 
     signal.alarm(0)
     signal.signal(signal.SIGALRM, signal.SIG_DFL)

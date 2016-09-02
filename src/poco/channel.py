@@ -178,10 +178,12 @@ class Wanted():
         regardless of where they are, internet or local folder.'''
         self.lst, self.dic = [], {}
         mega = 1048576.0
-        self.max_bytes = int(sub.max_mb) * mega
+        self.max_bytes = float(sub.max_mb) * mega
         self.cur_bytes = 0
         if hasattr(sub, 'from_the_top') and bump:
             combo.lst = combo.lst[jar.bookmark:]
+        if sub.max_no:
+            combo.lst = combo.lst[:int(sub.max_no)]
         for uid in combo.lst:
             entry = combo.dic[uid]
             if 'valid' not in entry:

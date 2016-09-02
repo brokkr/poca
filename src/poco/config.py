@@ -99,7 +99,7 @@ class Sub:
         if xml_meta is not None:
             xml_sub.remove(xml_meta)
             self.metadata = { e.tag: e.text for e in xml_meta.getchildren() }
-        required = {'title', 'url', 'max_mb'}
+        required = {'title', 'url'}
         elements = [ (e.tag, e.text) for e in xml_sub.getchildren() ]
         missing_required = required - { e[0] for e in elements }
         if missing_required:
@@ -107,6 +107,8 @@ class Sub:
                 '\n'.join(missing_required))
             output.conffatal(msg)
             sys.exit()
+        self.max_mb = float('inf')
+        self.max_no = False
         for e in elements:
             setattr(self, e[0], e[1])
         self.sub_dir = path.join(prefs.base_dir, self.title)
