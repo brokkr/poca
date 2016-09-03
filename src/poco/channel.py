@@ -62,6 +62,10 @@ class Channel:
             entry = self.wanted.dic[uid]
             self.acquire(uid, entry)
 
+        # download cover image
+        if self.downed and self.feed.image:
+            outcome = files.download_file(self.feed.image, sub.image_path)
+
         # print summary of operations in file log
         output.summary(self.title, self.downed, self.removed, self.failed)
 
@@ -75,7 +79,7 @@ class Channel:
         # and b) inserting all new entries at the front.
         output.downloading(entry)
         wantedindex = self.wanted.lst.index(uid) - len(self.failed)
-        outcome = files.download_audio_file(entry)
+        outcome = files.download_file(entry['poca_url'], entry['poca_abspath'])
         if outcome.success:
             outcome = tag.tag_audio_file(self.config.prefs, self.sub, entry)
             if not outcome.success:
@@ -157,6 +161,10 @@ class Feed:
                 self.outcome = Outcome(False, 'Cant find entries in feed.')
         if hasattr(sub, 'from_the_top'):
             self.lst.reverse()
+        try:
+            self.image = doc.feed.image['href']
+        except (AttributeError, KeyError):
+            self.image = None
         self.outcome = Outcome(True, 'Got feed.')
 
 class Combo:

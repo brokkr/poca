@@ -36,17 +36,17 @@ def download_block(u, f, block_size):
 def handler(signum, frame):
     raise TimesUpException("Download timed out")
 
-def download_audio_file(entry):
+def download_file(url, file_path):
     '''Download function with block time outs'''
     try:
-        u = urllib.request.urlopen(entry['poca_url'])
+        u = urllib.request.urlopen(url)
     except urllib.error.HTTPError as e:
         return Outcome(False, str(e))
     except socket.error as e:
         return Outcome(False, str(e))
 
     signal.signal(signal.SIGALRM, handler)
-    f = open(entry['poca_abspath'], "wb")
+    f = open(file_path, "wb")
 
     block_size = 8192
     while True:
@@ -60,11 +60,11 @@ def download_audio_file(entry):
         except TimesUpException as e:
             outcome = Outcome(False, str(e))
             f.close()
-            del_outcome = delete_file(entry['poca_abspath'])
+            del_outcome = delete_file(file_path)
             break
         except KeyboardInterrupt:
             f.close()
-            del_outcome = delete_file(entry['poca_abspath'])
+            del_outcome = delete_file(file_path)
             sys.exit()
 
     signal.alarm(0)
