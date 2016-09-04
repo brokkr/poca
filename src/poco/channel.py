@@ -129,25 +129,22 @@ class Feed:
     def __init__(self, sub, jar):
         '''Constructs a container for feed entries'''
         # do we need an update?
-        old_etag = jar.etag
+        self.etag = jar.etag
         self.max = (sub.max_no, sub.max_mb)
         if self.max != jar.max:
-            print('max_no or max_mb has changed!')
-            old_etag = None
+            self.etag = None
         try:
-            doc = feedparser.parse(sub.url, etag=old_etag)
+            doc = feedparser.parse(sub.url, etag=self.etag)
         except TypeError:
             # https://github.com/kurtmckee/feedparser/issues/30#issuecomment-183714444            
             if 'drv_libxml2' in feedparser.PREFERRED_XML_PARSERS:
                 feedparser.PREFERRED_XML_PARSERS.remove('drv_libxml2')
-                doc = feedparser.parse(sub.url, etag=old_etag)
+                doc = feedparser.parse(sub.url, etag=self.etag)
             else:
                 raise
         # save new etag if one
         if doc.has_key('etag'):
             self.etag = doc.etag
-        else:
-            self.etag = None
         # only bozo for actual errors
         if doc.bozo and not doc.entries:
             if 'status' in doc:
