@@ -112,5 +112,3 @@ class Sub:
         for e in elements:
             setattr(self, e[0], e[1])
         self.sub_dir = path.join(prefs.base_dir, self.title)
-        self.image_path = path.join(self.sub_dir, 'cover.jpg')
-    

@@ -10,6 +10,7 @@
 # or (at your option) any later version.
 
 import os
+import re
 import sys
 import signal
 import socket
@@ -71,6 +72,12 @@ def download_file(url, file_path):
     signal.signal(signal.SIGALRM, signal.SIG_DFL)
 
     return outcome
+
+def download_img_file(url, sub_dir):
+    extension = os.path.splitext(url)[1]
+    extension = re.match('\.[a-zA-Z]+', extension).group()
+    file_path = os.path.join(sub_dir, 'cover' + extension)
+    return download_file(url, file_path)
 
 # delete
 def delete_file(file_path):

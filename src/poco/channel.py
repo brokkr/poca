@@ -64,7 +64,7 @@ class Channel:
 
         # download cover image
         if self.downed and self.feed.image:
-            outcome = files.download_file(self.feed.image, sub.image_path)
+            outcome = files.download_img_file(self.feed.image, sub.sub_dir)
 
         # print summary of operations in file log
         output.summary(self.title, self.downed, self.removed, self.failed)
