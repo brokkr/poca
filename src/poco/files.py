@@ -75,7 +75,11 @@ def download_file(url, file_path):
 
 def download_img_file(url, sub_dir):
     extension = os.path.splitext(url)[1]
-    extension = re.match('\.[a-zA-Z]+', extension).group()
+    extension = re.match('\.[a-zA-Z]+', extension)
+    if extension:
+        extension = extension.group()
+    else:
+        extension = '.jpg'
     file_path = os.path.join(sub_dir, 'cover' + extension)
     return download_file(url, file_path)
 

@@ -36,6 +36,7 @@ class Jar:
         self.db_filename = os.path.join(paths.db_dir, sub.title)
         self.etag = None
         self.bookmark = 0
+        self.max = (sub.max_no, sub.max_mb)
         self.lst = []
         self.dic = {}
 

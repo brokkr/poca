@@ -62,6 +62,12 @@ class Channel:
             entry = self.wanted.dic[uid]
             self.acquire(uid, entry)
 
+        # save etag and max after succesful update
+        self.jar.max = self.feed.max 
+        if not self.failed:
+            self.jar.etag = self.feed.etag
+        self.jar.save()
+
         # download cover image
         if self.downed and self.feed.image:
             outcome = files.download_img_file(self.feed.image, sub.sub_dir)
@@ -122,9 +128,11 @@ class Channel:
 class Feed:
     def __init__(self, sub, jar):
         '''Constructs a container for feed entries'''
-        try:
-            old_etag = jar.etag
-        except AttributeError:
+        # do we need an update?
+        old_etag = jar.etag
+        self.max = (sub.max_no, sub.max_mb)
+        if self.max != jar.max:
+            print('max_no or max_mb has changed!')
             old_etag = None
         try:
             doc = feedparser.parse(sub.url, etag=old_etag)
@@ -135,6 +143,11 @@ class Feed:
                 doc = feedparser.parse(sub.url, etag=old_etag)
             else:
                 raise
+        # save new etag if one
+        if doc.has_key('etag'):
+            self.etag = doc.etag
+        else:
+            self.etag = None
         # only bozo for actual errors
         if doc.bozo and not doc.entries:
             if 'status' in doc:
@@ -145,9 +158,7 @@ class Feed:
             else:
                 self.outcome = Outcome(False, str(doc.bozo_exception))
                 return
-        if doc.has_key('etag'):
-            jar.etag = doc.etag
-            jar.save()
+        # harvest the entries
         try:
             self.lst = [ entry.id for entry in doc.entries ]
             self.dic = { entry.id : entry for entry in doc.entries }
