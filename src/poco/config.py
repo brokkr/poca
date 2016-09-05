@@ -94,11 +94,15 @@ def get_subs(prefs, xml_root):
 class Sub:
     def __init__(self, prefs, xml_sub):
         '''Create a subscription object with metadata in dic if any'''
-        self.metadata = None
+        self.metadata, self.filters = {}, {}
         xml_meta = xml_sub.find('metadata')
         if xml_meta is not None:
             xml_sub.remove(xml_meta)
             self.metadata = { e.tag: e.text for e in xml_meta.getchildren() }
+        xml_filters  = xml_sub.find('filters')
+        if xml_filters is not None:
+            xml_sub.remove(xml_filters)
+            self.filters = { e.tag: e.text for e in xml_filters.getchildren() }
         required = {'title', 'url'}
         elements = [ (e.tag, e.text) for e in xml_sub.getchildren() ]
         missing_required = required - { e[0] for e in elements }

@@ -192,9 +192,12 @@ class Filtered():
     def __init__(self, combo, sub):
         relambda = lambda x: bool(re.search('\d{4}-\d{2}-\d{2}-12-00', 
             combo.dic[x]['poca_filename']))
-        match_hour = lambda x, y: combo.dic[x]['updated_parsed'].tm_hour == y
-        match_wday = lambda x, y: combo.dic[x]['updated_parsed'].tm_wday == y
+        match_hour = lambda x: combo.dic[x]['updated_parsed'].tm_hour == int(sub.filters['hour'])
+        match_wday = lambda x: combo.dic[x]['updated_parsed'].tm_wday == int(sub.filters['weekday'])
+        self.lst = combo.lst
         #self.lst = list(filter(relambda, combo.lst))
+        if 'hour' in sub.filters:
+            self.lst = list(filter(match_hour, self.lst))
         self.dic = combo.dic
 
 class Wanted():
