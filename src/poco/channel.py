@@ -7,16 +7,13 @@
 # the Free Software Foundation, either version 3 of the License, 
 # or (at your option) any later version.
 
+import re
 import sys
 
 import feedparser
 
-from poco import files, history, entry, output, tag
+from poco import files, history, entryinfo, output, tag
 from poco.outcome import Outcome
-
-
-feedparser.FeedParserDict.attach_size = entry.attach_size
-feedparser.FeedParserDict.attach_path = entry.attach_path
 
 
 class Channel:
@@ -44,7 +41,8 @@ class Channel:
             output.suberror(self.title, self.feed.outcome)
             return 
         self.combo = Combo(self.feed, self.jar, self.sub)
-        self.wanted = Wanted(self.sub, self.combo, self.jar, bump)
+        self.filtered = Filtered(self.combo, self.sub)
+        self.wanted = Wanted(self.sub, self.filtered, self.jar, bump)
         self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
         self.lacking = set(self.wanted.lst) - set(self.jar.lst)
         output.plans(self.title, len(self.unwanted), len(self.lacking))
@@ -181,34 +179,39 @@ class Combo:
         entries. Copies feed then adds non-duplicates from jar'''
         if hasattr(sub, 'from_the_top'):
             self.lst = list(jar.lst)
-            self.lst.extend(x for x in feed.lst if x not in jar.lst)
+            self.lst.extend(uid for uid in feed.lst if uid not in jar.lst)
         else:
             self.lst = list(feed.lst)
-            self.lst.extend(x for x in jar.lst if x not in feed.lst)
-        self.dic = feed.dic.copy()
+            self.lst.extend(uid for uid in jar.lst if uid not in feed.lst)
+        self.dic = {uid: entryinfo.expand(feed.dic[uid], sub) 
+            for uid in feed.lst if uid not in jar.lst}
+        # remove from list entries with entry['valid'] = False?
         self.dic.update(jar.dic)
 
+class Filtered():
+    def __init__(self, combo, sub):
+        relambda = lambda x: bool(re.search('\d{4}-\d{2}-\d{2}-12-00', 
+            combo.dic[x]['poca_filename']))
+        match_hour = lambda x, y: combo.dic[x]['updated_parsed'].tm_hour == y
+        match_wday = lambda x, y: combo.dic[x]['updated_parsed'].tm_wday == y
+        #self.lst = list(filter(relambda, combo.lst))
+        self.dic = combo.dic
+
 class Wanted():
-    def __init__(self, sub, combo, jar, bump):
+    def __init__(self, sub, filtered, jar, bump):
         '''Constructs a container for all the entries we have room for, 
         regardless of where they are, internet or local folder.'''
         self.lst, self.dic = [], {}
-        mega = 1048576.0
-        self.max_bytes = float(sub.max_mb) * mega
+        self.max_bytes = float(sub.max_mb) * 1048576.0
         self.cur_bytes = 0
         if hasattr(sub, 'from_the_top') and bump:
-            combo.lst = combo.lst[jar.bookmark:]
+            filtered.lst = filtered.lst[jar.bookmark:]
         if sub.max_no:
-            combo.lst = combo.lst[:int(sub.max_no)]
-        for uid in combo.lst:
-            entry = combo.dic[uid]
-            if 'valid' not in entry:
-                entry.attach_size(mega)
-                if not entry.valid:
-                    continue
+            filtered.lst = filtered.lst[:int(sub.max_no)]
+        for uid in filtered.lst:
+            entry = filtered.dic[uid]
             if self.cur_bytes + entry.poca_size < self.max_bytes:
                 self.cur_bytes += entry.poca_size
-                entry.attach_path(sub)
                 self.lst.append(uid)
                 self.dic[uid] = entry
             else:
