@@ -74,13 +74,14 @@ def download_file(url, file_path):
     return outcome
 
 def download_img_file(url, sub_dir):
-    extension = os.path.splitext(url)[1]
-    extension = re.match('\.[a-zA-Z]+', extension)
-    if extension:
-        extension = extension.group()
-    else:
-        extension = '.jpg'
-    file_path = os.path.join(sub_dir, 'cover' + extension)
+    try:
+        u = urllib.request.urlopen(url)
+    except urllib.error.URLError:
+        return Outcome(False, 'Couldnt get image')
+    subtype = u.headers.get_content_subtype()
+    subtype = subtype.replace('jpeg', 'jpg')
+    u.close()
+    file_path = os.path.join(sub_dir, 'cover.' + subtype)
     return download_file(url, file_path)
 
 # delete
