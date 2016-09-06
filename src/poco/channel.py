@@ -190,14 +190,23 @@ class Combo:
 
 class Filtered():
     def __init__(self, combo, sub):
-        relambda = lambda x: bool(re.search('\d{4}-\d{2}-\d{2}-12-00', 
+        match_filename = lambda x: bool(re.search(sub.filters['filename'], 
             combo.dic[x]['poca_filename']))
-        match_hour = lambda x: combo.dic[x]['updated_parsed'].tm_hour == int(sub.filters['hour'])
-        match_wday = lambda x: combo.dic[x]['updated_parsed'].tm_wday == int(sub.filters['weekday'])
+        match_title = lambda x: bool(re.search(sub.filters['title'], 
+            combo.dic[x]['title']))
+        match_hour = lambda x: str(combo.dic[x]['updated_parsed'].tm_hour) \
+            == sub.filters['hour']
+        match_wdays = lambda x: str(combo.dic[x]['updated_parsed'].tm_wday) \
+            in list(sub.filters['weekdays'])
         self.lst = combo.lst
-        #self.lst = list(filter(relambda, combo.lst))
+        if 'filename' in sub.filters:
+            self.lst = list(filter(match_filename, self.lst))
+        if 'title' in sub.filters:
+            self.lst = list(filter(match_title, self.lst))
         if 'hour' in sub.filters:
             self.lst = list(filter(match_hour, self.lst))
+        if 'weekdays' in sub.filters:
+            self.lst = list(filter(match_wdays, self.lst))
         self.dic = combo.dic
 
 class Wanted():
