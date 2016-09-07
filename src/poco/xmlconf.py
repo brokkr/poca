@@ -81,7 +81,7 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
 
             <title>linux voice</title>
             <url>http://www.linuxvoice.com/podcast_mp3.rss</url>
-            <max_no>150</max_no>
+            <max_mb>250</max_mb>
             <filters>
                 <title>Season 4</title>
             </filters>
