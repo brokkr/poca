@@ -52,11 +52,39 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
               move on to the next four, use 'poca --bump [title]'. This is 
               useful for audiobook-style podcasts or working your way through
               old episodes of a newly discovered podcast. (optional)
+            * filers: contains one or more of the following tags that filter 
+              filter the entries in the feed:
+              * filename: The filename of the entry must match this string 
+                (or regex) in order to be included. Note that the tag is 
+                interpreted as a regex, so certain characters should be 
+                escaped (e.g. a literal point should be written '\.')
+                Example: <filename>\.mp3</filename> removes the videos in
+                         Ricky Gervais' podcast.
+              * title: The same as above, only for the title in the rss 
+                feed (not in the music file's metadata)
+                Example: <title>Wires</title> only gets the 'Within the Wires'
+                         episodes from the Nightvale feed.
+              * hour: The hour (24h-format) at which the entry was published.
+                This is useful for podcasts that put out more episodes a day
+                than you need, e.g. news broadcasts. 
+                Example: <hour>21</hour> only gives you the evening edition
+                         of BBC's Newshour.
+              * weekday: Removes all episodes not published on the specified
+                weekdays. Each weekday to be included is written as a single
+                digit where Monday is 0, Tuesday is 1, etc, up to 6 for 
+                Sunday. 
+                Example: <weekday>024</weekday> to get Monday, Wednesday, 
+                         and Friday episodes.
+              Note that filters can but probably should not be combined with
+              'from_the_top'.
               -->
 
             <title>linux voice</title>
             <url>http://www.linuxvoice.com/podcast_mp3.rss</url>
             <max_no>150</max_no>
+            <filters>
+                <title>Season 4</title>
+            </filters>
             <metadata>
                 <!-- These settings will be used to overwrite the mp3 files'
                 id3 metadata. The metadata tag and all subtags are optional. 
