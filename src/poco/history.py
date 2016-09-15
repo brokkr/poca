@@ -39,6 +39,7 @@ class Jar:
         self.max = (sub.max_no, sub.max_mb)
         self.lst = []
         self.dic = {}
+        self.del_lst = []
 
     def save(self):
         outcome = files.check_path(os.path.dirname(self.db_filename))

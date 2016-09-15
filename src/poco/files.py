@@ -107,3 +107,7 @@ def check_path(check_dir):
     except OSError as e:
         return Outcome(False, check_dir + ': Dir could not be created.')
 
+# check if file exists
+def verify__file(entry):
+    isfile = os.path.isfile(entry['poca_abspath'])
+    return Outcome(isfile, entry['poca_abspath'] + ' exists: ' + str(isfile))

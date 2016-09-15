@@ -36,12 +36,13 @@ class Channel:
         if not outcome.success:
             output.subfatal(self.title, outcome)
             sys.exit()
+        self.check_jar()
         self.feed = Feed(self.sub, self.jar)
         if not self.feed.outcome.success:
             output.suberror(self.title, self.feed.outcome)
             return 
         self.combo = Combo(self.feed, self.jar, self.sub)
-        self.filtered = Filtered(self.combo, self.sub)
+        self.filtered = Filtered(self.combo, self.sub, self.jar.del_lst)
         self.wanted = Wanted(self.sub, self.filtered, self.jar, bump)
         self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
         self.lacking = set(self.wanted.lst) - set(self.jar.lst)
@@ -72,6 +73,15 @@ class Channel:
 
         # print summary of operations in file log
         output.summary(self.title, self.downed, self.removed, self.failed)
+
+    def check_jar(self):
+        for uid in self.jar.lst:
+            outcome = files.verify_file(self.jar.dic[uid])
+            if not outcome.success:
+                self.jar.lst.remove(uid)
+                dummy = self.jar.dic.pop(uid)
+                self.jar.del_lst.append(uid)
+        self.jar.save()
 
     def acquire(self, uid, entry):
         '''Get new entries, tag them and add to history'''
@@ -189,7 +199,7 @@ class Combo:
         self.dic.update(jar.dic)
 
 class Filtered():
-    def __init__(self, combo, sub):
+    def __init__(self, combo, sub, del_lst):
         match_filename = lambda x: bool(re.search(sub.filters['filename'], 
             combo.dic[x]['poca_filename']))
         match_title = lambda x: bool(re.search(sub.filters['title'], 
@@ -200,7 +210,9 @@ class Filtered():
             in list(sub.filters['weekdays'])
         cutoff_date = lambda x: (combo.dic[x]['published_parsed']) \
             > sub.filters['after_date']
+        deletions = lambda x: x in del_lst
         self.lst = combo.lst
+        self.lst = list(filter(deletions, self.lst))
         if 'after_date' in sub.filters:
             self.lst = list(filter(cutoff_date, self.lst))
         if 'filename' in sub.filters:
