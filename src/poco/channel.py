@@ -198,7 +198,11 @@ class Filtered():
             == sub.filters['hour']
         match_wdays = lambda x: str(combo.dic[x]['updated_parsed'].tm_wday) \
             in list(sub.filters['weekdays'])
+        cutoff_date = lambda x: (combo.dic[x]['published_parsed']) \
+            > sub.filters['after_date']
         self.lst = combo.lst
+        if 'after_date' in sub.filters:
+            self.lst = list(filter(cutoff_date, self.lst))
         if 'filename' in sub.filters:
             self.lst = list(filter(match_filename, self.lst))
         if 'title' in sub.filters:

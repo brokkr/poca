@@ -8,6 +8,7 @@
 # or (at your option) any later version.
 
 import sys
+import time
 import logging
 from os import path
 from xml.etree import ElementTree 
@@ -103,6 +104,9 @@ class Sub:
         if xml_filters is not None:
             xml_sub.remove(xml_filters)
             self.filters = { e.tag: e.text for e in xml_filters.getchildren() }
+            if 'after_date' in self.filters:
+                self.filters['after_date'] = time.strptime(
+                    self.filters['after_date'], "%Y-%m-%d")
         required = {'title', 'url'}
         elements = [ (e.tag, e.text) for e in xml_sub.getchildren() ]
         missing_required = required - { e[0] for e in elements }

@@ -69,14 +69,17 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
                 than you need, e.g. news broadcasts. 
                 Example: [hour]21[/hour] only gives you the evening edition
                          of BBC's Newshour.
-              * weekday: Removes all episodes not published on the specified
+              * weekday: Excludes all episodes not published on the specified
                 weekdays. Each weekday to be included is written as a single
                 digit where Monday is 0, Tuesday is 1, etc, up to 6 for 
                 Sunday. 
                 Example: [weekday]024[/weekday] to get Monday, Wednesday, 
                          and Friday episodes.
-              Note that filters can but probably should not be combined with
-              'from_the_top'.
+              * after_date: Excludes all episodes pusblished BEFORE the date
+                specified. Format is YYYY-MM-DD. This is useful is you want
+                to assign lots of space to the sub but not download the back 
+                catalogue.
+                Example: [after_date]2016-08-23[/after_date]
               -->
 
             <title>linux voice</title>
