@@ -40,6 +40,7 @@ class Jar:
         self.lst = []
         self.dic = {}
         self.del_lst = []
+        self.del_dic = {}
 
     def save(self):
         outcome = files.check_path(os.path.dirname(self.db_filename))

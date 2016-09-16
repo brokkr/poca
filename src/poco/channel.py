@@ -47,7 +47,7 @@ class Channel:
         self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
         self.lacking = set(self.wanted.lst) - set(self.jar.lst)
         output.plans(self.title, len(self.unwanted), len(self.lacking))
-        self.removed, self.downed, self.failed = [], [], []
+        self.removed, self.downed, self.failed, self.man_remed = [], [], [], []
 
         # loop through unwanted (set) entries to remove
         for uid in self.unwanted:
@@ -79,9 +79,11 @@ class Channel:
             outcome = files.verify_file(self.jar.dic[uid])
             if not outcome.success:
                 self.jar.lst.remove(uid)
-                dummy = self.jar.dic.pop(uid)
                 self.jar.del_lst.append(uid)
+                jar.del_dic[uid] = self.jar.dic.pop(uid)
         self.jar.save()
+        for uid in self.jar.del_lst:
+            print(self.jar.del_dic[uid]['poca_filename'])
 
     def acquire(self, uid, entry):
         '''Get new entries, tag them and add to history'''
