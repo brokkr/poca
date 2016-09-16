@@ -210,7 +210,7 @@ class Filtered():
             in list(sub.filters['weekdays'])
         cutoff_date = lambda x: (combo.dic[x]['published_parsed']) \
             > sub.filters['after_date']
-        deletions = lambda x: x in del_lst
+        deletions = lambda x: x not in del_lst
         self.lst = combo.lst
         self.lst = list(filter(deletions, self.lst))
         if 'after_date' in sub.filters:
