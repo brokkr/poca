@@ -43,6 +43,11 @@ def plans(title, no_unwanted, no_lacking):
     logger.info(msg)
 
 # file operations individually (for stdout)
+def notice_udeleted(entry):
+    msg = ' ' + "\N{WARNING SIGN}" + ' ' + entry['poca_filename'] + \
+        ' deleted by user.'
+    logger.debug(msg)
+
 def removing(entry):
     msg = ' ' + "\N{CANCELLATION X}" + ' ' + entry['poca_filename'] + \
         ' [' + str(round(entry['poca_mb'])) + ' Mb]'

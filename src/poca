@@ -18,10 +18,7 @@ if __name__ == '__main__':
         poco.plogging.get_logger(args)
         config = poco.config.Config(args)
         for sub in config.subs:
-            if sub.title == args.bump:
-                channel = poco.channel.Channel(config, sub, bump=True)
-            else:
-                channel = poco.channel.Channel(config, sub)
+            channel = poco.channel.Channel(config, sub)
     except KeyboardInterrupt:
         pass
 

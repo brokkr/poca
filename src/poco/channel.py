@@ -17,13 +17,16 @@ from poco.outcome import Outcome
 
 
 class Channel:
-    def __init__(self, config, sub, bump=False):
+    def __init__(self, config, sub):
         '''A class for a single subscription/channel. Creates the containers
         first, then acts on them and updates the db as it goes.'''
         
         self.sub = sub
         self.title = sub.title.upper()
         self.config = config
+        self.udeleted = []
+
+        ### PART 1: PLANS
 
         # see that we can write to the designated directory
         outcome = files.check_path(sub.sub_dir)
@@ -31,22 +34,33 @@ class Channel:
             output.subfatal(self.title, outcome)
             sys.exit()
 
-        # get feed and jar and create collections (wanted, unwanted, etc.)
+        # get jar and check for user deleted files
         self.jar, outcome = history.get_jar(config.paths, self.sub)
         if not outcome.success:
             output.subfatal(self.title, outcome)
             sys.exit()
         self.check_jar()
+
+        # get feed, combine with jar and filter the lot
         self.feed = Feed(self.sub, self.jar)
         if not self.feed.outcome.success:
             output.suberror(self.title, self.feed.outcome)
             return 
         self.combo = Combo(self.feed, self.jar, self.sub)
         self.wanted = Wanted(self.sub, self.combo, self.jar.del_lst)
+
+        # inform user of intentions
         self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
         self.lacking = set(self.wanted.lst) - set(self.jar.lst)
         output.plans(self.title, len(self.unwanted), len(self.lacking))
-        self.removed, self.downed, self.failed, self.man_remed = [], [], [], []
+        self.removed, self.downed, self.failed = [], [], []
+
+        ### PART 2: ACTION
+
+        # loop through user deleted and indicate recognition
+        for uid in self.udeleted:
+            entry = self.jar.del_dic[uid]
+            output.notice_udeleted(entry)
 
         # loop through unwanted (set) entries to remove
         for uid in self.unwanted:
@@ -61,7 +75,7 @@ class Channel:
             self.acquire(uid, entry)
 
         # save etag and max after succesful update
-        self.jar.max = self.feed.max 
+        self.jar.max_no = self.feed.max_no 
         if not self.failed:
             self.jar.etag = self.feed.etag
         self.jar.save()
@@ -73,10 +87,13 @@ class Channel:
         # print summary of operations in file log
         output.summary(self.title, self.downed, self.removed, self.failed)
 
+
     def check_jar(self):
+        '''Check for user deleted files and mark any such'''
         for uid in self.jar.lst:
             outcome = files.verify_file(self.jar.dic[uid])
             if not outcome.success:
+                self.udeleted.append(uid)
                 self.jar.del_lst.append(uid)
                 self.jar.del_dic[uid] = self.jar.dic.pop(uid)
         self.jar.lst = [ x for x in self.jar.lst if x not in self.jar.del_lst ]
@@ -138,8 +155,8 @@ class Feed:
         '''Constructs a container for feed entries'''
         # do we need an update?
         self.etag = jar.etag
-        self.max = (sub.max_no, sub.max_mb)
-        if self.max != jar.max:
+        self.max_no = sub.max_no
+        if self.max_no != jar.max_no:
             self.etag = None
         try:
             doc = feedparser.parse(sub.url, etag=self.etag)
