@@ -83,8 +83,8 @@ class Channel:
         self.jar.lst = [ x for x in self.jar.lst if x not in self.jar.del_lst ]
         self.jar.save()
         # testing
-        for uid in self.jar.del_lst:
-            print(self.jar.del_dic[uid]['poca_filename'])
+        #for uid in self.jar.del_lst:
+        #    print(self.jar.del_dic[uid]['poca_filename'])
 
     def acquire(self, uid, entry):
         '''Get new entries, tag them and add to history'''
