@@ -38,9 +38,6 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
             * title: The name used for the folder of the subscription and 
               for reference (required)
             * url: The address of the rss feed (required)
-            * max_mb: The maximum disk space (in Mb) availlable to the 
-              subscription. Any more than this will not be downloaded / be
-              deleted (optional)
             * max_no: The maximum number of files to kepp in the 
               subscription. Any more than this will not be downloaded / be
               deleted. This can be used in conjunction with or instead of
@@ -49,21 +46,23 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
               over newer, so if max_no is 4, poca will download the latest
               4 episodes. If from_the_top is set to 'yes' poca will instead
               start at the beginning, download the oldest four episodes. To
-              move on to the next four, use 'poca -b [title]'. This is 
-              useful for audiobook-style podcasts or working your way through
-              old episodes of a newly discovered podcast. (optional)
+              move on, simply delete old files and poca will get newer ones
+              (still from the beginning) instead. This is useful for audio-
+              book-style podcasts or working your way through old episodes of 
+              a newly discovered podcast. (optional)
             * filters: contains one or more of the following tags that filter 
-              filter the entries in the feed (optional):
+              filter the entries in the feed (optional). Note: Examples are
+              written with square brackets to avoid closing off the comment.
               * filename: The filename of the entry must match this string 
                 (or regex) in order to be included. Note that the tag is 
                 interpreted as a regex, so certain characters should be 
                 escaped (e.g. a literal point should be written '\.')
-                Example: [filename]\.mp3[/filename] removes the videos in
+                Example: [filename]\.mp3[/filename] excludes the videos from
                          Ricky Gervais' podcast.
               * title: The same as above, only for the title in the rss 
                 feed (not in the music file's metadata)
                 Example: [title]Wires[/title] only gets the 'Within the Wires'
-                         episodes from the Nightvale feed.
+                         episodes from the Welcome to Nightvale feed.
               * hour: The hour (24h-format) at which the entry was published.
                 This is useful for podcasts that put out more episodes a day
                 than you need, e.g. news broadcasts. 
@@ -75,7 +74,7 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
                 Sunday. 
                 Example: [weekday]024[/weekday] to get Monday, Wednesday, 
                          and Friday episodes.
-              * after_date: Excludes all episodes pusblished BEFORE the date
+              * after_date: Excludes all episodes published BEFORE the date
                 specified. Format is YYYY-MM-DD. This is useful is you want
                 to assign lots of space to the sub but not download the back 
                 catalogue.
@@ -84,7 +83,7 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
 
             <title>linux voice</title>
             <url>http://www.linuxvoice.com/podcast_mp3.rss</url>
-            <max_mb>250</max_mb>
+            <max_no>4</max_no>
             <filters>
                 <title>Season 4</title>
             </filters>

@@ -115,7 +115,6 @@ class Sub:
                 '\n'.join(missing_required))
             output.conffatal(msg)
             sys.exit()
-        self.max_mb = float('inf')
         self.max_no = False
         for e in elements:
             setattr(self, e[0], e[1])

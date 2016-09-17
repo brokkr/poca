@@ -42,8 +42,7 @@ class Channel:
             output.suberror(self.title, self.feed.outcome)
             return 
         self.combo = Combo(self.feed, self.jar, self.sub)
-        self.filtered = Filtered(self.combo, self.sub, self.jar.del_lst)
-        self.wanted = Wanted(self.sub, self.filtered, self.jar, bump)
+        self.wanted = Wanted(self.sub, self.combo, self.jar.del_lst)
         self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
         self.lacking = set(self.wanted.lst) - set(self.jar.lst)
         output.plans(self.title, len(self.unwanted), len(self.lacking))
@@ -113,8 +112,6 @@ class Channel:
         '''Add new entry to jar'''
         self.jar.lst.insert(wantedindex, uid)
         self.jar.dic[uid] = entry
-        if hasattr(self.sub, 'from_the_top'):
-            self.jar.bookmark += 1
         outcome = self.jar.save()
         if not outcome.success:
             output.subfatal(self.title, outcome)
@@ -201,8 +198,9 @@ class Combo:
         # remove from list entries with entry['valid'] = False?
         self.dic.update(jar.dic)
 
-class Filtered():
-    def __init__(self, combo, sub, del_lst):
+class Wanted():
+    def __init__(self, sub, combo, del_lst):
+        # listing filters
         match_filename = lambda x: bool(re.search(sub.filters['filename'], 
             combo.dic[x]['poca_filename']))
         match_title = lambda x: bool(re.search(sub.filters['title'], 
@@ -214,10 +212,19 @@ class Filtered():
         cutoff_date = lambda x: (combo.dic[x]['published_parsed']) \
             > sub.filters['after_date']
         deletions = lambda x: x not in del_lst
+        # applying filters
         self.lst = combo.lst
+        # First we remove the ones that have been deleted. These are obviously
+        # out regardless of other criteria.
         self.lst = list(filter(deletions, self.lst))
+        # Note that after_date evaluates each entry on it's own merits. In
+        # other words it is not positional (all entries after x in list...) 
+        # Thus it should work with from_the_top. In effect though it should 
+        # divide the list in two and only keep one part.
         if 'after_date' in sub.filters:
             self.lst = list(filter(cutoff_date, self.lst))
+        # The following optional filters should remove various entries from
+        # the list in no particular order.
         if 'filename' in sub.filters:
             self.lst = list(filter(match_filename, self.lst))
         if 'title' in sub.filters:
@@ -226,25 +233,13 @@ class Filtered():
             self.lst = list(filter(match_hour, self.lst))
         if 'weekdays' in sub.filters:
             self.lst = list(filter(match_wdays, self.lst))
-        self.dic = combo.dic
-
-class Wanted():
-    def __init__(self, sub, filtered, jar, bump):
-        '''Constructs a container for all the entries we have room for, 
-        regardless of where they are, internet or local folder.'''
-        self.lst, self.dic = [], {}
-        self.max_bytes = float(sub.max_mb) * 1048576.0
-        self.cur_bytes = 0
-        if hasattr(sub, 'from_the_top') and bump:
-            filtered.lst = filtered.lst[jar.bookmark:]
+        # Lastly we limit the number of files. This has to come last as 
+        # otherwise the final number might get reduced further. Also this is
+        # now the ONLY positional filter so there's no chance of multiple 
+        # positional filters interacting in weird ways.
         if sub.max_no:
-            filtered.lst = filtered.lst[:int(sub.max_no)]
-        for uid in filtered.lst:
-            entry = filtered.dic[uid]
-            if self.cur_bytes + entry.poca_size < self.max_bytes:
-                self.cur_bytes += entry.poca_size
-                self.lst.append(uid)
-                self.dic[uid] = entry
-            else:
-                break
+            self.lst = self.lst[:int(sub.max_no)]
+        # Currently wwe just copy the whole b***** dic. Later on we will 
+        # reduce it by only taking on the ones with keys matching self.lst
+        self.dic = combo.dic
 

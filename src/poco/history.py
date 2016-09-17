@@ -34,9 +34,8 @@ class Jar:
     def __init__(self, paths, sub):
         '''Creates standard subscription info container with save method'''
         self.db_filename = os.path.join(paths.db_dir, sub.title)
+        self.max_no = sub.max_no
         self.etag = None
-        self.bookmark = 0
-        self.max = (sub.max_no, sub.max_mb)
         self.lst = []
         self.dic = {}
         self.del_lst = []
@@ -45,13 +44,13 @@ class Jar:
     def save(self):
         outcome = files.check_path(os.path.dirname(self.db_filename))
         if outcome.success:
-            try:
-                with open(self.db_filename, 'wb') as f:
-                    pickle.dump(self, f)
-                outcome = Outcome(True, 'Pickle successful')
+            #try:
+            with open(self.db_filename, 'wb') as f:
+                pickle.dump(self, f)
+            outcome = Outcome(True, 'Pickle successful')
             # need more specific exceptions here
-            except:
-                outcome = Outcome(False, 'Pickle failed')
+            #except:
+            #    outcome = Outcome(False, 'Pickle failed')
         return outcome
 
 
