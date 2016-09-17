@@ -42,7 +42,7 @@ class Channel:
         self.check_jar()
 
         # get feed, combine with jar and filter the lot
-        self.feed = Feed(self.sub, self.jar)
+        self.feed = Feed(self.sub, self.jar, self.udeleted)
         if not self.feed.outcome.success:
             output.suberror(self.title, self.feed.outcome)
             return 
@@ -152,12 +152,12 @@ class Channel:
 
 
 class Feed:
-    def __init__(self, sub, jar):
+    def __init__(self, sub, jar, udeleted):
         '''Constructs a container for feed entries'''
         # do we need an update?
         self.etag = jar.etag
         self.max_no = sub.max_no
-        if self.max_no != jar.max_no:
+        if self.max_no != jar.max_no or udeleted:
             self.etag = None
         try:
             doc = feedparser.parse(sub.url, etag=self.etag)
