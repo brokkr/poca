@@ -78,12 +78,11 @@ class Channel:
         for uid in self.jar.lst:
             outcome = files.verify_file(self.jar.dic[uid])
             if not outcome.success:
-                # here's the problem: we're skipping every second removal
-                # because we're looping through something we're deleting
-                self.jar.lst.remove(uid)
                 self.jar.del_lst.append(uid)
                 self.jar.del_dic[uid] = self.jar.dic.pop(uid)
+        self.jar.lst = [ x for x in self.jar.lst if x not in self.jar.del_lst ]
         self.jar.save()
+        # testing
         for uid in self.jar.del_lst:
             print(self.jar.del_dic[uid]['poca_filename'])
 
