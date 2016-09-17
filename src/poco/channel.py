@@ -85,7 +85,8 @@ class Channel:
             outcome = files.download_img_file(self.feed.image, sub.sub_dir)
 
         # print summary of operations in file log
-        output.summary(self.title, self.downed, self.removed, self.failed)
+        output.summary(self.title, self.udeleted, self.removed, self.downed, 
+            self.failed)
 
 
     def check_jar(self):

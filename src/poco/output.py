@@ -65,12 +65,14 @@ def tag_fail(outcome):
     logger.debug('   Tagging failed. ' + outcome.msg)
 
 # file operations summary (for file log)
-def summary(title, downed, removed, failed):
+def summary(title, udeleted, removed, downed, failed):
     '''print summary to log ('warn' is filtered out in stream)'''
+    if udeleted:
+        logger.warn(title + '. User deleted: ' + ', '.join(udeleted))
+    if removed:
+        logger.warn(title + '. Removed: ' + ', '.join(removed))
     if downed:
         logger.warn(title + '. Downloaded: ' + ', '.join(downed))
     if failed:
         logger.warn(title + '. Failed: ' + ', '.join(failed))
-    if removed:
-        logger.warn(title + '. Removed: ' + ', '.join(removed))
 
