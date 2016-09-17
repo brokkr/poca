@@ -58,9 +58,10 @@ class Channel:
         ### PART 2: ACTION
 
         # loop through user deleted and indicate recognition
+        self.udeleted_files = [ self.jar.del_dic[uid]['poca_filename'] for 
+            uid in self.udeleted ]
         for uid in self.udeleted:
-            entry = self.jar.del_dic[uid]
-            output.notice_udeleted(entry)
+            output.notice_udeleted(self.jar.del_dic[uid])
 
         # loop through unwanted (set) entries to remove
         for uid in self.unwanted:

@@ -45,7 +45,7 @@ def plans(title, no_unwanted, no_lacking):
 # file operations individually (for stdout)
 def notice_udeleted(entry):
     msg = ' ' + "\N{WARNING SIGN}" + ' ' + entry['poca_filename'] + \
-        ' deleted by user.'
+        ' deleted by user'
     logger.debug(msg)
 
 def removing(entry):
