@@ -24,7 +24,6 @@ class Channel:
         self.sub = sub
         self.title = sub.title.upper()
         self.config = config
-        self.udeleted = []
 
         ### PART 1: PLANS
 
@@ -35,6 +34,7 @@ class Channel:
             sys.exit()
 
         # get jar and check for user deleted files
+        self.udeleted = []
         self.jar, outcome = history.get_jar(config.paths, self.sub)
         if not outcome.success:
             output.subfatal(self.title, outcome)
@@ -75,8 +75,8 @@ class Channel:
             entry = self.wanted.dic[uid]
             self.acquire(uid, entry)
 
-        # save etag and max after succesful update
-        self.jar.max_no = self.feed.max_no 
+        # save etag and subsettings after succesful update
+        self.jar.sub = self.sub
         if not self.failed:
             self.jar.etag = self.feed.etag
         self.jar.save()
@@ -91,7 +91,7 @@ class Channel:
 
 
     def check_jar(self):
-        '''Check for user deleted files and mark any such'''
+        '''Check for user deleted files so we can filter them out'''
         for uid in self.jar.lst:
             outcome = files.verify_file(self.jar.dic[uid])
             if not outcome.success:
@@ -100,9 +100,6 @@ class Channel:
                 self.jar.del_dic[uid] = self.jar.dic.pop(uid)
         self.jar.lst = [ x for x in self.jar.lst if x not in self.jar.del_lst ]
         self.jar.save()
-        # testing
-        #for uid in self.jar.del_lst:
-        #    print(self.jar.del_dic[uid]['poca_filename'])
 
     def acquire(self, uid, entry):
         '''Get new entries, tag them and add to history'''
@@ -157,9 +154,10 @@ class Feed:
         '''Constructs a container for feed entries'''
         # do we need an update?
         self.etag = jar.etag
-        self.max_no = sub.max_no
-        if self.max_no != jar.max_no or udeleted:
+        if sub != jar.sub or udeleted:
             self.etag = None
+            # Testing
+            print('Changes to Sub or user deleted files were detected')
         try:
             doc = feedparser.parse(sub.url, etag=self.etag)
         except TypeError:

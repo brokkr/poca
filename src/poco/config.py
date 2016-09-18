@@ -119,3 +119,12 @@ class Sub:
         for e in elements:
             setattr(self, e[0], e[1])
         self.sub_dir = path.join(prefs.base_dir, self.title)
+
+    def __str__(self):
+        '''String representation of object?'''
+        return str(self.__dict__)
+
+    def __ne__(self, other):
+        '''Used to compare old sub instance to new to scan for changes'''
+        return self.__dict__ != other.__dict__
+
