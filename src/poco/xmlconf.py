@@ -36,7 +36,7 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
         <!-- The meaning of the subscription options are brifly as follows:
         * title: Name used for the folder of the subscription (required)
         * url: The address of the rss feed (required)
-        * max_no: Max number of files to keep in subscription (optional)
+        * max_number: Max number of files to keep in subscription (optional)
         * from_the_top: Get oldest files first, not newest (optional)
         * metadata: Override id3 header fields with these values
           (see https://github.com/brokkr/poca/wiki/ID3-frames for details)
@@ -56,14 +56,14 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
         <subscription>
             <title>example 2 - start with the two oldest episodes</title>
             <url>http://nightvale.libsyn.com/rss</url>
-            <max_no>2</max_no>
+            <max_number>2</max_number>
             <from_the_top>yes</from_the_top>
         </subscription>
 
         <subscription>
             <title>example 3 - override id3 header fields</title>
             <url>http://savagelove.savagelovecast.libsynpro.com/rss</url>
-            <max_no>2</max_no>
+            <max_number>2</max_number>
             <metadata>
                 <artist>Dan Savage</artist>
                 <genre>podcast</genre>
@@ -73,7 +73,7 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
         <subscription>
             <title>example 4 - filter based on hour of publishing</title>
             <url>http://www.bbc.co.uk/programmes/p002vsnk/episodes/downloads.rss</url>
-            <max_no>2</max_no>
+            <max_number>2</max_number>
             <filters>
                 <hour>21</hour>
             </filters>
