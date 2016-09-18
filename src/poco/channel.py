@@ -156,8 +156,6 @@ class Feed:
         self.etag = jar.etag
         if sub != jar.sub or udeleted:
             self.etag = None
-            # Testing
-            print('Changes to Sub or user deleted files were detected')
         try:
             doc = feedparser.parse(sub.url, etag=self.etag)
         except TypeError:
@@ -231,17 +229,11 @@ class Wanted():
         deletions = lambda x: x not in del_lst
         # applying filters
         self.lst = combo.lst
-        # First we remove the ones that have been deleted. These are obviously
-        # out regardless of other criteria.
+        # first, remove user deletions
         self.lst = list(filter(deletions, self.lst))
-        # Note that after_date evaluates each entry on it's own merits. In
-        # other words it is not positional (all entries after x in list...) 
-        # Thus it should work with from_the_top. In effect though it should 
-        # divide the list in two and only keep one part.
+        # then, apply 'spot' filters to remove undesirables
         if 'after_date' in sub.filters:
             self.lst = list(filter(cutoff_date, self.lst))
-        # The following optional filters should remove various entries from
-        # the list in no particular order.
         if 'filename' in sub.filters:
             self.lst = list(filter(match_filename, self.lst))
         if 'title' in sub.filters:
@@ -250,13 +242,8 @@ class Wanted():
             self.lst = list(filter(match_hour, self.lst))
         if 'weekdays' in sub.filters:
             self.lst = list(filter(match_wdays, self.lst))
-        # Lastly we limit the number of files. This has to come last as 
-        # otherwise the final number might get reduced further. Also this is
-        # now the ONLY positional filter so there's no chance of multiple 
-        # positional filters interacting in weird ways.
-        if sub.max_no:
-            self.lst = self.lst[:int(sub.max_no)]
-        # Currently wwe just copy the whole b***** dic. Later on we will 
-        # reduce it by only taking on the ones with keys matching self.lst
-        self.dic = combo.dic
+        # finally, max_number is only positional filter, therefore it's last
+        if sub.max_number:
+            self.lst = self.lst[:int(sub.max_number)]
+        self.dic = { x: combo.dic[x] for x in self.lst }
 

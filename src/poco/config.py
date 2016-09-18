@@ -115,7 +115,7 @@ class Sub:
                 '\n'.join(missing_required))
             output.conffatal(msg)
             sys.exit()
-        self.max_no = False
+        self.max_number = False
         for e in elements:
             setattr(self, e[0], e[1])
         self.sub_dir = path.join(prefs.base_dir, self.title)
