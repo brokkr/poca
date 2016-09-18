@@ -28,6 +28,7 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
         <base_dir>/tmp/poca</base_dir>
         <id3encoding>utf8</id3encoding>
         <id3removev1>yes</id3removev1>
+
     </settings>
 
     <subscriptions>
@@ -48,24 +49,34 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
         -->
 
         <subscription>
-            <title>example 1 - linux voice</title>
-            <url>http://www.linuxvoice.com/podcast_mp3.rss</url>
-            <max_no>4</max_no>
-            <filters>
-                <title>Season 4</title>
-            </filters>
+            <title>example 1 - basic unlimited</title>
+            <url>http://www.npr.org/rss/podcast.php?id=500005</url>
+        </subscription>
+
+        <subscription>
+            <title>example 2 - start with the two oldest episodes</title>
+            <url>http://nightvale.libsyn.com/rss</url>
+            <max_no>2</max_no>
+            <from_the_top>yes</from_the_top>
+        </subscription>
+
+        <subscription>
+            <title>example 3 - override id3 header fields</title>
+            <url>http://savagelove.savagelovecast.libsynpro.com/rss</url>
+            <max_no>2</max_no>
             <metadata>
-                <artist>Linux Voice</artist>
-                <album>Linux Voice</album>
+                <artist>Dan Savage</artist>
                 <genre>podcast</genre>
             </metadata>
         </subscription>
 
         <subscription>
-            <title>example 2 - welcome to night vale</title>
-            <url>http://nightvale.libsyn.com/rss</url>
-            <max_no>5</max_no>
-            <from_the_top>yes</from_the_top>
+            <title>example 4 - filter based on hour of publishing</title>
+            <url>http://www.bbc.co.uk/programmes/p002vsnk/episodes/downloads.rss</url>
+            <max_no>2</max_no>
+            <filters>
+                <hour>21</hour>
+            </filters>
         </subscription>
 
     </subscriptions>
