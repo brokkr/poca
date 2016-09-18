@@ -103,12 +103,7 @@ class Channel:
 
     def acquire(self, uid, entry):
         '''Get new entries, tag them and add to history'''
-        # loop through wanted entries (list) to download
-        # Looping through the lacking entries, we insert them at the
-        # index they have in wanted.lst. By the time we get to old ones,
-        # they will have the correct index. This has been found to 
-        # be preferable to a) starting a new list based on wanted 
-        # and b) inserting all new entries at the front.
+        # see https://github.com/brokkr/poca/wiki/Architecture#wantedindex
         output.downloading(entry)
         wantedindex = self.wanted.lst.index(uid) - len(self.failed)
         outcome = files.download_file(entry['poca_url'], entry['poca_abspath'])
@@ -119,8 +114,6 @@ class Channel:
             self.add_to_jar(uid, entry, wantedindex)
             self.downed.append(entry['poca_filename'])
         else:
-            # if a download fails, len(self.failed) is subtracted
-            # from wanted index of following files to keep order
             output.dl_fail(outcome)
             self.failed.append(entry['poca_filename'])
 
@@ -165,7 +158,7 @@ class Feed:
                 doc = feedparser.parse(sub.url, etag=self.etag)
             else:
                 raise
-        # save new etag if one
+        # save new etag if there is one in doc
         if doc.has_key('etag'):
             self.etag = doc.etag
         # only bozo for actual errors
