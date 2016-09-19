@@ -59,10 +59,8 @@ class Channel:
         ### PART 2: ACTION
 
         # loop through user deleted and indicate recognition
-        self.udeleted_files = [ self.jar.del_dic[uid]['poca_filename'] for 
-            uid in self.udeleted ]
-        for uid in self.udeleted:
-            output.notice_udeleted(self.jar.del_dic[uid])
+        for entry in self.udeleted:
+            output.notice_udeleted(entry)
 
         # loop through unwanted (set) entries to remove
         for uid in self.unwanted:
@@ -94,9 +92,10 @@ class Channel:
     def check_jar(self):
         '''Check for user deleted files so we can filter them out'''
         for uid in self.jar.lst:
-            outcome = files.verify_file(self.jar.dic[uid])
+            entry = self.jar.dic[uid]
+            outcome = files.verify_file(entry)
             if not outcome.success:
-                self.udeleted.append(uid)
+                self.udeleted.append(entry)
                 self.jar.del_lst.append(uid)
                 self.jar.del_dic[uid] = self.jar.dic.pop(uid)
         self.jar.lst = [ x for x in self.jar.lst if x not in self.jar.del_lst ]
@@ -113,10 +112,10 @@ class Channel:
             if not outcome.success:
                 output.tag_fail(outcome)
             self.add_to_jar(uid, entry, wantedindex)
-            self.downed.append(entry['poca_filename'])
+            self.downed.append(entry)
         else:
             output.dl_fail(outcome)
-            self.failed.append(entry['poca_filename'])
+            self.failed.append(entry)
 
     def add_to_jar(self, uid, entry, wantedindex):
         '''Add new entry to jar'''
@@ -140,7 +139,7 @@ class Channel:
         if not outcome.success:
             output.subfatal(self.title, outcome)
             sys.exit()
-        self.removed.append(entry['poca_filename'])
+        self.removed.append(entry)
 
 
 class Feed:

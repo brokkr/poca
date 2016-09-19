@@ -72,11 +72,15 @@ def tag_fail(outcome):
 def summary(title, udeleted, removed, downed, failed):
     '''print summary to log ('warn' is filtered out in stream)'''
     if udeleted:
-        logger.warn(title + '. User deleted: ' + ', '.join(udeleted))
+        udeleted_files = [ x['poca_filename'] for x in udeleted ]
+        logger.warn(title + '. User deleted: ' + ', '.join(udeleted_files))
     if removed:
-        logger.warn(title + '. Removed: ' + ', '.join(removed))
+        removed_files = [ x['poca_filename'] for x in removed ]
+        logger.warn(title + '. Removed: ' + ', '.join(removed_files))
     if downed:
-        logger.warn(title + '. Downloaded: ' + ', '.join(downed))
+        downed_files = [ x['poca_filename'] for x in downed ]
+        logger.warn(title + '. Downloaded: ' + ', '.join(downed_files))
     if failed:
-        logger.warn(title + '. Failed: ' + ', '.join(failed))
+        failed_files = [ x['poca_filename'] for x in failed ]
+        logger.warn(title + '. Failed: ' + ', '.join(failed_files))
 
