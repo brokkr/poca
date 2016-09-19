@@ -30,10 +30,14 @@ def suberror(title, outcome):
     logger.error(title + '. ' + err + 'ERROR' + err + ' ' + outcome.msg)
 
 # report on intentions based on analysis
-def plans(title, no_unwanted, no_lacking):
+def plans(title, no_udeleted, no_unwanted, no_lacking):
     msg = title
-    if no_unwanted > 0 or no_lacking > 0:
+    if no_udeleted > 0 or no_unwanted > 0 or no_lacking > 0:
         msg = msg + '. '
+    if no_udeleted > 0:
+        msg = msg + str(no_udeleted) + ' ' + "\N{WARNING SIGN}"
+    if no_udeleted > 0 and (no_unwanted > 0 or no_lacking > 0):
+        msg = msg + ' / '
     if no_unwanted > 0:
         msg = msg + str(no_unwanted) + ' ' + "\N{HEAVY MINUS SIGN}" 
     if no_unwanted > 0 and no_lacking > 0:

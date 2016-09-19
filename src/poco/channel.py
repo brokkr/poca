@@ -52,7 +52,8 @@ class Channel:
         # inform user of intentions
         self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
         self.lacking = set(self.wanted.lst) - set(self.jar.lst)
-        output.plans(self.title, len(self.unwanted), len(self.lacking))
+        output.plans(self.title, len(self.udeleted), len(self.unwanted), 
+            len(self.lacking))
         self.removed, self.downed, self.failed = [], [], []
 
         ### PART 2: ACTION
