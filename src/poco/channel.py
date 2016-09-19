@@ -75,8 +75,8 @@ class Channel:
             self.acquire(uid, entry)
 
         # save etag and subsettings after succesful update
-        self.jar.sub = self.sub
         if not self.failed:
+            self.jar.sub = self.sub
             self.jar.etag = self.feed.etag
         self.jar.save()
 
