@@ -23,11 +23,14 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
         * base_dir: directory containing the individual subscription folders
         * id3encoding: encoding to use on metadata (utf8 or latin1)
         * id3removev1: should we remove id3v1, only keeping v2 (yes or no)
+        * useragent: _fallback_ user agent if connection is rejected for
+          default python user agent. Leave empty not to use a fallback.
         -->
 
         <base_dir>/tmp/poca</base_dir>
         <id3encoding>utf8</id3encoding>
         <id3removev1>yes</id3removev1>
+        <useragent></useragent>
 
     </settings>
 
