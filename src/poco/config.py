@@ -79,6 +79,7 @@ class Prefs:
             msg = 'Missing required settings: ' + '\n'.join(missing_required)
             output.conffatal(msg)
             sys.exit()
+        self.useragent = None
         for e in elements:
             setattr(self, e[0], e[1])
 

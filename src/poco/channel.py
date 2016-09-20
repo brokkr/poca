@@ -82,7 +82,7 @@ class Channel:
 
         # download cover image
         if self.downed and self.feed.image:
-            outcome = files.download_img_file(self.feed.image, sub.sub_dir)
+            outcome = files.download_img_file(self.feed.image, sub.sub_dir, config.prefs)
 
         # print summary of operations in file log
         output.summary(self.title, self.udeleted, self.removed, self.downed, 
@@ -106,7 +106,7 @@ class Channel:
         # see https://github.com/brokkr/poca/wiki/Architecture#wantedindex
         output.downloading(entry)
         wantedindex = self.wanted.lst.index(uid) - len(self.failed)
-        outcome = files.download_file(entry['poca_url'], entry['poca_abspath'])
+        outcome = files.download_file(entry['poca_url'], entry['poca_abspath'], self.config.prefs)
         if outcome.success:
             outcome = tag.tag_audio_file(self.config.prefs, self.sub, entry)
             if not outcome.success:

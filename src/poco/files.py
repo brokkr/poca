@@ -37,12 +37,20 @@ def download_block(u, f, block_size):
 def handler(signum, frame):
     raise TimesUpException("Download timed out")
 
-def download_file(url, file_path):
+def download_file(url, file_path, prefs):
     '''Download function with block time outs'''
     try:
-        u = urllib.request.urlopen(url)
+        request = urllib.request.Request(url)
+        u = urllib.request.urlopen(request)
     except urllib.error.HTTPError as e:
-        return Outcome(False, str(e))
+        if not prefs.useragent:
+            return Outcome(False, str(e))
+        try:
+            fakeheaders = {"User-Agent" : prefs.useragent}
+            request = urllib.request.Request(url, headers=fakeheaders)
+            u = urllib.request.urlopen(request)
+        except urllib.error.HTTPError as e:
+            return Outcome(False, str(e))
     except socket.error as e:
         return Outcome(False, str(e))
 
@@ -73,7 +81,7 @@ def download_file(url, file_path):
 
     return outcome
 
-def download_img_file(url, sub_dir):
+def download_img_file(url, sub_dir, prefs):
     try:
         u = urllib.request.urlopen(url)
     except urllib.error.URLError:
@@ -82,7 +90,7 @@ def download_img_file(url, sub_dir):
     subtype = subtype.replace('jpeg', 'jpg')
     u.close()
     file_path = os.path.join(sub_dir, 'cover.' + subtype)
-    return download_file(url, file_path)
+    return download_file(url, file_path, prefs)
 
 # delete
 def delete_file(file_path):
