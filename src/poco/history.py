@@ -42,6 +42,7 @@ class Jar:
         self.del_dic = {}
 
     def save(self):
+        '''Saves jar instance to file using pickle'''
         outcome = files.check_path(os.path.dirname(self.db_filename))
         if outcome.success:
             #try:
