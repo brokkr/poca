@@ -10,7 +10,8 @@ With Poca you can set custom options for each individual subscription.
  * **Override ID3 metadata**. If you want 'Savage Love' to have Dan 
    Savage in the artist field (rather than The Stranger), poca will 
    automatically update the metadata upon download of each new episode. Or tag
-   all your podcasts with 'podcast' as genre.
+   all your podcasts with 'podcast' as genre. All
+   [fields](https://github.com/brokkr/poca/wiki/ID3-frames) are open.
  * **Filter a feed** using criteria such as filename and title, or the hour,
    weekday or date of publishing. Only want news reports in the morning or on
    Wednesdays? You got it.
@@ -22,7 +23,8 @@ With Poca you can set custom options for each individual subscription.
 Poca also: has excellent unicode support for feeds, filenames and tags, gets 
 cover images for feeds, has the ability to spoof user agent, remembers which
 downloads actually completed, and more. See the [Configuration](https://github.com/brokkr/poca/wiki/Configuration) section of the
-wiki for more details on features.
+wiki for more details on features and the [Development](https://github.com/brokkr/poca/wiki/Development) section for (possibly)
+upcoming one.
 
 ### Interface
 [![asciicast](https://asciinema.org/a/cwf8k4e154s6dkw2hiohqxj68.png)](https://asciinema.org/a/cwf8k4e154s6dkw2hiohqxj68)
