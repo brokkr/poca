@@ -19,6 +19,11 @@ With Poca you can set custom options for each individual subscription.
    than the latest. To move on to later episodes simply delete old ones and 
    poca will fill up with the next in line.
 
+Poca also: has excellent unicode support for feeds, filenames and tags, gets 
+cover images for feeds, has the ability to spoof user agent, remembers which
+downloads actually completed, and more. See the [Configuration](https://github.com/brokkr/poca/wiki/Configuration) section of the
+wiki for more details on features.
+
 ### Interface
 [![asciicast](https://asciinema.org/a/cwf8k4e154s6dkw2hiohqxj68.png)](https://asciinema.org/a/cwf8k4e154s6dkw2hiohqxj68)
 
