@@ -22,10 +22,9 @@ With Poca you can set custom options for each individual subscription.
 ### Interface
 [![asciicast](https://asciinema.org/a/cwf8k4e154s6dkw2hiohqxj68.png)](https://asciinema.org/a/cwf8k4e154s6dkw2hiohqxj68)
 
-Poca is designed to be as intutive as possible. All
-configuration is done in a single XML-format file and the output is easy to
-read. For maximal cron job compatibility, Poca has both a file logging and
-quiet mode.
+Poca is designed to be as intutive as possible. All configuration is done in 
+a single XML-format file and the output is easy to read. For maximal cron job 
+compatibility, Poca has both a file logging and quiet mode.
 
 ### Installing
 You can install poca using only setuptools but 'pip' is recommended. Find pip 
@@ -50,5 +49,5 @@ To remove Poca - having installed it using pip - simply do:
 ### Dependencies
  * You will need Python 3 for setup and running the program.
  * The following third-party modules are required: feedparser, mutagen.
- * Pip can install both  of these using 'pip3 install [name of module]' 
+ * Pip can install both of these using 'pip3 install [name of module]' 
 
