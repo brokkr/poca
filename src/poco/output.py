@@ -19,7 +19,7 @@ def conffatal(msg):
     logger.fatal(msg)
 
 def confinfo(msg):
-    '''Feedback/suggestions from reading7creating config'''
+    '''Feedback/suggestions from reading/creating config'''
     logger.info(msg)
 
 # subscription error reporting
@@ -49,7 +49,7 @@ def plans(title, no_udeleted, no_unwanted, no_lacking):
         msg = msg + ' / '
     if no_lacking > 0:
         msg = msg + str(no_lacking) + ' ' + "\N{HEAVY PLUS SIGN}" 
-    logger.info(msg)
+    logger.debug(msg)
 
 # file operations individually (for stdout)
 def notice_udeleted(entry):
