@@ -205,13 +205,13 @@ class Combo:
         else:
             self.lst = list(feed.lst)
             self.lst.extend(uid for uid in jar.lst if uid not in feed.lst)
-        print(time.strftime('%X'), ': got combolst')
+        #print(time.strftime('%X'), ': got combolst')
         self.dic = {uid: entryinfo.expand(feed.dic[uid], sub)
             for uid in feed.lst if uid not in jar.lst}
-        print(time.strftime('%X'), ': expanded unknown')
+        #print(time.strftime('%X'), ': expanded unknown')
         # remove from list entries with entry['valid'] = False?
         self.dic.update(jar.dic)
-        print(time.strftime('%X'), ': updated jardic')
+        #print(time.strftime('%X'), ': updated jardic')
 
 class Wanted():
     def __init__(self, sub, combo, del_lst):
