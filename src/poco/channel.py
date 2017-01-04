@@ -231,7 +231,7 @@ class Wanted():
         # first, remove user deletions
         self.lst = list(filter(deletions, self.lst))
         # second, remove invalid entries (missing enclosure urls or size)
-        self.lst = list(filter(invalid, self.lst)
+        self.lst = list(filter(invalid, self.lst))
         # then, apply 'spot' filters to remove undesirables
         if 'after_date' in sub.filters:
             self.lst = list(filter(cutoff_date, self.lst))

@@ -18,8 +18,8 @@ def expand(entry, sub):
         entry['valid'] = True
     except (KeyError, IndexError, AttributeError):
         entry['valid'] = False
-        for key in entry:
-            print(key, ' : ', entry[key])
+        #for key in entry:
+        #    print(key, ' : ', entry[key])
         return entry
     try:
         entry['poca_size'] = int(entry.enclosures[0]['length'])
