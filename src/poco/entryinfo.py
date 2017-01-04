@@ -15,11 +15,15 @@ def expand(entry, sub):
     '''Expands entry with url, paths and size'''
     try:
         entry['poca_url'] = entry.enclosures[0]['href']
+        entry['valid'] = True
     except (KeyError, IndexError, AttributeError):
         entry['valid'] = False
+        for key in entry:
+            print(key, ' : ', entry[key])
         return entry
     try:
         entry['poca_size'] = int(entry.enclosures[0]['length'])
+        print(entry['poca_size'])
         if entry['poca_size'] == 0:
             raise ValueError
     except (KeyError, ValueError):
@@ -27,6 +31,7 @@ def expand(entry, sub):
             f = urllib.request.urlopen(entry['poca_url'])
             entry['poca_size'] = int(f.info()['Content-Length'])
             f.close()
+            print(entry['poca_size'])
         except (urllib.error.HTTPError, urllib.error.URLError):
             entry['valid'] = False
             return entry

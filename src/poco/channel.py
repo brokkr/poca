@@ -10,6 +10,8 @@
 import re
 import sys
 
+import time
+
 import feedparser
 
 from poco import files, history, entryinfo, output, tag
@@ -201,10 +203,13 @@ class Combo:
         else:
             self.lst = list(feed.lst)
             self.lst.extend(uid for uid in jar.lst if uid not in feed.lst)
+        print(time.strftime('%X'), ': got combolst')
         self.dic = {uid: entryinfo.expand(feed.dic[uid], sub) 
             for uid in feed.lst if uid not in jar.lst}
+        print(time.strftime('%X'), ': expanded unknown')
         # remove from list entries with entry['valid'] = False?
         self.dic.update(jar.dic)
+        print(time.strftime('%X'), ': updated jardic')
 
 class Wanted():
     def __init__(self, sub, combo, del_lst):
@@ -220,10 +225,13 @@ class Wanted():
         cutoff_date = lambda x: (combo.dic[x]['published_parsed']) \
             > sub.filters['after_date']
         deletions = lambda x: x not in del_lst
+        invalid = lambda x: combo.dic[x]['valid'] == True
         # applying filters
         self.lst = combo.lst
         # first, remove user deletions
         self.lst = list(filter(deletions, self.lst))
+        # second, remove invalid entries (missing enclosure urls or size)
+        self.lst = list(filter(invalid, self.lst)
         # then, apply 'spot' filters to remove undesirables
         if 'after_date' in sub.filters:
             self.lst = list(filter(cutoff_date, self.lst))
@@ -238,5 +246,6 @@ class Wanted():
         # finally, max_number is only positional filter, therefore it's last
         if sub.max_number:
             self.lst = self.lst[:int(sub.max_number)]
+        # create dic only for entries in wanted
         self.dic = { x: combo.dic[x] for x in self.lst }
 
