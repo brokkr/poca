@@ -84,7 +84,8 @@ class Channel:
 
         # download cover image
         if self.downed and self.feed.image:
-            outcome = files.download_img_file(self.feed.image, sub.sub_dir, config.prefs)
+            outcome = files.download_img_file(self.feed.image, sub.sub_dir, 
+                      config.prefs)
 
         # print summary of operations in file log
         output.summary(self.title, self.udeleted, self.removed, self.downed, 
@@ -108,7 +109,8 @@ class Channel:
         # see https://github.com/brokkr/poca/wiki/Architecture#wantedindex
         output.downloading(entry)
         wantedindex = self.wanted.lst.index(uid) - len(self.failed)
-        outcome = files.download_file(entry['poca_url'], entry['poca_abspath'], self.config.prefs)
+        outcome = files.download_file(entry['poca_url'], 
+                  entry['poca_abspath'], self.config.prefs)
         if outcome.success:
             outcome = tag.tag_audio_file(self.config.prefs, self.sub, entry)
             if not outcome.success:
@@ -204,7 +206,7 @@ class Combo:
             self.lst = list(feed.lst)
             self.lst.extend(uid for uid in jar.lst if uid not in feed.lst)
         print(time.strftime('%X'), ': got combolst')
-        self.dic = {uid: entryinfo.expand(feed.dic[uid], sub) 
+        self.dic = {uid: entryinfo.expand(feed.dic[uid], sub)
             for uid in feed.lst if uid not in jar.lst}
         print(time.strftime('%X'), ': expanded unknown')
         # remove from list entries with entry['valid'] = False?

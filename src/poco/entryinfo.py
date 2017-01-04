@@ -23,19 +23,12 @@ def expand(entry, sub):
         return entry
     try:
         entry['poca_size'] = int(entry.enclosures[0]['length'])
-        print(entry['poca_size'])
         if entry['poca_size'] == 0:
             raise ValueError
-    except (KeyError, ValueError):
-        try:
-            f = urllib.request.urlopen(entry['poca_url'])
-            entry['poca_size'] = int(f.info()['Content-Length'])
-            f.close()
-            print(entry['poca_size'])
-        except (urllib.error.HTTPError, urllib.error.URLError):
-            entry['valid'] = False
-            return entry
-    entry['poca_mb'] = round(entry.poca_size / 1048576.0, 2)
+        entry['poca_mb'] = round(entry.poca_size / 1048576.0, 2)
+    except (KeyError, ValueError, TypeError):
+        entry['poca_size'] = None
+        entry['poca_mb'] = None
     parsed_url = urllib.parse.urlparse(entry['poca_url'])
     entry['poca_filename'] = path.basename(parsed_url.path)
     entry['poca_basename'] = entry['poca_filename'].split('.')[0]
