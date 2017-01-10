@@ -120,6 +120,7 @@ class Sub:
         for e in elements:
             setattr(self, e[0], e[1])
         self.sub_dir = path.join(prefs.base_dir, self.title)
+        self.ctitle = self.title.upper()
 
     def __str__(self):
         '''String representation of object?'''

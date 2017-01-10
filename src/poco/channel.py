@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
+
 # Copyright 2010-2016 Mads Michelsen (mail@brokkr.net)
-# 
 # This file is part of Poca.
-# Poca is free software: you can redistribute it and/or modify it 
-# under the terms of the GNU General Public License as published by 
-# the Free Software Foundation, either version 3 of the License, 
+# Poca is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
 # or (at your option) any later version.
+
+"""Per-subscription operations"""
 
 import re
 import sys
-
-import time
 
 import feedparser
 
@@ -19,43 +19,40 @@ from poco.outcome import Outcome
 
 
 class Channel:
+    '''A class for a single subscription/channel. Creates the containers
+    first, then acts on them and updates the db as it goes.'''
     def __init__(self, config, sub):
-        '''A class for a single subscription/channel. Creates the containers
-        first, then acts on them and updates the db as it goes.'''
-        
         self.sub = sub
-        self.title = sub.title.upper()
-        self.config = config
 
         ### PART 1: PLANS
 
         # see that we can write to the designated directory
         outcome = files.check_path(sub.sub_dir)
         if not outcome.success:
-            output.subfatal(self.title, outcome)
+            output.subfatal(self.sub.ctitle, outcome)
             sys.exit()
 
         # get jar and check for user deleted files
         self.udeleted = []
         self.jar, outcome = history.get_jar(config.paths, self.sub)
         if not outcome.success:
-            output.subfatal(self.title, outcome)
+            output.subfatal(self.sub.ctitle, outcome)
             sys.exit()
         self.check_jar()
 
         # get feed, combine with jar and filter the lot
         self.feed = Feed(self.sub, self.jar, self.udeleted)
         if not self.feed.outcome.success:
-            output.suberror(self.title, self.feed.outcome)
-            return 
+            output.suberror(self.sub.ctitle, self.feed.outcome)
+            return
         self.combo = Combo(self.feed, self.jar, self.sub)
         self.wanted = Wanted(self.sub, self.combo, self.jar.del_lst)
 
         # inform user of intentions
         self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
         self.lacking = set(self.wanted.lst) - set(self.jar.lst)
-        output.plans(self.title, len(self.udeleted), len(self.unwanted), 
-            len(self.lacking))
+        output.plans(self.sub.ctitle, len(self.udeleted), len(self.unwanted),
+                     len(self.lacking))
         self.removed, self.downed, self.failed = [], [], []
 
         ### PART 2: ACTION
@@ -74,7 +71,7 @@ class Channel:
             if uid not in self.lacking:
                 continue
             entry = self.wanted.dic[uid]
-            self.acquire(uid, entry)
+            self.acquire(uid, entry, config)
 
         # save etag and subsettings after succesful update
         if not self.failed:
@@ -84,12 +81,12 @@ class Channel:
 
         # download cover image
         if self.downed and self.feed.image:
-            outcome = files.download_img_file(self.feed.image, sub.sub_dir, 
-                      config.prefs)
+            outcome = files.download_img_file(self.feed.image, sub.sub_dir,
+                                              config.prefs)
 
         # print summary of operations in file log
-        output.summary(self.title, self.udeleted, self.removed, self.downed, 
-            self.failed)
+        output.summary(self.sub.ctitle, self.udeleted, self.removed,
+                       self.downed, self.failed)
 
 
     def check_jar(self):
@@ -101,18 +98,18 @@ class Channel:
                 self.udeleted.append(entry)
                 self.jar.del_lst.append(uid)
                 self.jar.del_dic[uid] = self.jar.dic.pop(uid)
-        self.jar.lst = [ x for x in self.jar.lst if x not in self.jar.del_lst ]
+        self.jar.lst = [x for x in self.jar.lst if x not in self.jar.del_lst]
         self.jar.save()
 
-    def acquire(self, uid, entry):
+    def acquire(self, uid, entry, config):
         '''Get new entries, tag them and add to history'''
         # see https://github.com/brokkr/poca/wiki/Architecture#wantedindex
         output.downloading(entry)
         wantedindex = self.wanted.lst.index(uid) - len(self.failed)
-        outcome = files.download_file(entry['poca_url'], 
-                  entry['poca_abspath'], self.config.prefs)
+        outcome = files.download_file(entry['poca_url'],
+                                      entry['poca_abspath'], config.prefs)
         if outcome.success:
-            outcome = tag.tag_audio_file(self.config.prefs, self.sub, entry)
+            outcome = tag.tag_audio_file(config.prefs, self.sub, entry)
             if not outcome.success:
                 output.tag_fail(outcome)
             self.add_to_jar(uid, entry, wantedindex)
@@ -127,7 +124,7 @@ class Channel:
         self.jar.dic[uid] = entry
         outcome = self.jar.save()
         if not outcome.success:
-            output.subfatal(self.title, outcome)
+            output.subfatal(self.sub.ctitle, outcome)
             sys.exit()
 
     def remove(self, uid, entry):
@@ -135,20 +132,20 @@ class Channel:
         output.removing(entry)
         outcome = files.delete_file(entry['poca_abspath'])
         if not outcome.success:
-            output.subfatal(self.title, outcome)
+            output.subfatal(self.sub.ctitle, outcome)
             sys.exit()
         self.jar.lst.remove(uid)
         del(self.jar.dic[uid])
         outcome = self.jar.save()
         if not outcome.success:
-            output.subfatal(self.title, outcome)
+            output.subfatal(self.sub.ctitle, outcome)
             sys.exit()
         self.removed.append(entry)
 
 
 class Feed:
+    '''Constructs a container for feed entries'''
     def __init__(self, sub, jar, udeleted):
-        '''Constructs a container for feed entries'''
         # do we need an update?
         self.etag = jar.etag
         if sub != jar.sub or udeleted:
@@ -156,7 +153,7 @@ class Feed:
         try:
             doc = feedparser.parse(sub.url, etag=self.etag)
         except TypeError:
-            # https://github.com/kurtmckee/feedparser/issues/30#issuecomment-183714444            
+            # https://github.com/kurtmckee/feedparser/issues/30#issuecomment-183714444
             if 'drv_libxml2' in feedparser.PREFERRED_XML_PARSERS:
                 feedparser.PREFERRED_XML_PARSERS.remove('drv_libxml2')
                 doc = feedparser.parse(sub.url, etag=self.etag)
