@@ -146,10 +146,17 @@ class Channel:
 class Feed:
     '''Constructs a container for feed entries'''
     def __init__(self, sub, jar, udeleted):
-        # do we need an update?
+        self.outcome = Outcome(True, '')
         self.etag = jar.etag
         if sub != jar.sub or udeleted:
             self.etag = None
+        doc = self.update(sub)
+        if not self.outcome.success:
+            return
+        self.set_entries(doc, sub)
+
+    def update(self, sub):
+        '''Check feed, return the xml'''
         try:
             doc = feedparser.parse(sub.url, etag=self.etag)
         except TypeError:
@@ -168,20 +175,21 @@ class Feed:
                 # if etag is 304 doc.entries is empty and we proceed as normal
                 if doc.status != 304:
                     self.outcome = Outcome(False, str(doc.bozo_exception))
-                    return
             else:
                 self.outcome = Outcome(False, str(doc.bozo_exception))
-                return
-        # harvest the entries
+        return doc
+
+    def set_entries(self, doc, sub):
+        '''Extract entries from the feed xml'''
         try:
-            self.lst = [ entry.id for entry in doc.entries ]
-            self.dic = { entry.id : entry for entry in doc.entries }
+            self.lst = [entry.id for entry in doc.entries]
+            self.dic = {entry.id : entry for entry in doc.entries}
         except (KeyError, AttributeError):
             try:
-                self.lst = [ entry.enclosures[0]['href'] 
-                    for entry in doc.entries ]
-                self.dic = { entry.enclosures[0]['href'] : entry 
-                    for entry in doc.entries }
+                self.lst = [entry.enclosures[0]['href']
+                            for entry in doc.entries]
+                self.dic = {entry.enclosures[0]['href'] : entry
+                            for entry in doc.entries}
             except (KeyError, AttributeError):
                 self.outcome = Outcome(False, 'Cant find entries in feed.')
         if hasattr(sub, 'from_the_top'):
@@ -190,61 +198,54 @@ class Feed:
             self.image = doc.feed.image['href']
         except (AttributeError, KeyError):
             self.image = None
-        self.outcome = Outcome(True, 'Got feed.')
 
 class Combo:
+    '''Constructs a container holding all combined feed and jar
+    entries. Copies feed then adds non-duplicates from jar'''
     def __init__(self, feed, jar, sub):
-        '''Constructs a container holding all combined feed and jar 
-        entries. Copies feed then adds non-duplicates from jar'''
         if hasattr(sub, 'from_the_top'):
             self.lst = list(jar.lst)
             self.lst.extend(uid for uid in feed.lst if uid not in jar.lst)
         else:
             self.lst = list(feed.lst)
             self.lst.extend(uid for uid in jar.lst if uid not in feed.lst)
-        #print(time.strftime('%X'), ': got combolst')
         self.dic = {uid: entryinfo.expand(feed.dic[uid], sub)
-            for uid in feed.lst if uid not in jar.lst}
-        #print(time.strftime('%X'), ': expanded unknown')
-        # remove from list entries with entry['valid'] = False?
+                    for uid in feed.lst if uid not in jar.lst}
         self.dic.update(jar.dic)
-        #print(time.strftime('%X'), ': updated jardic')
 
 class Wanted():
+    '''Filters the combo entries and decides which ones to go for'''
     def __init__(self, sub, combo, del_lst):
-        # listing filters
-        match_filename = lambda x: bool(re.search(sub.filters['filename'], 
-            combo.dic[x]['poca_filename']))
-        match_title = lambda x: bool(re.search(sub.filters['title'], 
-            combo.dic[x]['title']))
+        # user filters
+        match_date = lambda x: (combo.dic[x]['published_parsed']) \
+                      > sub.filters['after_date']
+        match_filename = lambda x: bool(re.search(sub.filters['filename'],
+                                        combo.dic[x]['poca_filename']))
+        match_title = lambda x: bool(re.search(sub.filters['title'],
+                                               combo.dic[x]['title']))
         match_hour = lambda x: str(combo.dic[x]['updated_parsed'].tm_hour) \
             == sub.filters['hour']
         match_wdays = lambda x: str(combo.dic[x]['updated_parsed'].tm_wday) \
             in list(sub.filters['weekdays'])
-        cutoff_date = lambda x: (combo.dic[x]['published_parsed']) \
-            > sub.filters['after_date']
+        # system filters
         deletions = lambda x: x not in del_lst
-        invalid = lambda x: combo.dic[x]['valid'] == True
+        invalid = lambda x: combo.dic[x]['valid']
         # applying filters
         self.lst = combo.lst
         # first, remove user deletions
         self.lst = list(filter(deletions, self.lst))
         # second, remove invalid entries (missing enclosure urls or size)
         self.lst = list(filter(invalid, self.lst))
-        # then, apply 'spot' filters to remove undesirables
-        if 'after_date' in sub.filters:
-            self.lst = list(filter(cutoff_date, self.lst))
-        if 'filename' in sub.filters:
-            self.lst = list(filter(match_filename, self.lst))
-        if 'title' in sub.filters:
-            self.lst = list(filter(match_title, self.lst))
-        if 'hour' in sub.filters:
-            self.lst = list(filter(match_hour, self.lst))
-        if 'weekdays' in sub.filters:
-            self.lst = list(filter(match_wdays, self.lst))
+        # apply user filters
+        lambda_dic = {'after_date' : match_date,
+                      'filename': match_filename,
+                      'title': match_title,
+                      'hour': match_hour,
+                      'weekdays': match_wdays}
+        for key in sub.filters:
+            self.lst = list(filter(lambda_dic[key], self.lst)
         # finally, max_number is only positional filter, therefore it's last
         if sub.max_number:
             self.lst = self.lst[:int(sub.max_number)]
         # create dic only for entries in wanted
-        self.dic = { x: combo.dic[x] for x in self.lst }
-
+        self.dic = {x: combo.dic[x] for x in self.lst}
