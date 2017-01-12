@@ -216,35 +216,31 @@ class Combo:
 class Wanted():
     '''Filters the combo entries and decides which ones to go for'''
     def __init__(self, sub, combo, del_lst):
-        # user filters
-        match_date = lambda x: (combo.dic[x]['published_parsed']) \
-                      > sub.filters['after_date']
-        match_filename = lambda x: bool(re.search(sub.filters['filename'],
-                                        combo.dic[x]['poca_filename']))
-        match_title = lambda x: bool(re.search(sub.filters['title'],
-                                               combo.dic[x]['title']))
-        match_hour = lambda x: str(combo.dic[x]['updated_parsed'].tm_hour) \
-            == sub.filters['hour']
-        match_wdays = lambda x: str(combo.dic[x]['updated_parsed'].tm_wday) \
-            in list(sub.filters['weekdays'])
-        # system filters
-        deletions = lambda x: x not in del_lst
-        invalid = lambda x: combo.dic[x]['valid']
-        # applying filters
         self.lst = combo.lst
-        # first, remove user deletions
-        self.lst = list(filter(deletions, self.lst))
-        # second, remove invalid entries (missing enclosure urls or size)
-        self.lst = list(filter(invalid, self.lst))
+        self.lst = list(filter(lambda x: x not in del_lst, self.lst))
+        self.lst = list(filter(lambda x: combo.dic[x]['valid'], self.lst))
+
+        self.match_date = lambda x : d[x]['published_parsed'] > sub.filters['after_date']
+        self.match_filename = lambda x : bool(re.search(sub.filters['filename'], combo.dic[x]['poca_filename']))
+        self.match_title = lambda x : bool(re.search(sub.filters['title'], combo.dic[x]['title']))
+
+    def match_hour(d, x, filters):
+        return str(dic[x]['updated_parsed'].tm_hour) == filters['hour']
+
+    def match_wdays(d, x, filters): 
+        return str(d[x]['updated_parsed'].tm_wday) in list(filters['weekdays'])
+
+    def filter(sub):
         # apply user filters
-        lambda_dic = {'after_date' : match_date,
-                      'filename': match_filename,
-                      'title': match_title,
-                      'hour': match_hour,
-                      'weekdays': match_wdays}
+        func_dic = {'after_date' : self.match_date,
+                    'filename': self.match_filename,
+                    'title': self.match_title,
+                    'hour': self.match_hour,
+                    'weekdays': self.match_wdays}
         for key in sub.filters:
-            self.lst = list(filter(lambda_dic[key], self.lst)
-        # finally, max_number is only positional filter, therefore it's last
+            f = func_dic[key]
+            self.lst = list(filter(f, self.lst))
+        # max_number is only positional filter, therefore it's last
         if sub.max_number:
             self.lst = self.lst[:int(sub.max_number)]
         # create dic only for entries in wanted
