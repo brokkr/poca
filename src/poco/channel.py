@@ -238,7 +238,7 @@ class Wanted():
         return [x for x in lst if str(dic[x]['updated_parsed'].tm_wday)
                 in list(filters['weekdays'])]
 
-    def match_date(self, lst, dic, filters): 
+    def match_date(self, lst, dic, filters):
         '''Only return episodes published after a specific date'''
         return [x for x in lst if dic[x]['published_parsed'] >
                 filters['after_date']]
