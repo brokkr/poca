@@ -9,4 +9,4 @@
 
 """Version number of Poco/Poca"""
 
-__version__ = 'rev219'
+__version__ = 'rev220'
