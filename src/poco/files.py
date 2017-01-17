@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
+
 # Copyright 2010-2016 Mads Michelsen (mail@brokkr.net)
-# except download function copyright PabloG 
-# (http://stackoverflow.com/users/394/pablog) and Mads Michelsen 2015, 2016
-# 
 # This file is part of Poca.
-# Poca is free software: you can redistribute it and/or modify it 
-# under the terms of the GNU General Public License as published by 
-# the Free Software Foundation, either version 3 of the License, 
+# Poca is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
 # or (at your option) any later version.
 
+"""File operations"""
+
 import os
-import re
+#import re
 import sys
 import signal
 import socket
@@ -22,9 +22,11 @@ from poco.outcome import Outcome
 
 # download
 class NoMoreBufferException(Exception):
+    '''Custom sub-classed exception used to trigger except in dl function'''
     pass
 
 class TimesUpException(Exception):
+    '''Custom sub-classed exception used to trigger except in dl function'''
     pass
 
 def download_block(u, f, block_size):
@@ -92,7 +94,6 @@ def download_img_file(url, sub_dir, prefs):
     file_path = os.path.join(sub_dir, 'cover.' + subtype)
     return download_file(url, file_path, prefs)
 
-# delete
 def delete_file(file_path):
     '''Deletes a file'''
     try:
@@ -101,7 +102,6 @@ def delete_file(file_path):
     except OSError as e:
         return Outcome(False, file_path + ': ' + str(e))
 
-# permissions check
 def check_path(check_dir):
     '''Create a directory'''
     if os.path.isdir(check_dir):
@@ -115,7 +115,7 @@ def check_path(check_dir):
     except OSError as e:
         return Outcome(False, check_dir + ': Dir could not be created.')
 
-# check if file exists
 def verify_file(entry):
+    '''Check to see if recorded file exists or has been removed'''
     isfile = os.path.isfile(entry['poca_abspath'])
     return Outcome(isfile, entry['poca_abspath'] + ' exists: ' + str(isfile))

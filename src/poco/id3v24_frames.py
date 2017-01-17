@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
+
 # Copyright 2010-2016 Mads Michelsen (mail@brokkr.net)
-# Translation taken from http://puddletag.sourceforge.net/source/id3.html
-# Originally licensed under Apache License version 2.0
-# 
 # This file is part of Poca.
-# Poca is free software: you can redistribute it and/or modify it 
-# under the terms of the GNU General Public License as published by 
-# the Free Software Foundation, either version 3 of the License, 
+# Poca is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
 # or (at your option) any later version.
+
+"""A dictionary tying keywords to ID3 header fields"""
 
 from mutagen import id3
 
 
-frame_dic = { \
+FRAME_DIC = { \
     "album": id3.TALB,
     "albumartist": id3.TPE2,
     "albumsortorder": id3.TSOA,
@@ -59,5 +59,5 @@ frame_dic = { \
     "titlesortorder": id3.TSOT,
     "track": id3.TRCK,
     "version": id3.TIT3,
-    "year": id3.TYER 
+    "year": id3.TYER
 }

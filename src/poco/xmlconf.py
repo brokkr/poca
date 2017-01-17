@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
+
 # Copyright 2010-2016 Mads Michelsen (mail@brokkr.net)
-# 
 # This file is part of Poca.
-# Poca is free software: you can redistribute it and/or modify it 
-# under the terms of the GNU General Public License as published by 
-# the Free Software Foundation, either version 3 of the License, 
+# Poca is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
 # or (at your option) any later version.
 
+"""poca.xml configuration template"""
 
 from poco.outcome import Outcome
 
 
-template = """<?xml version="1.0" encoding="UTF-8"?>
+TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 <poca version="0.6">
 
     <!-- Please see detailed configuration documentation online:
@@ -74,11 +75,11 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
         </subscription>
 
         <subscription>
-            <title>example 4 - filter based on hour of publishing</title>
+            <title>example 4 - filter based on weekday of publishing (only tuesdays)</title>
             <url>http://www.bbc.co.uk/programmes/p002vsnk/episodes/downloads.rss</url>
             <max_number>2</max_number>
             <filters>
-                <hour>21</hour>
+                <weekday>1</weekday>
             </filters>
         </subscription>
 
@@ -91,9 +92,8 @@ def write_template(file_path):
     '''Writes a string to file. Currently specific to creating config file.'''
     try:
         wfile = open(file_path, mode='wt', encoding='utf-8')
-        wfile.write(template)
+        wfile.write(TEMPLATE)
         wfile.close()
         return Outcome(True, file_path + ': Config template created.')
     except IOError as e:
         return Outcome(False, file_path + ': ' + str(e))
-

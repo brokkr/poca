@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
+
 # Copyright 2010-2016 Mads Michelsen (mail@brokkr.net)
-# except download function copyright PabloG 
-# (http://stackoverflow.com/users/394/pablog) and Mads Michelsen 2015, 2016
-# 
 # This file is part of Poca.
-# Poca is free software: you can redistribute it and/or modify it 
-# under the terms of the GNU General Public License as published by 
-# the Free Software Foundation, either version 3 of the License, 
+# Poca is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
 # or (at your option) any later version.
+
+"""Editing metadata on music files"""
 
 import mutagen
 
-from poco.id3v24_frames import frame_dic
+from poco.id3v24_frames import FRAME_DIC
 from poco.outcome import Outcome
 
 
@@ -40,7 +40,7 @@ def tag_audio_file(prefs, sub, entry):
     for override in sub.metadata:
         failure_lst = []
         try:
-            frame = frame_dic[override]
+            frame = FRAME_DIC[override]
         except KeyError:
             failure_lst.append(override)
             continue
@@ -54,4 +54,3 @@ def tag_audio_file(prefs, sub, entry):
         return Outcome(False, 'Bad overrides: ' + str(failure_lst))
     else:
         return Outcome(True, 'Metadata successfully updated')
-
