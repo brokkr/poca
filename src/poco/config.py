@@ -72,13 +72,13 @@ class Prefs:
         if xml_prefs is None:
             confquit('No \'settings\' tag found. Quitting.')
         required = {'id3removev1', 'id3encoding', 'base_dir'}
-        elements = [(x.tag, x.text) for x in xml_prefs.getchildren()]
-        missing_required = required - {e[0] for e in elements}
+        elements = [(node.tag, node.text) for node in xml_prefs.getchildren()]
+        missing_required = required - {element[0] for element in elements}
         if missing_required:
             confquit('Missing settings: ' + '\n'.join(missing_required))
         self.useragent = None
-        for x in elements:
-            setattr(self, x[0], x[1])
+        for element in elements:
+            setattr(self, element[0], element[1])
 
 
 def get_subs(prefs, xml_root):
@@ -110,7 +110,8 @@ class Sub:
         xml_filters = xml_sub.find('filters')
         if xml_filters is not None:
             xml_sub.remove(xml_filters)
-            self.filters = {e.tag: e.text for e in xml_filters.getchildren()}
+            self.filters = {node.tag: node.text for node in
+                            xml_filters.getchildren()}
             if 'after_date' in self.filters:
                 self.filters['after_date'] = \
                     time.strptime(self.filters['after_date'], "%Y-%m-%d")
@@ -123,8 +124,8 @@ class Sub:
             confquit(msg)
         self.title = '__missing_title__'
         self.max_number = False
-        for x in elements:
-            setattr(self, x[0], x[1])
+        for element in elements:
+            setattr(self, element[0], element[1])
         self.sub_dir = path.join(prefs.base_dir, self.title)
         self.ctitle = self.title.upper()
 
