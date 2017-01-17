@@ -16,8 +16,8 @@ from . import output
 from . import channel
 from . import config
 from . import entryinfo
-from . import files # dl function needs rethinking before edits
-from . import id3v24_frames # false positives on id3 members
+from . import files
+from . import id3v24_frames
 from . import history
 from . import xmlconf
 from . import tag

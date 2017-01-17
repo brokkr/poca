@@ -112,7 +112,7 @@ def check_path(check_dir):
     try:
         os.makedirs(check_dir)
         return Outcome(True, check_dir + ': Dir was successfully created.')
-    except OSError as e:
+    except OSError:
         return Outcome(False, check_dir + ': Dir could not be created.')
 
 def verify_file(entry):
