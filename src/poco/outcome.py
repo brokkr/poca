@@ -9,8 +9,6 @@
 
 """Provides class used to return results of operations"""
 
-class Outcome:
-    '''A way to return outcome of operations in a uniform fashion'''
-    def __init__(self, success, msg=''):
-        self.success = success
-        self.msg = msg
+from collections import namedtuple
+
+Outcome = namedtuple('Outcome', 'success msg')

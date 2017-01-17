@@ -250,7 +250,7 @@ class Wanted():
         self.lst = [x for x in self.lst if dic[x]['updated_parsed'].tm_hour ==
                     filters['hour']]
 
-    def apply_filters(self, combo, sub):
+    def apply_filters(self, sub, combo):
         '''Apply all filters set to be used on the subscription'''
         func_dic = {'after_date': self.match_date,
                     'filename': self.match_filename,
