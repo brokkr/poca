@@ -10,7 +10,6 @@
 """File operations"""
 
 import os
-#import re
 import sys
 import signal
 import socket
@@ -84,6 +83,7 @@ def download_file(url, file_path, prefs):
     return outcome
 
 def download_img_file(url, sub_dir, prefs):
+    '''Download an image file'''
     try:
         u = urllib.request.urlopen(url)
     except urllib.error.URLError:
