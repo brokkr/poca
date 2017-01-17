@@ -220,33 +220,35 @@ class Wanted():
         self.lst = list(filter(lambda x: x not in del_lst, self.lst))
         self.lst = list(filter(lambda x: combo.dic[x]['valid'], self.lst))
         self.apply_filters(sub, combo)
-        self.lst = self.limit(self.lst, sub)
+        self.limit(sub)
         self.dic = {x: combo.dic[x] for x in self.lst}
 
-    def match_filename(self, lst, dic, filters):
+    def match_filename(self, dic, filters):
         '''The episode filename must match a regex/string'''
-        return [x for x in lst if
-                bool(re.search(filters['filename'], dic[x]['poca_filename']))]
+        self.lst = [x for x in self.lst if
+                    bool(re.search(filters['filename'],
+                                   dic[x]['poca_filename']))]
 
-    def match_title(self, lst, dic, filters):
+    def match_title(self, dic, filters):
         '''The episode title must match a regex/string'''
-        return [x for x in lst if
-                bool(re.search(filters['title'], dic[x]['title']))]
+        self.lst = [x for x in self.lst if
+                    bool(re.search(filters['title'], dic[x]['title']))]
 
-    def match_wdays(self, lst, dic, filters):
+    def match_wdays(self, dic, filters):
         '''Only return episodes published on specific week days'''
-        return [x for x in lst if str(dic[x]['updated_parsed'].tm_wday)
-                in list(filters['weekdays'])]
+        self.lst = [x for x in self.lst if
+                    str(dic[x]['updated_parsed'].tm_wday)
+                    in list(filters['weekdays'])]
 
-    def match_date(self, lst, dic, filters):
+    def match_date(self, dic, filters):
         '''Only return episodes published after a specific date'''
-        return [x for x in lst if dic[x]['published_parsed'] >
-                filters['after_date']]
+        self.lst = [x for x in self.lst if dic[x]['published_parsed'] >
+                    filters['after_date']]
 
-    def match_hour(self, lst, dic, filters):
+    def match_hour(self, dic, filters):
         '''Only return episodes published at a specific hour of the day'''
-        return [x for x in lst if dic[x]['updated_parsed'].tm_hour ==
-                filters['hour']]
+        self.lst = [x for x in self.lst if dic[x]['updated_parsed'].tm_hour ==
+                    filters['hour']]
 
     def apply_filters(self, combo, sub):
         '''Apply all filters set to be used on the subscription'''
@@ -256,8 +258,8 @@ class Wanted():
                     'hour': self.match_hour,
                     'weekdays': self.match_wdays}
         for key in sub.filters:
-            self.lst = func_dic[key](self.lst, combo.dic, sub.filters)
+            func_dic[key](combo.dic, sub.filters)
 
-    def limit(self, lst, sub):
+    def limit(self, sub):
         '''Limit the number of episodes to that set in max_number'''
-        return lst[:int(sub.max_number)]
+        self.lst = self.lst[:int(sub.max_number)]
