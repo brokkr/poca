@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
+
 # Copyright 2010-2016 Mads Michelsen (mail@brokkr.net)
-# 
 # This file is part of Poca.
-# Poca is free software: you can redistribute it and/or modify it 
-# under the terms of the GNU General Public License as published by 
-# the Free Software Foundation, either version 3 of the License, 
+# Poca is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
 # or (at your option) any later version.
+
+"""Get more information on a single feed entry"""
 
 from os import path
 import urllib.request, urllib.error, urllib.parse
@@ -18,8 +20,6 @@ def expand(entry, sub):
         entry['valid'] = True
     except (KeyError, IndexError, AttributeError):
         entry['valid'] = False
-        #for key in entry:
-        #    print(key, ' : ', entry[key])
         return entry
     try:
         entry['poca_size'] = int(entry.enclosures[0]['length'])
@@ -36,4 +36,3 @@ def expand(entry, sub):
     entry['poca_abspath'] = path.join(sub.sub_dir, entry['poca_filename'])
     entry['valid'] = True
     return entry
-
