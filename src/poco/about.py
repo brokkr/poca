@@ -7,6 +7,9 @@
 # the Free Software Foundation, either version 3 of the License,
 # or (at your option) any later version.
 
-"""Version number of Poco/Poca"""
+"""Basic info"""
 
-__version__ = 'rev221'
+VERSION = 'rev221'
+MAINTAINER = "Mads Michelsen <mail@brokkr.net>"
+DESCRIPTION = "A cron-friendly command line podcast aggregator"
+URL = "https://github.com/brokkr/poca"

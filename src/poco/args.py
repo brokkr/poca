@@ -10,13 +10,13 @@
 """Submodule for parsing and storing cli arguments"""
 
 import argparse
-from poco import version, DESCRIPTION
+from poco import about
 
 
 def get_args():
     '''Returns arguments from a command line argument parser'''
-    about = "Poca " + version.__version__ + " : " + DESCRIPTION
-    parser = argparse.ArgumentParser(description=about)
+    blurb = "Poca " + about.VERSION + " : " + about.DESCRIPTION
+    parser = argparse.ArgumentParser(description=blurb)
     parser.add_argument('-q', '--quiet', action='store_true', default=False,
                         help='Quiet mode (useful for cron jobs)')
     parser.add_argument('-l', '--logfile', action='store_true', default=False,

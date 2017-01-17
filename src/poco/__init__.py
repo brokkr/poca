@@ -9,7 +9,7 @@
 
 """Poco is the main library of Poca, a command line podcast client"""
 
-from . import version
+from . import about
 from . import args
 from . import outcome
 from . import output
@@ -21,8 +21,3 @@ from . import id3v24_frames # false positives on id3 members
 from . import history
 from . import xmlconf
 from . import tag
-
-MAINTAINER = "Mads Michelsen <mail@brokkr.net>"
-DESCRIPTION = ("A cron-friendly, disk-space-conscious, command line podcast "
-               "aggregator, written in Python")
-URL = "https://github.com/brokkr/poca"
