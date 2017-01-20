@@ -28,16 +28,12 @@ class Channel:
 
         # see that we can write to the designated directory
         outcome = files.check_path(sub.sub_dir)
-        if not outcome.success:
-            output.subfatal(self.sub.ctitle, outcome)
-            sys.exit()
+        self.check_outcome(outcome)
 
         # get jar and check for user deleted files
         self.udeleted = []
         self.jar, outcome = history.get_jar(config.paths, self.sub)
-        if not outcome.success:
-            output.subfatal(self.sub.ctitle, outcome)
-            sys.exit()
+        self.check_outcome(outcome)
         self.check_jar()
 
         # get feed, combine with jar and filter the lot
@@ -123,24 +119,24 @@ class Channel:
         self.jar.lst.insert(wantedindex, uid)
         self.jar.dic[uid] = entry
         outcome = self.jar.save()
-        if not outcome.success:
-            output.subfatal(self.sub.ctitle, outcome)
-            sys.exit()
+        self.check_outcome(outcome)
 
     def remove(self, uid, entry):
         '''Deletes the file and removes the entry from the jar'''
         output.removing(entry)
         outcome = files.delete_file(entry['poca_abspath'])
-        if not outcome.success:
-            output.subfatal(self.sub.ctitle, outcome)
-            sys.exit()
+        self.check_outcome(outcome)
         self.jar.lst.remove(uid)
         del(self.jar.dic[uid])
         outcome = self.jar.save()
+        self.check_outcome(outcome)
+        self.removed.append(entry)
+
+    def check_outcome(self, outcome):
+        '''Check for fatal sub issues'''
         if not outcome.success:
             output.subfatal(self.sub.ctitle, outcome)
             sys.exit()
-        self.removed.append(entry)
 
 
 class Feed:
