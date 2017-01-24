@@ -8,13 +8,16 @@
 # the Free Software Foundation, either version 3 of the License,
 # or (at your option) any later version.
 
+"""A cron-friendly command line podcast aggregator"""
+
+
 import poco
 
 def main():
     '''Main script'''
     try:
         args = poco.args.get_args()
-        poco.plogging.get_streamlogger(args)
+        poco.plogging.start_streamlogger(args)
         config = poco.config.Config(args)
         for sub in config.subs:
             channel = poco.channel.Channel(config, sub)

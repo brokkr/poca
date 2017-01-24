@@ -9,16 +9,20 @@
 
 """Create loggers needed for operation"""
 
-import sys
 import logging
 
 
-def get_streamlogger(args):
-    '''Gets stream logging instance'''
-    logger = logging.getLogger('POCASTREAM')
+def get_logger(logger_name):
+    '''Initialises and returns a basic, generic logger'''
+    logger = logging.getLogger(logger_name)
     logger.setLevel(logging.INFO)
     null_handler = logging.NullHandler()
     logger.addHandler(null_handler)
+    return logger
+
+def start_streamlogger(args):
+    '''Starts up a stream logger'''
+    logger = get_logger('POCASTREAM')
     if not args.quiet:
         stream_handler = logging.StreamHandler()
         stream_handler.setLevel(logging.INFO)
@@ -26,16 +30,13 @@ def get_streamlogger(args):
         stream_handler.setFormatter(stream_formatter)
         logger.addHandler(stream_handler)
 
-def get_summarylogger(log_file_path):
-    '''Adds a filehandler to (presumed) logging instance'''
-    logger = logging.getLogger('POCASUMMARY')
-    logger.setLevel(logging.INFO)
-    null_handler = logging.NullHandler()
-    logger.addHandler(null_handler)
-    file_handler = logging.FileHandler(log_file_path)
-    file_handler.setLevel(logging.INFO)
-    file_formatter = logging.Formatter("%(asctime)s %(message)s", 
-        datefmt='%Y-%m-%d %H:%M')
-    file_handler.setFormatter(file_formatter)
-    logger.addHandler(file_handler)
-
+def start_summarylogger(args, log_file_path):
+    '''Starts up the summary logger (for use in file and email logging)'''
+    logger = get_logger('POCASUMMARY')
+    if args.logfile:
+        file_handler = logging.FileHandler(log_file_path)
+        file_handler.setLevel(logging.INFO)
+        file_formatter = logging.Formatter("%(asctime)s %(message)s",
+                                           datefmt='%Y-%m-%d %H:%M')
+        file_handler.setFormatter(file_formatter)
+        logger.addHandler(file_handler)
