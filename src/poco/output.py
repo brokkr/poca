@@ -12,27 +12,28 @@
 import logging
 
 
-LOGGER = logging.getLogger('POCA')
+STREAM = logging.getLogger('POCASTREAM')
+SUMMARY = logging.getLogger('POCASUMMARY')
 
 # config reporting
 def conffatal(msg):
     '''Fatal errors encountered during config read'''
-    LOGGER.fatal(msg)
+    STREAM.fatal(msg)
 
 def confinfo(msg):
     '''Feedback/suggestions from reading/creating config'''
-    LOGGER.info(msg)
+    STREAM.info(msg)
 
 # subscription error reporting
 def subfatal(title, outcome):
     '''Fatal errors encountered processing a specific subscription'''
     err = "\N{Heavy Exclamation Mark Symbol}"
-    LOGGER.fatal(title + '. ' + err + 'FATAL' + err + ' ' + outcome.msg)
+    STREAM.fatal(title + '. ' + err + 'FATAL' + err + ' ' + outcome.msg)
 
 def suberror(title, outcome):
     '''Non-fatal errors encountered processing a specific subscription'''
     err = "\N{Heavy Exclamation Mark Symbol}"
-    LOGGER.error(title + '. ' + err + 'ERROR' + err + ' ' + outcome.msg)
+    STREAM.error(title + '. ' + err + 'ERROR' + err + ' ' + outcome.msg)
 
 # report on intentions based on analysis
 def plans(title, no_udeleted, no_unwanted, no_lacking):
@@ -50,21 +51,21 @@ def plans(title, no_udeleted, no_unwanted, no_lacking):
         msg = msg + ' / '
     if no_lacking > 0:
         msg = msg + str(no_lacking) + ' ' + "\N{HEAVY PLUS SIGN}"
-    LOGGER.debug(msg)
+    STREAM.info(msg)
 
 # file operations individually (for stdout)
 def notice_udeleted(entry):
     '''One line per entry telling user of episodes deleted by user'''
     msg = ' ' + "\N{WARNING SIGN}" + ' ' + entry['poca_filename'] + \
         ' deleted by user'
-    LOGGER.debug(msg)
+    STREAM.info(msg)
 
 def removing(entry):
     '''One line per entry telling user of episodes being deleted by poca'''
     size = entry['poca_mb']
     size_str = ' [' + str(round(size)) + ' Mb]' if size else ' [Unknown]'
     msg = ' ' + "\N{CANCELLATION X}" + ' ' + entry['poca_filename'] + size_str
-    LOGGER.debug(msg)
+    STREAM.info(msg)
 
 def downloading(entry):
     '''One line per entry telling user of episodes being downloaded by poca'''
@@ -72,29 +73,29 @@ def downloading(entry):
     size_str = ' [' + str(round(size)) + ' Mb]' if size else ' [Unknown]'
     msg = ' ' + "\N{DOWNWARDS ARROW LEFTWARDS OF UPWARDS ARROW}" + ' ' + \
         entry['poca_filename'] + size_str
-    LOGGER.debug(msg)
+    STREAM.info(msg)
 
 # single entry failures
 def dl_fail(outcome):
     '''Subline telling user of single entry download failure'''
-    LOGGER.debug('   Download failed. ' + outcome.msg)
+    STREAM.info('   Download failed. ' + outcome.msg)
 
 def tag_fail(outcome):
     '''Subline telling user of single entry tagging failure'''
-    LOGGER.debug('   Tagging failed. ' + outcome.msg)
+    STREAM.info('   Tagging failed. ' + outcome.msg)
 
 # file operations summary (for file log)
 def summary(title, udeleted, removed, downed, failed):
-    '''Print summary to log ('warn' is filtered out in stream)'''
+    '''Print summary to log'''
     if udeleted:
         udeleted_files = [x['poca_filename'] for x in udeleted]
-        LOGGER.warn(title + '. User deleted: ' + ', '.join(udeleted_files))
+        SUMMARY.info(title + '. User deleted: ' + ', '.join(udeleted_files))
     if removed:
         removed_files = [x['poca_filename'] for x in removed]
-        LOGGER.warn(title + '. Removed: ' + ', '.join(removed_files))
+        SUMMARY.info(title + '. Removed: ' + ', '.join(removed_files))
     if downed:
         downed_files = [x['poca_filename'] for x in downed]
-        LOGGER.warn(title + '. Downloaded: ' + ', '.join(downed_files))
+        SUMMARY.info(title + '. Downloaded: ' + ', '.join(downed_files))
     if failed:
         failed_files = [x['poca_filename'] for x in failed]
-        LOGGER.warn(title + '. Failed: ' + ', '.join(failed_files))
+        SUMMARY.info(title + '. Failed: ' + ', '.join(failed_files))

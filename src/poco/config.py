@@ -18,7 +18,7 @@ from xml.etree import ElementTree
 from poco import files, output, xmlconf, plogging
 
 
-LOGGER = logging.getLogger('POCA')
+STREAM = logging.getLogger('POCA')
 
 def confquit(msg):
     '''Something wasn't right about the preferences. Leave'''
@@ -31,7 +31,7 @@ class Config:
         self.paths = Paths()
         self.args = args
         if self.args.logfile:
-            plogging.add_filehandler(self.paths.log_file, LOGGER)
+            plogging.add_filehandler(self.paths.log_file, STREAM)
         xml_root = self.get_xml()
         self.prefs = Prefs(xml_root)
         self.subs = get_subs(self.prefs, xml_root)

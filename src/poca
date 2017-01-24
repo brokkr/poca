@@ -14,7 +14,7 @@ def main():
     '''Main script'''
     try:
         args = poco.args.get_args()
-        poco.plogging.get_logger(args)
+        poco.plogging.get_streamlogger(args)
         config = poco.config.Config(args)
         for sub in config.subs:
             channel = poco.channel.Channel(config, sub)
