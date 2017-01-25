@@ -40,3 +40,16 @@ def start_summarylogger(args, log_file_path):
                                            datefmt='%Y-%m-%d %H:%M')
         file_handler.setFormatter(file_formatter)
         logger.addHandler(file_handler)
+
+    # if args.smtp
+    # specify an smtphandler
+    # specify memoryhandler (with smpthandler as target)
+    # yes to flushonclose
+    # set a high enough buffer (number of entries) that it will not trigger
+    # close memoryhandler after sub loop, flushing the buffer
+    # (note: this will probably also flush and empty buffer...)
+
+    # smtp_handler = logging.handlers.SMTPHandler('localhost', 'mads@localhost', 'mads@localhost', 'Oops!')
+    # smtp_formatter = logging.Formatter("%(asctime)s %(message)s", datefmt='%Y-%m-%d %H:%M')
+    # smtp_handler.setLevel(logging.INFO)
+    # logger.addHandler(smtp_handler)
