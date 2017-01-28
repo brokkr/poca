@@ -68,6 +68,7 @@ class Prefs:
         xml_prefs = xml_root.find('settings')
         if xml_prefs is None:
             confquit('No \'settings\' tag found. Quitting.')
+        self.set_email(xml_prefs)
         required = {'id3removev1', 'id3encoding', 'base_dir'}
         elements = [(node.tag, node.text) for node in xml_prefs.getchildren()]
         missing_required = required - {element[0] for element in elements}
@@ -77,6 +78,12 @@ class Prefs:
         for element in elements:
             setattr(self, element[0], element[1])
 
+    def set_email(self, xml_prefs):
+        '''Saves settings about music file metadata'''
+        xml_email = xml_prefs.find('email')
+        if xml_email is not None:
+            xml_prefs.remove(xml_email)
+            self.email = {e.tag: e.text for e in xml_email.getchildren()}
 
 def get_subs(prefs, xml_root):
     '''Function to create a list of all subscriptions and their preferences'''

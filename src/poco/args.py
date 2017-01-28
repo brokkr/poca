@@ -21,5 +21,7 @@ def get_args():
                         help='Quiet mode (useful for cron jobs)')
     parser.add_argument('-l', '--logfile', action='store_true', default=False,
                         help='Output to file in poca config directory')
+    parser.add_argument('-e', '--email', action='store_true', default=False,
+                        help='Output to email (set in config)')
 
     return parser.parse_args()
