@@ -15,14 +15,18 @@ import poco
 
 def main():
     '''Main script'''
-    try:
-        args = poco.args.get_args()
-        poco.plogging.start_streamlogger(args)
-        config = poco.config.Config(args)
-        for sub in config.subs:
-            channel = poco.channel.Channel(config, sub)
-    except KeyboardInterrupt:
-        pass
+    args = poco.args.get_args()
+    stream_logger = poco.plogging.start_streamlogger(args)
+    config = poco.config.Config(args)
+    summary_logger = poco.plogging.start_summarylogger(args, config.paths,
+                                                       config.prefs)
+    for sub in config.subs:
+        channel = poco.channel.Channel(config, sub)
+    if summary_logger.poca_email_handler:
+        summary_logger.poca_email_handler.close()
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass

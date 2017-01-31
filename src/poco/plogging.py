@@ -30,16 +30,22 @@ def start_streamlogger(args):
         stream_formatter = logging.Formatter("%(message)s")
         stream_handler.setFormatter(stream_formatter)
         logger.addHandler(stream_handler)
+    return logger
 
 def start_summarylogger(args, paths, prefs):
     '''Starts up the summary logger (for use in file and email logging)'''
     logger = get_logger('POCASUMMARY')
+    logger.poca_file_handler = None
+    logger.poca_email_handler = None
     if args.logfile:
         file_handler = get_file_handler(paths)
         logger.addHandler(file_handler)
+        logger.poca_file_handler = file_handler
     if args.email:
         email_handler = get_email_handler(prefs)
         logger.addHandler(email_handler)
+        logger.poca_email_handler = email_handler
+    return logger
 
 def get_file_handler(paths):
     '''Adds a file handler to the logger'''
@@ -57,7 +63,7 @@ def get_email_handler(prefs):
                                prefs.email['to'], 'POCA log')
     smtp_handler.setLevel(logging.INFO)
     smtp_formatter = logging.Formatter("%(asctime)s %(message)s",
-                                       datefmt='%Y-%m-%d %H:%M')
+                                       datefmt='%Y-%m-%d')
     smtp_handler.setFormatter(smtp_formatter)
     memory_handler = MemoryHandler(1000, flushLevel=logging.CRITICAL,
                                    target=smtp_handler)
