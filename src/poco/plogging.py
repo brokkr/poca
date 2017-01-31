@@ -10,6 +10,7 @@
 """Create loggers needed for operation"""
 
 import logging
+from logging.handlers import SMTPHandler, MemoryHandler
 
 
 def get_logger(logger_name):
@@ -30,26 +31,34 @@ def start_streamlogger(args):
         stream_handler.setFormatter(stream_formatter)
         logger.addHandler(stream_handler)
 
-def start_summarylogger(args, log_file_path):
+def start_summarylogger(args, paths, prefs):
     '''Starts up the summary logger (for use in file and email logging)'''
     logger = get_logger('POCASUMMARY')
     if args.logfile:
-        file_handler = logging.FileHandler(log_file_path)
-        file_handler.setLevel(logging.INFO)
-        file_formatter = logging.Formatter("%(asctime)s %(message)s",
-                                           datefmt='%Y-%m-%d %H:%M')
-        file_handler.setFormatter(file_formatter)
+        file_handler = get_file_handler(paths)
         logger.addHandler(file_handler)
+    if args.email:
+        email_handler = get_email_handler(prefs)
+        logger.addHandler(email_handler)
 
-    # if args.smtp
-    # specify an smtphandler
-    # specify memoryhandler (with smpthandler as target)
-    # yes to flushonclose
-    # set a high enough buffer (number of entries) that it will not trigger
-    # close memoryhandler after sub loop, flushing the buffer
-    # (note: this will probably also flush and empty buffer...)
+def get_file_handler(paths):
+    '''Adds a file handler to the logger'''
+    file_handler = logging.FileHandler(paths.log_file)
+    file_handler.setLevel(logging.INFO)
+    file_formatter = logging.Formatter("%(asctime)s %(message)s",
+                                       datefmt='%Y-%m-%d %H:%M')
+    file_handler.setFormatter(file_formatter)
+    return file_handler
 
-    # smtp_handler = logging.handlers.SMTPHandler('localhost', 'mads@localhost', 'mads@localhost', 'Oops!')
-    # smtp_formatter = logging.Formatter("%(asctime)s %(message)s", datefmt='%Y-%m-%d %H:%M')
-    # smtp_handler.setLevel(logging.INFO)
-    # logger.addHandler(smtp_handler)
+def get_email_handler(prefs):
+    '''Adds an email handler to the logger (all sessions messages are
+    gathered in memory before email is sent)'''
+    smtp_handler = SMTPHandler('localhost', prefs.email['from'],
+                               prefs.email['to'], 'POCA log')
+    smtp_handler.setLevel(logging.INFO)
+    smtp_formatter = logging.Formatter("%(asctime)s %(message)s",
+                                       datefmt='%Y-%m-%d %H:%M')
+    smtp_handler.setFormatter(smtp_formatter)
+    memory_handler = MemoryHandler(1000, flushLevel=logging.CRITICAL,
+                                   target=smtp_handler)
+    return memory_handler
