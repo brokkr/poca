@@ -10,7 +10,8 @@
 """Create loggers needed for operation"""
 
 import logging
-from logging.handlers import SMTPHandler, MemoryHandler
+from logging import handlers
+import smtplib
 
 
 def get_logger(logger_name):
@@ -38,8 +39,12 @@ def start_summarylogger(args, paths, prefs):
         file_handler = get_file_handler(paths)
         logger.addHandler(file_handler)
     if args.email:
-        email_handler = get_email_handler(prefs)
-        logger.addHandler(email_handler)
+        #email_handler = get_email_handler(prefs)
+        #logger.addHandler(email_handler)
+        bsmtp_handler = BufferingSMTPHandler('localhost', prefs.email['from'],
+                                             prefs.email['to'], 'POCA log')
+        logger.addHandler(bsmtp_handler)
+
 
 def get_file_handler(paths):
     '''Adds a file handler to the logger'''
@@ -53,12 +58,38 @@ def get_file_handler(paths):
 def get_email_handler(prefs):
     '''Adds an email handler to the logger (all sessions messages are
     gathered in memory before email is sent)'''
-    smtp_handler = SMTPHandler('localhost', prefs.email['from'],
-                               prefs.email['to'], 'POCA log')
+    smtp_handler = handlers.SMTPHandler('localhost', prefs.email['from'],
+                                        prefs.email['to'], 'POCA log')
     smtp_handler.setLevel(logging.INFO)
     smtp_formatter = logging.Formatter("%(asctime)s %(message)s",
                                        datefmt='%Y-%m-%d %H:%M')
     smtp_handler.setFormatter(smtp_formatter)
-    memory_handler = MemoryHandler(1000, flushLevel=logging.CRITICAL,
-                                   target=smtp_handler)
+    memory_handler = handlers.MemoryHandler(1000, flushLevel=logging.CRITICAL,
+                                            target=smtp_handler)
     return memory_handler
+
+class BufferingSMTPHandler(handlers.BufferingHandler):
+    def __init__(self, mailhost, fromaddr, toaddr, subject):
+        handlers.BufferingHandler.__init__(self, 1000)
+        self.mailhost = mailhost
+        self.mailport = smtplib.SMTP_PORT
+        self.fromaddr = fromaddr
+        self.toaddr = toaddr
+        self.subject = subject
+        smtp_formatter = logging.Formatter("%(asctime)s %(message)s",
+                                           datefmt='%Y-%m-%d %H:%M')
+        self.setFormatter(smtp_formatter)
+
+    def flush(self):
+        if not len(self.buffer):
+            return
+        smtp = smtplib.SMTP(self.mailhost, self.mailport)
+        #msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n" % (self.fromaddr, string.join(self.toaddrs, ","), self.subject)
+        msg = str()
+        for record in self.buffer:
+            s = self.format(record)
+            msg = msg + s + "\r\n"
+        smtp.sendmail(self.fromaddr, [self.toaddr], msg)
+        smtp.quit()
+        self.buffer = []
+
