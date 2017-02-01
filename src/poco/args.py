@@ -18,7 +18,7 @@ def get_args():
     blurb = "Poca " + about.VERSION + " : " + about.DESCRIPTION
     parser = argparse.ArgumentParser(description=blurb)
     parser.add_argument('-q', '--quiet', action='store_true', default=False,
-                        help='Quiet mode (useful for cron jobs)')
+                        help='No output to stdout (useful for cron jobs)')
     parser.add_argument('-l', '--logfile', action='store_true', default=False,
                         help='Output to file in poca config directory')
     parser.add_argument('-e', '--email', action='store_true', default=False,

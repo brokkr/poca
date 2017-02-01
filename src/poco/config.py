@@ -11,7 +11,6 @@
 
 import sys
 import time
-import logging
 from os import path
 from xml.etree import ElementTree
 
@@ -28,7 +27,6 @@ class Config:
     def __init__(self, args):
         self.paths = Paths()
         self.args = args
-        plogging.start_summarylogger(args, self.paths.log_file)
         xml_root = self.get_xml()
         self.prefs = Prefs(xml_root)
         self.subs = get_subs(self.prefs, xml_root)
