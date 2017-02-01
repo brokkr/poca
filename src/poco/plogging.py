@@ -45,8 +45,8 @@ def start_summarylogger(args, paths, prefs):
     if args.email:
         #email_handler = get_email_handler(prefs)
         #logger.addHandler(email_handler)
-        bsmtp_handler = BufferingSMTPHandler('localhost', prefs.email['from'],
-                                             prefs.email['to'], 'POCA log')
+        bsmtp_handler = BufferSMTPHandler('localhost', prefs.email['sender'],
+                                          prefs.email['recipient'], 'POCA log')
         logger.addHandler(bsmtp_handler)
         logger.poca_email_handler = bsmtp_handler
     return logger
@@ -73,7 +73,7 @@ def get_email_handler(prefs):
                                             target=smtp_handler)
     return memory_handler
 
-class BufferingSMTPHandler(handlers.BufferingHandler):
+class BufferSMTPHandler(handlers.BufferingHandler):
     def __init__(self, mailhost, fromaddr, toaddr, subject):
         handlers.BufferingHandler.__init__(self, 1000)
         self.mailhost = mailhost
