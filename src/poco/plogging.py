@@ -43,8 +43,6 @@ def start_summarylogger(args, paths, prefs):
         logger.addHandler(file_handler)
         logger.poca_file_handler = file_handler
     if args.email:
-        #email_handler = get_email_handler(prefs)
-        #logger.addHandler(email_handler)
         bsmtp_handler = BufferSMTPHandler('localhost', prefs.email['sender'],
                                           prefs.email['recipient'], 'POCA log')
         logger.addHandler(bsmtp_handler)
@@ -59,19 +57,6 @@ def get_file_handler(paths):
                                        datefmt='%Y-%m-%d %H:%M')
     file_handler.setFormatter(file_formatter)
     return file_handler
-
-def get_email_handler(prefs):
-    '''Adds an email handler to the logger (all sessions messages are
-    gathered in memory before email is sent)'''
-    smtp_handler = handlers.SMTPHandler('localhost', prefs.email['from'],
-                                        prefs.email['to'], 'POCA log')
-    smtp_handler.setLevel(logging.INFO)
-    smtp_formatter = logging.Formatter("%(asctime)s %(message)s",
-                                       datefmt='%Y-%m-%d')
-    smtp_handler.setFormatter(smtp_formatter)
-    memory_handler = handlers.MemoryHandler(1000, flushLevel=logging.CRITICAL,
-                                            target=smtp_handler)
-    return memory_handler
 
 class BufferSMTPHandler(handlers.BufferingHandler):
     def __init__(self, mailhost, fromaddr, toaddr, subject):
@@ -89,8 +74,8 @@ class BufferSMTPHandler(handlers.BufferingHandler):
         if not len(self.buffer):
             return
         smtp = smtplib.SMTP(self.mailhost, self.mailport)
-        #msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n" % (self.fromaddr, string.join(self.toaddrs, ","), self.subject)
-        msg = str()
+        msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n" % \
+              (self.fromaddr, self.toaddr, self.subject)
         for record in self.buffer:
             s = self.format(record)
             msg = msg + s + "\r\n"
