@@ -20,20 +20,20 @@ def conffatal(msg):
     '''Fatal errors encountered during config read'''
     STREAM.fatal(msg)
 
-def confinfo(msg):
-    '''Feedback/suggestions from reading/creating config'''
-    STREAM.info(msg)
-
 # subscription error reporting
 def subfatal(title, outcome):
     '''Fatal errors encountered processing a specific subscription'''
     err = "\N{Heavy Exclamation Mark Symbol}"
-    STREAM.fatal(title + '. ' + err + 'FATAL' + err + ' ' + outcome.msg)
+    msg = title + '. ' + err + 'FATAL' + err + ' ' + outcome.msg
+    STREAM.fatal(msg)
+    SUMMARY.fatal(msg)
 
 def suberror(title, outcome):
     '''Non-fatal errors encountered processing a specific subscription'''
     err = "\N{Heavy Exclamation Mark Symbol}"
-    STREAM.error(title + '. ' + err + 'ERROR' + err + ' ' + outcome.msg)
+    msg = title + '. ' + err + 'ERROR' + err + ' ' + outcome.msg
+    STREAM.error(msg)
+    SUMMARY.error(msg)
 
 # report on intentions based on analysis
 def plans(title, no_udeleted, no_unwanted, no_lacking):
@@ -78,11 +78,11 @@ def downloading(entry):
 # single entry failures
 def dl_fail(outcome):
     '''Subline telling user of single entry download failure'''
-    STREAM.info('   Download failed. ' + outcome.msg)
+    STREAM.error('   Download failed. ' + outcome.msg)
 
 def tag_fail(outcome):
     '''Subline telling user of single entry tagging failure'''
-    STREAM.info('   Tagging failed. ' + outcome.msg)
+    STREAM.error('   Tagging failed. ' + outcome.msg)
 
 # file operations summary (for file log)
 def summary(title, udeleted, removed, downed, failed):

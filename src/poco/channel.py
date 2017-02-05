@@ -108,6 +108,7 @@ class Channel:
             outcome = tag.tag_audio_file(config.prefs, self.sub, entry)
             if not outcome.success:
                 output.tag_fail(outcome)
+                # add to failed?
             self.add_to_jar(uid, entry, wantedindex)
             self.downed.append(entry)
         else:

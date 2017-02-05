@@ -12,6 +12,7 @@
 import logging
 from logging import handlers
 import smtplib
+from email.mime.text import MIMEText
 
 
 def get_logger(logger_name):
@@ -59,6 +60,7 @@ def get_file_handler(paths):
     return file_handler
 
 class BufferSMTPHandler(handlers.BufferingHandler):
+    '''SMTPHandler that send one email per flush'''
     def __init__(self, mailhost, fromaddr, toaddr, subject):
         handlers.BufferingHandler.__init__(self, 1000)
         self.mailhost = mailhost
@@ -77,9 +79,9 @@ class BufferSMTPHandler(handlers.BufferingHandler):
         msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n" % \
               (self.fromaddr, self.toaddr, self.subject)
         for record in self.buffer:
-            s = self.format(record)
-            msg = msg + s + "\r\n"
-        smtp.sendmail(self.fromaddr, [self.toaddr], msg)
+            line = self.format(record)
+            msg = msg + line + "\r\n"
+        msg = MIMEText(msg.encode('utf-8'), _charset="utf-8")
+        smtp.sendmail(self.fromaddr, [self.toaddr], msg.as_string())
         smtp.quit()
         self.buffer = []
-

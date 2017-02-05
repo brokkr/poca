@@ -56,7 +56,6 @@ class Paths:
             if not outcome.success:
                 confquit(outcome.msg)
         if not path.isfile(self.config_file):
-            output.confinfo('No config file found. Writing one...')
             outcome = xmlconf.write_template(self.config_file)
             confquit(outcome.msg)
 

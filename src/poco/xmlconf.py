@@ -90,10 +90,13 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 
 def write_template(file_path):
     '''Writes a string to file. Currently specific to creating config file.'''
+    msg = 'No config file found. Writing one... \n'
     try:
         wfile = open(file_path, mode='wt', encoding='utf-8')
         wfile.write(TEMPLATE)
         wfile.close()
-        return Outcome(True, file_path + ': Config template created.')
+        msg = msg + file_path + ': Config template created.'
+        return Outcome(True, msg)
     except IOError as e:
-        return Outcome(False, file_path + ': ' + str(e))
+        msg = msg + file_path + ': ' + str(e)
+        return Outcome(False, msg)
