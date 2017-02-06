@@ -45,8 +45,9 @@ def start_summarylogger(args, paths, prefs):
         logger.addHandler(file_handler)
         logger.poca_file_handler = file_handler
     if args.email:
-        bsmtp_handler = BufferSMTPHandler('localhost', prefs.email['sender'],
-                                          prefs.email['recipient'], paths)
+        bsmtp_handler = BufferSMTPHandler(prefs.email, paths)
+        loglevel = logging.ERROR if prefs.email['only_error'] else logging.INFO
+        bsmtp_handler.setLevel(loglevel)
         logger.addHandler(bsmtp_handler)
         logger.poca_email_handler = bsmtp_handler
     return logger
@@ -62,14 +63,14 @@ def get_file_handler(paths):
 
 class BufferSMTPHandler(handlers.BufferingHandler):
     '''SMTPHandler that send one email per flush'''
-    def __init__(self, mailhost, fromaddr, toaddr, paths):
-        handlers.BufferingHandler.__init__(self, 1000)
+    def __init__(self, email, paths):
+        handlers.BufferingHandler.__init__(self, int(email['threshold']))
         self.state_jar, outcome = history.get_statejar(paths)
         self.buffer = self.state_jar.buffer
-        self.mailhost = mailhost
+        self.mailhost = email['host']
         self.mailport = smtplib.SMTP_PORT
-        self.fromaddr = fromaddr
-        self.toaddr = toaddr
+        self.fromaddr = email['fromaddr']
+        self.toaddr = email['toaddr']
         self.subject = 'POCA log'
         smtp_formatter = logging.Formatter("%(asctime)s %(message)s",
                                            datefmt='%Y-%m-%d %H:%M')
@@ -78,8 +79,11 @@ class BufferSMTPHandler(handlers.BufferingHandler):
     def flush(self):
         if not len(self.buffer):
             return
-        self.state_jar.buffer = self.buffer
-        self.state_jar.save()
+        if len(self.buffer) < self.capacity:
+            self.state_jar.buffer = self.buffer
+            self.state_jar.save()
+            self.buffer = []
+            return
         smtp = smtplib.SMTP(self.mailhost, self.mailport)
         msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n" % \
               (self.fromaddr, self.toaddr, self.subject)
@@ -90,3 +94,8 @@ class BufferSMTPHandler(handlers.BufferingHandler):
         smtp.sendmail(self.fromaddr, [self.toaddr], msg.as_string())
         smtp.quit()
         self.buffer = []
+        self.state_jar.buffer = self.buffer
+        self.state_jar.save()
+
+    def shouldFlush(self, record):
+        return False

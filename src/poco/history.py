@@ -78,7 +78,7 @@ class Statejar:
     '''Creates standard subscription info container with save method'''
     def __init__(self, db_filename):
         self.db_filename = db_filename
-        self.buffer = None
+        self.buffer = []
 
     def save(self):
         '''Saves jar instance to file using pickle'''

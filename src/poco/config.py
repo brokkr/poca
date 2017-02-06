@@ -81,6 +81,8 @@ class Prefs:
         if xml_email is not None:
             xml_prefs.remove(xml_email)
             self.email = {e.tag: e.text for e in xml_email.getchildren()}
+            self.email['only_error'] = True if self.email['only_error'] == \
+                                       'yes' else False
 
 def get_subs(prefs, xml_root):
     '''Function to create a list of all subscriptions and their preferences'''
