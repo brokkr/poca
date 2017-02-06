@@ -32,7 +32,7 @@ class Channel:
 
         # get jar and check for user deleted files
         self.udeleted = []
-        self.jar, outcome = history.get_jar(config.paths, self.sub)
+        self.jar, outcome = history.get_subjar(config.paths, self.sub)
         self.check_outcome(outcome)
         self.check_jar()
 

@@ -15,24 +15,28 @@ import pickle
 from poco import files
 from poco.outcome import Outcome
 
+def open_jar(db_filename):
+    '''Tries opening existing jar'''
+    try:
+        with open(db_filename, mode='rb') as f:
+            jar = pickle.load(f)
+            outcome = Outcome(True, 'Pickle loaded')
+    except (PermissionError, pickle.UnpicklingError, EOFError) as e:
+        outcome = Outcome(False, str(e))
+        jar = None
+    return jar, outcome
 
-def get_jar(paths, sub):
+def get_subjar(paths, sub):
     '''Returns existing jar if any, else creates a new one'''
     db_filename = os.path.join(paths.db_dir, sub.title)
     if os.path.isfile(db_filename):
-        try:
-            with open(db_filename, mode='rb') as f:
-                jar = pickle.load(f)
-                outcome = Outcome(True, 'Pickle loaded')
-        except (PermissionError, pickle.UnpicklingError, EOFError) as e:
-            outcome = Outcome(False, str(e))
-            jar = None
+        jar, outcome = open_jar(db_filename)
     else:
-        jar = Jar(paths, sub)
+        jar = Subjar(paths, sub)
         outcome = jar.save()
     return jar, outcome
 
-class Jar:
+class Subjar:
     '''Creates standard subscription info container with save method'''
     def __init__(self, paths, sub):
         self.db_filename = os.path.join(paths.db_dir, sub.title)
@@ -54,4 +58,29 @@ class Jar:
             # need more specific exceptions here
             #except:
             #    outcome = Outcome(False, 'Pickle failed')
+        return outcome
+
+def get_statejar(paths):
+    '''Returns existing jar if any, else creates a new one'''
+    db_filename = os.path.join(paths.db_dir, '.poca')
+    if os.path.isfile(db_filename):
+        jar, outcome = open_jar(db_filename)
+    else:
+        jar = Statejar(db_filename)
+        outcome = jar.save()
+    return jar, outcome
+
+class Statejar:
+    '''Creates standard subscription info container with save method'''
+    def __init__(self, db_filename):
+        self.db_filename = db_filename
+        self.buffer = None
+
+    def save(self):
+        '''Saves jar instance to file using pickle'''
+        outcome = files.check_path(os.path.dirname(self.db_filename))
+        if outcome.success:
+            with open(self.db_filename, 'wb') as f:
+                pickle.dump(self, f)
+            outcome = Outcome(True, 'Pickle successful')
         return outcome
