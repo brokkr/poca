@@ -64,7 +64,8 @@ class BufferSMTPHandler(handlers.BufferingHandler):
     '''SMTPHandler that send one email per flush'''
     def __init__(self, mailhost, fromaddr, toaddr, paths):
         handlers.BufferingHandler.__init__(self, 1000)
-        self.buffer_jar, outcome = history.get_statejar(paths)
+        self.state_jar, outcome = history.get_statejar(paths)
+        self.buffer = self.state_jar.buffer
         self.mailhost = mailhost
         self.mailport = smtplib.SMTP_PORT
         self.fromaddr = fromaddr
@@ -77,8 +78,8 @@ class BufferSMTPHandler(handlers.BufferingHandler):
     def flush(self):
         if not len(self.buffer):
             return
-        self.buffer_jar.buffer = self.buffer
-        self.buffer_jar.save()
+        self.state_jar.buffer = self.buffer
+        self.state_jar.save()
         smtp = smtplib.SMTP(self.mailhost, self.mailport)
         msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n" % \
               (self.fromaddr, self.toaddr, self.subject)

@@ -60,6 +60,10 @@ class Subjar:
             #    outcome = Outcome(False, 'Pickle failed')
         return outcome
 
+class Jar(Subjar):
+    '''Old name for Subjar. Needed for unpickling old instances'''
+    pass
+
 def get_statejar(paths):
     '''Returns existing jar if any, else creates a new one'''
     db_filename = os.path.join(paths.db_dir, '.poca')
