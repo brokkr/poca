@@ -82,7 +82,7 @@ class Prefs:
             xml_prefs.remove(xml_email)
             self.email = {
                 'host' : 'localhost',
-                'port' : '25',
+                'starttls' : 'no',
                 'fromaddr' : '',
                 'toaddr' : '',
                 'password' : '',
@@ -91,6 +91,8 @@ class Prefs:
                 }
             for element in xml_email.getchildren():
                 self.email[element.tag] = element.text
+            self.email['starttls'] = True if self.email['starttls'] == \
+                                       'yes' else False
             self.email['only_error'] = True if self.email['only_error'] == \
                                        'yes' else False
 

@@ -80,14 +80,24 @@ class BufferSMTPHandler(handlers.BufferingHandler):
             self.state_jar.save()
             self.buffer = []
             return
-        smtp = smtplib.SMTP(self.email['host'], self.email['port'])
-        header = "From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n" % \
-                 (self.email['fromaddr'], self.email['toaddr'], 'POCA log')
-        msg = str()
+        msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n" % \
+              (self.email['fromaddr'], self.email['toaddr'], 'POCA log')
         for record in self.buffer:
             line = self.format(record)
             msg = msg + line + "\r\n"
         msg = MIMEText(msg.encode('utf-8'), _charset="utf-8")
+        if self.email['starttls']:
+            smtp = smtplib.SMTP(self.email['host'], 587)
+            ehlo = smtp.ehlo()
+            smtp.starttls()
+            try:
+                smtp.login(self.email['fromaddr'], self.email['password'])
+            except smtplib.SMTPAuthenticationError:
+                # how do we deal with this?
+                print("Bad credentials, sorry")
+        else:
+            smtp = smtplib.SMTP(self.email['host'], 25)
+            ehlo = smtp.ehlo()
         smtp.sendmail(self.email['fromaddr'], [self.email['toaddr']],
                       msg.as_string())
         smtp.quit()
