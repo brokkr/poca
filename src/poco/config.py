@@ -7,7 +7,7 @@
 # the Free Software Foundation, either version 3 of the License,
 # or (at your option) any later version.
 
-"""Read configuration from poca.xml"""
+"""A terrible, horrible, not good, very bad configuration parser"""
 
 import sys
 import time
@@ -80,7 +80,17 @@ class Prefs:
         xml_email = xml_prefs.find('email')
         if xml_email is not None:
             xml_prefs.remove(xml_email)
-            self.email = {e.tag: e.text for e in xml_email.getchildren()}
+            self.email = {
+                'host' : 'localhost',
+                'port' : '25',
+                'fromaddr' : '',
+                'toaddr' : '',
+                'password' : '',
+                'only_error' : 'no',
+                'threshold' : '1',
+                }
+            for element in xml_email.getchildren():
+                self.email[element.tag] = element.text
             self.email['only_error'] = True if self.email['only_error'] == \
                                        'yes' else False
 

@@ -44,7 +44,7 @@ def start_summarylogger(args, paths, prefs):
         file_handler = get_file_handler(paths)
         logger.addHandler(file_handler)
         logger.poca_file_handler = file_handler
-    if args.email:
+    if args.email and hasattr(prefs, 'email'):
         bsmtp_handler = BufferSMTPHandler(prefs.email, paths)
         loglevel = logging.ERROR if prefs.email['only_error'] else logging.INFO
         bsmtp_handler.setLevel(loglevel)
@@ -68,7 +68,7 @@ class BufferSMTPHandler(handlers.BufferingHandler):
         self.state_jar, outcome = history.get_statejar(paths)
         self.buffer = self.state_jar.buffer
         self.mailhost = email['host']
-        self.mailport = smtplib.SMTP_PORT
+        self.mailport = email['port']
         self.fromaddr = email['fromaddr']
         self.toaddr = email['toaddr']
         self.subject = 'POCA log'
