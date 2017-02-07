@@ -67,11 +67,7 @@ class BufferSMTPHandler(handlers.BufferingHandler):
         handlers.BufferingHandler.__init__(self, int(email['threshold']))
         self.state_jar, outcome = history.get_statejar(paths)
         self.buffer = self.state_jar.buffer
-        self.mailhost = email['host']
-        self.mailport = email['port']
-        self.fromaddr = email['fromaddr']
-        self.toaddr = email['toaddr']
-        self.subject = 'POCA log'
+        self.email = email
         smtp_formatter = logging.Formatter("%(asctime)s %(message)s",
                                            datefmt='%Y-%m-%d %H:%M')
         self.setFormatter(smtp_formatter)
@@ -84,14 +80,16 @@ class BufferSMTPHandler(handlers.BufferingHandler):
             self.state_jar.save()
             self.buffer = []
             return
-        smtp = smtplib.SMTP(self.mailhost, self.mailport)
-        msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n" % \
-              (self.fromaddr, self.toaddr, self.subject)
+        smtp = smtplib.SMTP(self.email['host'], self.email['port'])
+        header = "From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n" % \
+                 (self.email['fromaddr'], self.email['toaddr'], 'POCA log')
+        msg = str()
         for record in self.buffer:
             line = self.format(record)
             msg = msg + line + "\r\n"
         msg = MIMEText(msg.encode('utf-8'), _charset="utf-8")
-        smtp.sendmail(self.fromaddr, [self.toaddr], msg.as_string())
+        smtp.sendmail(self.email['fromaddr'], [self.email['toaddr']],
+                      msg.as_string())
         smtp.quit()
         self.buffer = []
         self.state_jar.buffer = self.buffer
