@@ -13,6 +13,7 @@ import logging
 from logging import handlers
 import smtplib
 from email.mime.text import MIMEText
+from email.header import Header
 from poco import history
 
 
@@ -73,19 +74,25 @@ class BufferSMTPHandler(handlers.BufferingHandler):
         self.setFormatter(smtp_formatter)
 
     def flush(self):
-        if not len(self.buffer):
+        '''Flush if we exceed threshold; otherwise save the buffer'''
+        if not self.buffer:
             return
+        # we need to check for empty buffer first because closing the handler
+        # for some reason trigger three flushes and we don't wanna overwrite
+        # saved buffer with an empty one
         if len(self.buffer) < self.capacity:
+            #print(len(self.buffer))
             self.state_jar.buffer = self.buffer
             self.state_jar.save()
             self.buffer = []
             return
-        msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n" % \
-              (self.email['fromaddr'], self.email['toaddr'], 'POCA log')
+        body = str()
         for record in self.buffer:
-            line = self.format(record)
-            msg = msg + line + "\r\n"
-        msg = MIMEText(msg.encode('utf-8'), _charset="utf-8")
+            body = body + self.format(record) + "\r\n"
+        msg = MIMEText(body.encode('utf-8'), _charset="utf-8")
+        msg['From'] = self.email['fromaddr']
+        msg['To'] = self.email['toaddr']
+        msg['Subject'] = Header("POCA log")
         if self.email['starttls']:
             # socket.gaierror?
             smtp = smtplib.SMTP(self.email['host'], 587)
@@ -108,4 +115,5 @@ class BufferSMTPHandler(handlers.BufferingHandler):
         self.state_jar.save()
 
     def shouldFlush(self, record):
+        '''Returns false to stop automatic flushing (we flush on close)'''
         return False

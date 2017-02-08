@@ -26,6 +26,7 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
         * id3removev1: should we remove id3v1, only keeping v2 (yes or no)
         * useragent: _fallback_ user agent if connection is rejected for
           default python user agent. Leave empty not to use a fallback.
+        * email logging setup not included by default, see wiki for details.
         -->
 
         <base_dir>/tmp/poca</base_dir>
