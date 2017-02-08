@@ -101,8 +101,7 @@ class BufferSMTPHandler(handlers.BufferingHandler):
             try:
                 smtp.login(self.email['fromaddr'], self.email['password'])
             except smtplib.SMTPAuthenticationError:
-                # how do we deal with this?
-                print("Bad credentials, sorry")
+                return
         else:
             # socket.gaierror?
             smtp = smtplib.SMTP(self.email['host'], 25)
