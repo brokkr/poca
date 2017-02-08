@@ -13,7 +13,7 @@ from poco.outcome import Outcome
 
 
 TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
-<poca version="0.6">
+<poca version="0.7">
 
     <!-- Please see detailed configuration documentation online:
      https://github.com/brokkr/poca/wiki/Configuration -->
@@ -51,6 +51,7 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
           * hour: The hour (24h-format) at which the entry was published.
           * weekday: Only entries from one of these weekdays (as integers)
           * after_date: Only use entries published after date specified.
+          * quota: maximum per-day number of episodes (avoids constant refresh)
         -->
 
         <subscription>
