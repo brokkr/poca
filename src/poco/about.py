@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2010-2016 Mads Michelsen (mail@brokkr.net)
+# Copyright 2010-2017 Mads Michelsen (mail@brokkr.net)
 # This file is part of Poca.
 # Poca is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 """Basic info"""
 
-__version__ = 'rev251'
+__version__ = 'rev252'
 VERSION = __version__
 MAINTAINER = "Mads Michelsen <mail@brokkr.net>"
 DESCRIPTION = "A cron-friendly command line podcast aggregator"

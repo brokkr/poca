@@ -12,10 +12,12 @@
 import logging
 from logging import handlers
 import smtplib
+import socket
 from email.mime.text import MIMEText
 from email.header import Header
-import socket
+
 from poco import history
+from poco.outcome import Outcome
 
 
 def get_logger(logger_name):
@@ -69,6 +71,7 @@ class BufferSMTPHandler(handlers.BufferingHandler):
         handlers.BufferingHandler.__init__(self, int(email['threshold']))
         self.state_jar, outcome = history.get_statejar(paths)
         self.buffer = self.state_jar.buffer
+        self.outcome = Outcome(None, '')
         self.email = email
         smtp_formatter = logging.Formatter("%(asctime)s %(message)s",
                                            datefmt='%Y-%m-%d %H:%M')
@@ -77,11 +80,10 @@ class BufferSMTPHandler(handlers.BufferingHandler):
     def flush(self):
         '''Flush if we exceed threshold; otherwise save the buffer'''
         if not self.buffer:
-        # we need to check for empty buffer first because closing the handler
-        # for some reason trigger three flushes and we don't wanna overwrite
-        # our saved buffer with an empty one
+            self.outcome = Outcome(None, 'Buffer was empty')
             return
         if len(self.buffer) < self.capacity:
+            self.outcome = Outcome(None, 'Buffer no sufficiently full')
             self.save()
             return
         body = str()
@@ -95,24 +97,35 @@ class BufferSMTPHandler(handlers.BufferingHandler):
             try:
                 smtp = smtplib.SMTP(self.email['host'], 587, timeout=10)
                 ehlo = smtp.ehlo()
-            except (ConnectionRefusedError, socket.gaierror, socket.timeout):
+            except (ConnectionRefusedError, socket.gaierror, socket.timeout) \
+                    as error:
+                self.outcome = Outcome(False, str(error))
                 self.save()
-                return #SilentFail
+                return
             smtp.starttls()
             try:
                 smtp.login(self.email['fromaddr'], self.email['password'])
-            except smtplib.SMTPAuthenticationError:
+            except smtplib.SMTPAuthenticationError as error:
+                self.outcome = Outcome(False, str(error))
                 self.save()
-                return #SilentFail
+                return
         else:
             try:
                 smtp = smtplib.SMTP(self.email['host'], 25, timeout=10)
                 ehlo = smtp.ehlo()
-            except (ConnectionRefusedError, socket.gaierror, socket.timeout):
+            except (ConnectionRefusedError, socket.gaierror, socket.timeout) \
+                    as error:
+                self.outcome = Outcome(False, str(error))
                 self.save()
-                return #SilentFail
-        smtp.sendmail(self.email['fromaddr'], [self.email['toaddr']],
-                      msg.as_string())
+                return
+        try:
+            smtp.sendmail(self.email['fromaddr'], [self.email['toaddr']],
+                          msg.as_string())
+            self.outcome = Outcome(True, "Succesfully sent email")
+        except (smtplib.SMTPException, socket.timeout) as error:
+            self.outcome = Outcome(False, str(error))
+            self.save()
+            return
         smtp.quit()
         self.buffer = []
         self.state_jar.buffer = self.buffer
@@ -123,9 +136,8 @@ class BufferSMTPHandler(handlers.BufferingHandler):
         return False
 
     def save(self):
-        '''Save the buffer for some other (it either isn't full yet or we
-           can't empty it)'''
+        '''Save the buffer for some other time (it either isn't
+           full yet or we can't empty it)'''
         self.state_jar.buffer = self.buffer
         self.state_jar.save()
         self.buffer = []
-

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright 2010-2016 Mads Michelsen (mail@brokkr.net)
+# Copyright 2010-2017 Mads Michelsen (mail@brokkr.net)
 # This file is part of Poca.
 # Poca is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -16,14 +16,18 @@ import poco
 def main():
     '''Main script'''
     args = poco.args.get_args()
-    stream_logger = poco.plogging.start_streamlogger(args)
+    stream_logger = poco.loggers.start_streamlogger(args)
     config = poco.config.Config(args)
-    summary_logger = poco.plogging.start_summarylogger(args, config.paths,
+    summary_logger = poco.loggers.start_summarylogger(args, config.paths,
                                                        config.prefs)
     for sub in config.subs:
         channel = poco.channel.Channel(config, sub)
     if summary_logger.poca_email_handler:
         summary_logger.poca_email_handler.close()
+        outcome = summary_logger.poca_email_handler.outcome
+        if outcome.success is False:
+            poco.output.conffatal('Email log failed with: ')
+            poco.output.conffatal('  ' + outcome.msg)
 
 if __name__ == '__main__':
     try:

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2010-2016 Mads Michelsen (mail@brokkr.net)
+# Copyright 2010-2017 Mads Michelsen (mail@brokkr.net)
 # This file is part of Poca.
 # Poca is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -23,5 +23,4 @@ def get_args():
                         help='Output to file in poca config directory')
     parser.add_argument('-e', '--email', action='store_true', default=False,
                         help='Output to email (set in config)')
-
     return parser.parse_args()

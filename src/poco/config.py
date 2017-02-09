@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2010-2016 Mads Michelsen (mail@brokkr.net)
+# Copyright 2010-2017 Mads Michelsen (mail@brokkr.net)
 # This file is part of Poca.
 # Poca is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@ import time
 from os import path
 from xml.etree import ElementTree
 
-from poco import files, output, xmlconf, plogging
+from poco import files, output, xmlconf
 
 
 def confquit(msg):

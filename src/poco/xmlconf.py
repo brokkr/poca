@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2010-2016 Mads Michelsen (mail@brokkr.net)
+# Copyright 2010-2017 Mads Michelsen (mail@brokkr.net)
 # This file is part of Poca.
 # Poca is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -51,7 +51,6 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
           * hour: The hour (24h-format) at which the entry was published.
           * weekday: Only entries from one of these weekdays (as integers)
           * after_date: Only use entries published after date specified.
-          * quota: maximum per-day number of episodes (avoids constant refresh)
         -->
 
         <subscription>
