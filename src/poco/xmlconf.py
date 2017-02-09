@@ -49,7 +49,7 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
           * filename: Filename of the entry must match this string/regex
           * title: Same as above, only for the title in the rss 
           * hour: The hour (24h-format) at which the entry was published.
-          * weekday: Only entries from one of these weekdays (as integers)
+          * weekdays: Only entries from one of these weekdays (as integers)
           * after_date: Only use entries published after date specified.
         -->
 
@@ -80,7 +80,7 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
             <url>http://www.bbc.co.uk/programmes/p002vsnk/episodes/downloads.rss</url>
             <max_number>2</max_number>
             <filters>
-                <weekday>1</weekday>
+                <weekdays>1</weekdays>
             </filters>
         </subscription>
 

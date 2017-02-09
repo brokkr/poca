@@ -217,7 +217,8 @@ class Wanted():
         self.lst = list(filter(lambda x: x not in del_lst, self.lst))
         self.lst = list(filter(lambda x: combo.dic[x]['valid'], self.lst))
         self.apply_filters(sub, combo)
-        self.limit(sub)
+        if sub.max_number:
+            self.limit(sub)
         self.dic = {x: combo.dic[x] for x in self.lst}
 
     def match_filename(self, dic, filters):
