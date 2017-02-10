@@ -19,6 +19,9 @@ With Poca you can set custom options for each individual subscription.
    0.6. introduces a special mode that gets the oldest episodes first, rather 
    than the latest. To move on to later episodes simply delete old ones and 
    poca will fill up with the next in line.
+ * **Keeping track**. Poca logs downloads and removals to a local file so you
+   easily see what's changed. Or configure it with an SMTP server and get
+   notified when a feed stops working (new in 0.7).
 
 Poca also: has excellent unicode support for feeds, filenames and tags, gets 
 cover images for feeds, has the ability to spoof user agent, remembers which
