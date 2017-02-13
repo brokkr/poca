@@ -246,7 +246,7 @@ class Wanted():
     def match_hour(self, dic, filters):
         '''Only return episodes published at a specific hour of the day'''
         self.lst = [x for x in self.lst if dic[x]['updated_parsed'].tm_hour ==
-                    filters['hour']]
+                    int(filters['hour'])]
 
     def apply_filters(self, sub, combo):
         '''Apply all filters set to be used on the subscription'''

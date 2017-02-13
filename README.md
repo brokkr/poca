@@ -16,18 +16,17 @@ With Poca you can set custom options for each individual subscription.
    weekday or date of publishing. Only want news reports in the morning or on
    Wednesdays? You got it.
  * **From the top**. Some podcasts are best if you start at the beginning. Poca 
-   0.6. introduces a special mode that gets the oldest episodes first, rather 
+   introduces a special mode that gets the oldest episodes first, rather 
    than the latest. To move on to later episodes simply delete old ones and 
-   poca will fill up with the next in line.
+   poca will fill up with the next in line (new in 0.6).
  * **Keeping track**. Poca logs downloads and removals to a local file so you
    easily see what's changed. Or configure it with an SMTP server and get
    notified when a feed stops working (new in 0.7).
 
 Poca also: has excellent unicode support for feeds, filenames and tags, gets 
-cover images for feeds, has the ability to spoof user agent, remembers which
+cover images for feeds, has the ability to spoof user agents, remembers which
 downloads actually completed, and more. See the [Configuration](https://github.com/brokkr/poca/wiki/Configuration) section of the
-wiki for more details on features and the [Development](https://github.com/brokkr/poca/wiki/Development) section for (possibly)
-upcoming one.
+wiki for more details on features.
 
 ### Interface
 [![asciicast](https://asciinema.org/a/cwf8k4e154s6dkw2hiohqxj68.png)](https://asciinema.org/a/cwf8k4e154s6dkw2hiohqxj68)
