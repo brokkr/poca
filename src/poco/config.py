@@ -10,9 +10,8 @@
 """A terrible, horrible, not good, very bad configuration parser"""
 
 import sys
-import time
 from os import path
-from xml.etree import ElementTree
+from lxml import etree, objectify
 
 from poco import files, output, xmlconf
 
@@ -28,14 +27,21 @@ class Config:
         self.paths = Paths()
         self.args = args
         xml_root = self.get_xml()
-        self.prefs = Prefs(xml_root)
-        self.subs = get_subs(self.prefs, xml_root)
+        required_nodes = ['settings', 'subscriptions']
+        if not all(hasattr(xml_root, attr) for attr in required_nodes):
+            confquit('Missing \'settings\' or \'subscriptions\' tag.')
+        required_attrs = ['title', 'url']
+        self.prefs = xml_root.settings
+        self.subs = [sub for sub in xml_root.subscriptions.iterchildren() \
+                     if all(hasattr(sub, attr) for attr in required_attrs)]
 
     def get_xml(self):
         '''Returns the XML tree root harvested from the users poca.xml file.'''
         try:
-            return ElementTree.parse(self.paths.config_file).getroot()
-        except ElementTree.ParseError as e:
+            with open(self.paths.config_file, 'rb') as f:
+                xml_object = objectify.parse(f)
+            return xml_object.getroot()
+        except etree.XMLSyntaxError as e:
             msg = ('The settings file could not be parsed. \n' +
                    'Parser said: ' + str(e))
             confquit(msg)
@@ -58,96 +64,3 @@ class Paths:
         if not path.isfile(self.config_file):
             outcome = xmlconf.write_template(self.config_file)
             confquit(outcome.msg)
-
-class Prefs:
-    '''Collection of global preferences, mainly base directory for mp3s'''
-    def __init__(self, xml_root):
-        xml_prefs = xml_root.find('settings')
-        if xml_prefs is None:
-            confquit('No \'settings\' tag found. Quitting.')
-        self.set_email(xml_prefs)
-        required = {'id3removev1', 'id3encoding', 'base_dir'}
-        elements = [(node.tag, node.text) for node in xml_prefs.getchildren()]
-        missing_required = required - {element[0] for element in elements}
-        if missing_required:
-            confquit('Missing settings: ' + '\n'.join(missing_required))
-        self.useragent = None
-        for element in elements:
-            setattr(self, element[0], element[1])
-
-    def set_email(self, xml_prefs):
-        '''Saves settings about music file metadata'''
-        xml_email = xml_prefs.find('email')
-        if xml_email is not None:
-            xml_prefs.remove(xml_email)
-            self.email = {
-                'host' : 'localhost',
-                'starttls' : 'no',
-                'fromaddr' : '',
-                'toaddr' : '',
-                'password' : '',
-                'only_error' : 'no',
-                'threshold' : '1',
-                }
-            for element in xml_email.getchildren():
-                self.email[element.tag] = element.text
-            self.email['starttls'] = True if self.email['starttls'] == \
-                                       'yes' else False
-            self.email['only_error'] = True if self.email['only_error'] == \
-                                       'yes' else False
-
-def get_subs(prefs, xml_root):
-    '''Function to create a list of all subscriptions and their preferences'''
-    xml_subs = xml_root.find('subscriptions')
-    if xml_subs is None:
-        msg = 'No \'subscriptions\' tag found. confquitting.'
-        confquit(msg)
-    else:
-        return [Sub(prefs, xml_sub) for xml_sub in xml_subs.getchildren()]
-
-class Sub:
-    '''Create a subscription object with metadata in dic if any'''
-    def __init__(self, prefs, xml_sub):
-        self.metadata, self.filters = {}, {}
-        self.set_metadata(xml_sub)
-        self.set_filters(xml_sub)
-        self.set_subsettings(xml_sub, prefs)
-
-    def set_metadata(self, xml_sub):
-        '''Saves settings about music file metadata'''
-        xml_meta = xml_sub.find('metadata')
-        if xml_meta is not None:
-            xml_sub.remove(xml_meta)
-            self.metadata = {e.tag: e.text for e in xml_meta.getchildren()}
-
-    def set_filters(self, xml_sub):
-        '''Saves settings about feed filters'''
-        xml_filters = xml_sub.find('filters')
-        if xml_filters is not None:
-            xml_sub.remove(xml_filters)
-            self.filters = {node.tag: node.text for node in
-                            xml_filters.getchildren()}
-            if 'after_date' in self.filters:
-                self.filters['after_date'] = \
-                    time.strptime(self.filters['after_date'], "%Y-%m-%d")
-
-    def set_subsettings(self, xml_sub, prefs):
-        '''Saves basic settings like title, url and max_number'''
-        elements = [(x.tag, x.text) for x in xml_sub.getchildren()]
-        if not 'url' in [x[0] for x in elements]:
-            msg = 'A subscription is missing required url setting'
-            confquit(msg)
-        self.title = '__missing_title__'
-        self.max_number = False
-        for element in elements:
-            setattr(self, element[0], element[1])
-        self.sub_dir = path.join(prefs.base_dir, self.title)
-        self.ctitle = self.title.upper()
-
-    def __str__(self):
-        '''String representation of object?'''
-        return str(self.__dict__)
-
-    def __ne__(self, other):
-        '''Used to compare old sub instance to new to scan for changes'''
-        return self.__dict__ != other.__dict__
