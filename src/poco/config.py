@@ -16,6 +16,11 @@ from lxml import etree, objectify
 from poco import files, output, xmlconf
 
 
+DEFAULTS = {'base_dir' : '/tmp/poca',
+            'id3encoding' : 'utf8',
+            'id3removev1' : 'yes',
+            'useragent' : ''}
+
 def confquit(msg):
     '''Something wasn't right about the preferences. Leave'''
     output.conffatal(msg)
@@ -34,6 +39,9 @@ class Config:
         self.prefs = xml_root.settings
         self.subs = [sub for sub in xml_root.subscriptions.iterchildren() \
                      if all(hasattr(sub, attr) for attr in required_attrs)]
+        for tag in DEFAULTS:
+            self.prefs[tag] = self.prefs[tag] if hasattr(self.prefs, tag) \
+                              else DEFAULTS[tag]
 
     def get_xml(self):
         '''Returns the XML tree root harvested from the users poca.xml file.'''
