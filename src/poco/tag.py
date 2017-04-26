@@ -20,7 +20,6 @@ def tag_audio_file(prefs, sub, entry):
     # get general metadata settings
     id3v1_dic = {'yes': 0, 'no': 2}
     id3v1 = id3v1_dic[prefs.id3removev1.text]
-    print(type(id3v1), id3v1)
     id3encoding_dic = {'latin1': 0, 'utf8': 3}
     id3encoding = id3encoding_dic[prefs.id3encoding]
     # check for proper header and metadata to apply

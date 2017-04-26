@@ -149,8 +149,8 @@ class Feed:
     def __init__(self, sub, jar, udeleted):
         self.outcome = Outcome(True, '')
         self.etag = jar.etag
-        #if sub != jar.sub or udeleted:
-        self.etag = None
+        if sub != jar.sub or udeleted:
+            self.etag = None
         doc = self.update(sub)
         if not self.outcome.success:
             return
@@ -158,15 +158,7 @@ class Feed:
 
     def update(self, sub):
         '''Check feed, return the xml'''
-        try:
-            doc = feedparser.parse(sub.url.text, etag=self.etag)
-        except TypeError:
-            # https://github.com/kurtmckee/feedparser/issues/30#issuecomment-183714444
-            if 'drv_libxml2' in feedparser.PREFERRED_XML_PARSERS:
-                feedparser.PREFERRED_XML_PARSERS.remove('drv_libxml2')
-                doc = feedparser.parse(sub.url.text, etag=self.etag)
-            else:
-                raise
+        doc = feedparser.parse(sub.url.text, etag=self.etag)
         # save new etag if there is one in doc
         if doc.has_key('etag'):
             self.etag = doc.etag
