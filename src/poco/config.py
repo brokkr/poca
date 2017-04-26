@@ -35,8 +35,8 @@ class Config:
         required_nodes = ['settings', 'subscriptions']
         if not all(hasattr(xml_root, attr) for attr in required_nodes):
             confquit('Missing \'settings\' or \'subscriptions\' tag.')
-        required_attrs = ['title', 'url']
         self.prefs = xml_root.settings
+        required_attrs = ['title', 'url']
         self.subs = [sub for sub in xml_root.subscriptions.iterchildren() \
                      if all(hasattr(sub, attr) for attr in required_attrs)]
         for tag in DEFAULTS:

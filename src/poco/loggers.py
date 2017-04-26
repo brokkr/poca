@@ -50,7 +50,8 @@ def start_summarylogger(args, paths, prefs):
         logger.poca_file_handler = file_handler
     if args.email and hasattr(prefs, 'email'):
         bsmtp_handler = BufferSMTPHandler(prefs.email, paths)
-        loglevel = logging.ERROR if prefs.email['only_error'] else logging.INFO
+        loglevel = logging.ERROR if prefs.email['only_error'] == 'no' \
+                   else logging.INFO
         bsmtp_handler.setLevel(loglevel)
         logger.addHandler(bsmtp_handler)
         logger.poca_email_handler = bsmtp_handler
@@ -68,7 +69,7 @@ def get_file_handler(paths):
 class BufferSMTPHandler(handlers.BufferingHandler):
     '''SMTPHandler that send one email per flush'''
     def __init__(self, email, paths):
-        handlers.BufferingHandler.__init__(self, int(email['threshold']))
+        handlers.BufferingHandler.__init__(self, email['threshold'])
         self.state_jar, outcome = history.get_statejar(paths)
         self.buffer = self.state_jar.buffer
         self.outcome = Outcome(None, '')
@@ -93,7 +94,7 @@ class BufferSMTPHandler(handlers.BufferingHandler):
         msg['From'] = self.email['fromaddr']
         msg['To'] = self.email['toaddr']
         msg['Subject'] = Header("POCA log")
-        if self.email['starttls']:
+        if self.email['starttls'] == 'yes':
             try:
                 smtp = smtplib.SMTP(self.email['host'], 587, timeout=10)
                 ehlo = smtp.ehlo()

@@ -28,7 +28,7 @@ def open_jar(db_filename):
 
 def get_subjar(paths, sub):
     '''Returns existing jar if any, else creates a new one'''
-    db_filename = os.path.join(paths.db_dir, sub.title)
+    db_filename = os.path.join(paths.db_dir, sub.title.text)
     if os.path.isfile(db_filename):
         jar, outcome = open_jar(db_filename)
     else:
@@ -39,7 +39,7 @@ def get_subjar(paths, sub):
 class Subjar:
     '''Creates standard subscription info container with save method'''
     def __init__(self, paths, sub):
-        self.db_filename = os.path.join(paths.db_dir, sub.title)
+        self.db_filename = os.path.join(paths.db_dir, sub.title.text)
         self.sub = sub
         self.etag = None
         self.lst = []

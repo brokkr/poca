@@ -9,6 +9,7 @@
 
 """Per-subscription operations"""
 
+import os
 import re
 import sys
 
@@ -23,11 +24,14 @@ class Channel:
     first, then acts on them and updates the db as it goes.'''
     def __init__(self, config, sub):
         self.sub = sub
+        self.sub_dir = os.path.join(config.prefs.base_dir.text,
+                                    self.sub.title.text)
+        self.ctitle = self.sub.title.text.upper()
 
         ### PART 1: PLANS
 
         # see that we can write to the designated directory
-        outcome = files.check_path(sub.sub_dir)
+        outcome = files.check_path(self.sub_dir)
         self.check_outcome(outcome)
 
         # get jar and check for user deleted files
@@ -39,7 +43,7 @@ class Channel:
         # get feed, combine with jar and filter the lot
         self.feed = Feed(self.sub, self.jar, self.udeleted)
         if not self.feed.outcome.success:
-            output.suberror(self.sub.ctitle, self.feed.outcome)
+            output.suberror(self.ctitle, self.feed.outcome)
             return
         self.combo = Combo(self.feed, self.jar, self.sub)
         self.wanted = Wanted(self.sub, self.combo, self.jar.del_lst)
@@ -47,7 +51,7 @@ class Channel:
         # inform user of intentions
         self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
         self.lacking = set(self.wanted.lst) - set(self.jar.lst)
-        output.plans(self.sub.ctitle, len(self.udeleted), len(self.unwanted),
+        output.plans(self.ctitle, len(self.udeleted), len(self.unwanted),
                      len(self.lacking))
         self.removed, self.downed, self.failed = [], [], []
 
@@ -81,7 +85,7 @@ class Channel:
                                               config.prefs)
 
         # print summary of operations in file log
-        output.summary(self.sub.ctitle, self.udeleted, self.removed,
+        output.summary(self.ctitle, self.udeleted, self.removed,
                        self.downed, self.failed)
 
 
@@ -136,7 +140,7 @@ class Channel:
     def check_outcome(self, outcome):
         '''Check for fatal sub issues'''
         if not outcome.success:
-            output.subfatal(self.sub.ctitle, outcome)
+            output.subfatal(self.ctitle, outcome)
             sys.exit()
 
 
@@ -217,7 +221,7 @@ class Wanted():
         self.lst = list(filter(lambda x: x not in del_lst, self.lst))
         self.lst = list(filter(lambda x: combo.dic[x]['valid'], self.lst))
         self.apply_filters(sub, combo)
-        if sub.max_number:
+        if hasattr(sub, 'max_number'):
             self.limit(sub)
         self.dic = {x: combo.dic[x] for x in self.lst}
 
