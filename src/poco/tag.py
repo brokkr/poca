@@ -19,13 +19,14 @@ def tag_audio_file(prefs, sub, entry):
     '''Reintroducing id3 tagging using mutagen'''
     # get general metadata settings
     id3v1_dic = {'yes': 0, 'no': 2}
-    id3v1 = id3v1_dic[prefs.id3removev1]
+    id3v1 = id3v1_dic[prefs.id3removev1.text]
+    print(type(id3v1), id3v1)
     id3encoding_dic = {'latin1': 0, 'utf8': 3}
     id3encoding = id3encoding_dic[prefs.id3encoding]
     # check for proper header and metadata to apply
     if entry['poca_ext'] != '.mp3':
         return Outcome(True, 'Not an mp3')
-    if not sub.metadata:
+    if not hasattr(sub, 'metadata'):
         return Outcome(True, 'No metadata overrides to apply')
     try:
         id3tag = mutagen.id3.ID3(entry['poca_abspath'])
@@ -37,15 +38,14 @@ def tag_audio_file(prefs, sub, entry):
         id3tag = mutagen.id3.ID3(entry['poca_abspath'])
     id3tag.update_to_v24()
     # apply overrides to header and save file with chosen encoding
-    for override in sub.metadata:
+    for override in sub.metadata.iterchildren():
         failure_lst = []
         try:
-            frame = FRAME_DIC[override]
+            frame = FRAME_DIC[override.tag]
         except KeyError:
-            failure_lst.append(override)
+            failure_lst.append(override.tag)
             continue
-        ftext = sub.metadata[override]
-        id3tag.add(frame(encoding=id3encoding, text=ftext))
+        id3tag.add(frame(encoding=id3encoding, text=override.text))
     try:
         id3tag.save(v1=id3v1, v2_version=4)
     except UnicodeEncodeError:

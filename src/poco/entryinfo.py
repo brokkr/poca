@@ -13,7 +13,7 @@ from os import path
 import urllib.request, urllib.error, urllib.parse
 
 
-def expand(entry, sub):
+def expand(entry, sub, sub_dir):
     '''Expands entry with url, paths and size'''
     try:
         entry['poca_url'] = entry.enclosures[0]['href']
@@ -33,6 +33,6 @@ def expand(entry, sub):
     entry['poca_filename'] = path.basename(parsed_url.path)
     entry['poca_basename'] = entry['poca_filename'].split('.')[0]
     entry['poca_ext'] = path.splitext(entry['poca_filename'])[1].lower()
-    entry['poca_abspath'] = path.join(sub.sub_dir, entry['poca_filename'])
+    entry['poca_abspath'] = path.join(sub_dir, entry['poca_filename'])
     entry['valid'] = True
     return entry

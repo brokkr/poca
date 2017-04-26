@@ -45,7 +45,7 @@ class Channel:
         if not self.feed.outcome.success:
             output.suberror(self.ctitle, self.feed.outcome)
             return
-        self.combo = Combo(self.feed, self.jar, self.sub)
+        self.combo = Combo(self.feed, self.jar, self.sub, self.sub_dir)
         self.wanted = Wanted(self.sub, self.combo, self.jar.del_lst)
 
         # inform user of intentions
@@ -81,7 +81,7 @@ class Channel:
 
         # download cover image
         if self.downed and self.feed.image:
-            outcome = files.download_img_file(self.feed.image, sub.sub_dir,
+            outcome = files.download_img_file(self.feed.image, self.sub_dir,
                                               config.prefs)
 
         # print summary of operations in file log
@@ -149,8 +149,8 @@ class Feed:
     def __init__(self, sub, jar, udeleted):
         self.outcome = Outcome(True, '')
         self.etag = jar.etag
-        if sub != jar.sub or udeleted:
-            self.etag = None
+        #if sub != jar.sub or udeleted:
+        self.etag = None
         doc = self.update(sub)
         if not self.outcome.success:
             return
@@ -159,12 +159,12 @@ class Feed:
     def update(self, sub):
         '''Check feed, return the xml'''
         try:
-            doc = feedparser.parse(sub.url, etag=self.etag)
+            doc = feedparser.parse(sub.url.text, etag=self.etag)
         except TypeError:
             # https://github.com/kurtmckee/feedparser/issues/30#issuecomment-183714444
             if 'drv_libxml2' in feedparser.PREFERRED_XML_PARSERS:
                 feedparser.PREFERRED_XML_PARSERS.remove('drv_libxml2')
-                doc = feedparser.parse(sub.url, etag=self.etag)
+                doc = feedparser.parse(sub.url.text, etag=self.etag)
             else:
                 raise
         # save new etag if there is one in doc
@@ -203,14 +203,14 @@ class Feed:
 class Combo:
     '''Constructs a container holding all combined feed and jar
     entries. Copies feed then adds non-duplicates from jar'''
-    def __init__(self, feed, jar, sub):
+    def __init__(self, feed, jar, sub, sub_dir):
         if hasattr(sub, 'from_the_top'):
             self.lst = list(jar.lst)
             self.lst.extend(uid for uid in feed.lst if uid not in jar.lst)
         else:
             self.lst = list(feed.lst)
             self.lst.extend(uid for uid in jar.lst if uid not in feed.lst)
-        self.dic = {uid: entryinfo.expand(feed.dic[uid], sub)
+        self.dic = {uid: entryinfo.expand(feed.dic[uid], sub, sub_dir)
                     for uid in feed.lst if uid not in jar.lst}
         self.dic.update(jar.dic)
 
@@ -220,37 +220,37 @@ class Wanted():
         self.lst = combo.lst
         self.lst = list(filter(lambda x: x not in del_lst, self.lst))
         self.lst = list(filter(lambda x: combo.dic[x]['valid'], self.lst))
-        self.apply_filters(sub, combo)
+        if hasattr(sub, 'filters'):
+            self.apply_filters(sub, combo)
+        # we don't know that max_number is a number
         if hasattr(sub, 'max_number'):
             self.limit(sub)
         self.dic = {x: combo.dic[x] for x in self.lst}
 
-    def match_filename(self, dic, filters):
+    def match_filename(self, dic, filter_text):
         '''The episode filename must match a regex/string'''
         self.lst = [x for x in self.lst if
-                    bool(re.search(filters['filename'],
-                                   dic[x]['poca_filename']))]
+                    bool(re.search(filter_text, dic[x]['poca_filename']))]
 
-    def match_title(self, dic, filters):
+    def match_title(self, dic, filter_text):
         '''The episode title must match a regex/string'''
         self.lst = [x for x in self.lst if
-                    bool(re.search(filters['title'], dic[x]['title']))]
+                    bool(re.search(filter_text, dic[x]['title']))]
 
-    def match_wdays(self, dic, filters):
+    def match_weekdays(self, dic, filter_text):
         '''Only return episodes published on specific week days'''
         self.lst = [x for x in self.lst if
-                    str(dic[x]['updated_parsed'].tm_wday)
-                    in list(filters['weekdays'])]
+                    str(dic[x]['updated_parsed'].tm_wday) in list(filter_text)]
 
-    def match_date(self, dic, filters):
+    def match_date(self, dic, filter_text):
         '''Only return episodes published after a specific date'''
         self.lst = [x for x in self.lst if dic[x]['published_parsed'] >
-                    filters['after_date']]
+                   filter_text]
 
-    def match_hour(self, dic, filters):
+    def match_hour(self, dic, filter_text):
         '''Only return episodes published at a specific hour of the day'''
         self.lst = [x for x in self.lst if dic[x]['updated_parsed'].tm_hour ==
-                    int(filters['hour'])]
+                    int(filter_text)]
 
     def apply_filters(self, sub, combo):
         '''Apply all filters set to be used on the subscription'''
@@ -258,9 +258,9 @@ class Wanted():
                     'filename': self.match_filename,
                     'title': self.match_title,
                     'hour': self.match_hour,
-                    'weekdays': self.match_wdays}
-        for key in sub.filters:
-            func_dic[key](combo.dic, sub.filters)
+                    'weekdays': self.match_weekdays}
+        for key in sub.filters.iterchildren():
+            func_dic[key.tag](combo.dic, key.text)
 
     def limit(self, sub):
         '''Limit the number of episodes to that set in max_number'''
