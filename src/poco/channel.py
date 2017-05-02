@@ -23,6 +23,9 @@ class Channel:
     '''A class for a single subscription/channel. Creates the containers
     first, then acts on them and updates the db as it goes.'''
     def __init__(self, config, sub):
+        sub.extend(config.defaults.iterchildren())
+        for element in config.defaults.xpath('./metadata|./filters'):
+            sub[element.tag].extend(element.iterchildren())
         self.sub = sub
         self.sub_dir = os.path.join(config.prefs.base_dir.text,
                                     self.sub.title.text)
