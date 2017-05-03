@@ -19,9 +19,10 @@ def main():
     stream_logger = poco.loggers.start_streamlogger(args)
     config = poco.config.Config(args)
     summary_logger = poco.loggers.start_summarylogger(args, config.paths,
-                                                       config.prefs)
+                                                      config.prefs)
     for sub in config.subs:
         channel = poco.channel.Channel(config, sub)
+        channel.run()
     if summary_logger.poca_email_handler:
         summary_logger.poca_email_handler.close()
         outcome = summary_logger.poca_email_handler.outcome

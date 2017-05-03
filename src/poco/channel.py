@@ -23,6 +23,7 @@ class Channel:
     '''A class for a single subscription/channel. Creates the containers
     first, then acts on them and updates the db as it goes.'''
     def __init__(self, config, sub):
+        self.config = config
         sub.extend(config.defaults.iterchildren())
         for element in config.defaults.xpath('./metadata|./filters'):
             sub[element.tag].extend(element.iterchildren())
@@ -33,13 +34,15 @@ class Channel:
 
         ### PART 1: PLANS
 
+    def run(self):
+        '''Putting it all together'''
         # see that we can write to the designated directory
         outcome = files.check_path(self.sub_dir)
         self.check_outcome(outcome)
 
         # get jar and check for user deleted files
         self.udeleted = []
-        self.jar, outcome = history.get_subjar(config.paths, self.sub)
+        self.jar, outcome = history.get_subjar(self.config.paths, self.sub)
         self.check_outcome(outcome)
         self.check_jar()
 
@@ -74,7 +77,7 @@ class Channel:
             if uid not in self.lacking:
                 continue
             entry = self.wanted.dic[uid]
-            self.acquire(uid, entry, config)
+            self.acquire(uid, entry)
 
         # save etag and subsettings after succesful update
         if not self.failed:
@@ -85,7 +88,7 @@ class Channel:
         # download cover image
         if self.downed and self.feed.image:
             outcome = files.download_img_file(self.feed.image, self.sub_dir,
-                                              config.prefs)
+                                              self.config.prefs)
 
         # print summary of operations in file log
         output.summary(self.ctitle, self.udeleted, self.removed,
@@ -104,15 +107,15 @@ class Channel:
         self.jar.lst = [x for x in self.jar.lst if x not in self.jar.del_lst]
         self.jar.save()
 
-    def acquire(self, uid, entry, config):
+    def acquire(self, uid, entry):
         '''Get new entries, tag them and add to history'''
         # see https://github.com/brokkr/poca/wiki/Architecture#wantedindex
         output.downloading(entry)
         wantedindex = self.wanted.lst.index(uid) - len(self.failed)
         outcome = files.download_file(entry['poca_url'],
-                                      entry['poca_abspath'], config.prefs)
+                                      entry['poca_abspath'], self.config.prefs)
         if outcome.success:
-            outcome = tag.tag_audio_file(config.prefs, self.sub, entry)
+            outcome = tag.tag_audio_file(self.config.prefs, self.sub, entry)
             if not outcome.success:
                 output.tag_fail(outcome)
                 # add to failed?
