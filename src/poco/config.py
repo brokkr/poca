@@ -36,10 +36,9 @@ class Config:
         self.args = args
         xml_root = self.get_xml()
         self.xml = xml_root
-        settings = DEFAULT_SETTINGS
-        for x in xml_root.xpath('./settings/*'):
-            settings[x.tag] = x
-        self.settings = settings[0] if len(settings) > 0 else SETTINGS
+        self.settings = DEFAULT_SETTINGS
+        for element in xml_root.xpath('./settings/*'):
+            self.settings[element.tag] = element
         defaults = xml_root.xpath('./defaults')
         self.defaults = defaults[0] if len(defaults) > 0 else DEFAULTS
         self.subs = xml_root.xpath('./subscriptions/subscription[title][url]')
