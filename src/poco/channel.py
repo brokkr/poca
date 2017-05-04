@@ -30,7 +30,7 @@ class Channel:
         for element in defaults.xpath('./metadata|./filters'):
             self.extend(sub[element.tag], element)
         self.sub = sub
-        self.sub_dir = os.path.join(config.prefs.base_dir.text,
+        self.sub_dir = os.path.join(config.settings.base_dir.text,
                                     self.sub.title.text)
         self.ctitle = self.sub.title.text.upper()
 
@@ -95,7 +95,7 @@ class Channel:
         # download cover image
         if self.downed and self.feed.image:
             outcome = files.download_img_file(self.feed.image, self.sub_dir,
-                                              self.config.prefs)
+                                              self.config.settings)
 
         # print summary of operations in file log
         output.summary(self.ctitle, self.udeleted, self.removed,
@@ -120,9 +120,9 @@ class Channel:
         output.downloading(entry)
         wantedindex = self.wanted.lst.index(uid) - len(self.failed)
         outcome = files.download_file(entry['poca_url'],
-                                      entry['poca_abspath'], self.config.prefs)
+                                      entry['poca_abspath'], self.config.settings)
         if outcome.success:
-            outcome = tag.tag_audio_file(self.config.prefs, self.sub, entry)
+            outcome = tag.tag_audio_file(self.config.settings, self.sub, entry)
             if not outcome.success:
                 output.tag_fail(outcome)
                 # add to failed?

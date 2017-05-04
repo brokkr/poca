@@ -19,7 +19,7 @@ def main():
     stream_logger = poco.loggers.start_streamlogger(args)
     config = poco.config.Config(args)
     summary_logger = poco.loggers.start_summarylogger(args, config.paths,
-                                                      config.prefs)
+                                                      config.settings)
     for sub in config.subs:
         channel = poco.channel.Channel(config, sub)
         channel.make_plans()

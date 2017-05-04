@@ -16,11 +16,13 @@ from lxml import etree, objectify
 from poco import files, output, xmlconf
 
 
-DEFAULT_SETTINGS = {'base_dir' : '/tmp/poca',
-                    'id3encoding' : 'utf8',
-                    'id3removev1' : 'yes',
-                    'useragent' : ''}
-DEFAULT_DEFAULTS = objectify.Element("defaults")
+SETTINGS = objectify.Element("settings")
+DEFAULTS = objectify.Element("defaults")
+E = objectify.E
+DEFAULT_SETTINGS = E.root(E.base_dir('/tmp/poca'),
+                          E.id3encoding('utf8'),
+                          E.id3removev1('yes'),
+                          E.useragent(''))
 
 def confquit(msg):
     '''Something wasn't right about the preferences. Leave'''
@@ -33,18 +35,14 @@ class Config:
         self.paths = Paths()
         self.args = args
         xml_root = self.get_xml()
-        required_nodes = ['settings', 'subscriptions']
-        if not all(hasattr(xml_root, attr) for attr in required_nodes):
-            confquit('Missing \'settings\' or \'subscriptions\' tag.')
-        self.prefs = xml_root.settings
-        self.defaults = xml_root.defaults if hasattr(xml_root, 'defaults') \
-                        else DEFAULT_DEFAULTS
-        required_attrs = ['title', 'url']
-        self.subs = [sub for sub in xml_root.subscriptions.iterchildren() \
-                     if all(hasattr(sub, attr) for attr in required_attrs)]
-        for tag in DEFAULT_SETTINGS:
-            self.prefs[tag] = self.prefs[tag] if hasattr(self.prefs, tag) \
-                              else DEFAULT_SETTINGS[tag]
+        self.xml = xml_root
+        settings = DEFAULT_SETTINGS
+        for x in xml_root.xpath('./settings/*'):
+            settings[x.tag] = x
+        self.settings = settings[0] if len(settings) > 0 else SETTINGS
+        defaults = xml_root.xpath('./defaults')
+        self.defaults = defaults[0] if len(defaults) > 0 else DEFAULTS
+        self.subs = xml_root.xpath('./subscriptions/subscription[title][url]')
 
     def get_xml(self):
         '''Returns the XML tree root harvested from the users poca.xml file.'''
