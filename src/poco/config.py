@@ -20,6 +20,7 @@ DEFAULT_SETTINGS = {'base_dir' : '/tmp/poca',
                     'id3encoding' : 'utf8',
                     'id3removev1' : 'yes',
                     'useragent' : ''}
+DEFAULT_DEFAULTS = objectify.Element("defaults")
 
 def confquit(msg):
     '''Something wasn't right about the preferences. Leave'''
@@ -36,7 +37,8 @@ class Config:
         if not all(hasattr(xml_root, attr) for attr in required_nodes):
             confquit('Missing \'settings\' or \'subscriptions\' tag.')
         self.prefs = xml_root.settings
-        self.defaults = xml_root.defaults
+        self.defaults = xml_root.defaults if hasattr(xml_root, 'defaults') \
+                        else DEFAULT_DEFAULTS
         required_attrs = ['title', 'url']
         self.subs = [sub for sub in xml_root.subscriptions.iterchildren() \
                      if all(hasattr(sub, attr) for attr in required_attrs)]

@@ -12,6 +12,7 @@
 import os
 import re
 import sys
+from copy import deepcopy
 
 import feedparser
 
@@ -24,16 +25,9 @@ class Channel:
     first, then acts on them and updates the db as it goes.'''
     def __init__(self, config, sub):
         self.config = config
-        #self.test_inherit(sub)
-        #sub_set = {element.tag for element in sub.iterchildren()}
-        #default_set = {element.tag for element in config.defaults.iterchildren()}
-        #def_additions = default_set.difference(sub_set)
-        #sub.extend([config.defaults[el_tag] for el_tag in def_additions])
-        #self.test_inherit(sub)
-        #for element in config.defaults.xpath('./metadata|./filters'):
-        #    sub[element.tag].extend(element.iterchildren())
-        self.extend(sub, config.defaults)
-        for element in config.defaults.xpath('./metadata|./filters'):
+        defaults = deepcopy(config.defaults)
+        self.extend(sub, defaults)
+        for element in defaults.xpath('./metadata|./filters'):
             self.extend(sub[element.tag], element)
         self.sub = sub
         self.sub_dir = os.path.join(config.prefs.base_dir.text,
@@ -47,17 +41,8 @@ class Channel:
         additions = extend_set.difference(base_set)
         base.extend([extension[el_tag] for el_tag in additions])
 
-        ### PART 0: TEST
-    def test_inherit(self, element):
-        for subel in element.iterchildren():
-            print(subel.tag, subel.text)
-            print()
-
-
-        ### PART 1: PLANS
-
-    def run(self):
-        '''Putting it all together'''
+    def make_plans(self):
+        '''Calculate what files to get and what files to dump'''
         # see that we can write to the designated directory
         outcome = files.check_path(self.sub_dir)
         self.check_outcome(outcome)
@@ -83,8 +68,8 @@ class Channel:
                      len(self.lacking))
         self.removed, self.downed, self.failed = [], [], []
 
-        ### PART 2: ACTION
-
+    def follow_through(self):
+        '''Act on the plans laid out'''
         # loop through user deleted and indicate recognition
         for entry in self.udeleted:
             output.notice_udeleted(entry)

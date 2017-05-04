@@ -22,7 +22,8 @@ def main():
                                                       config.prefs)
     for sub in config.subs:
         channel = poco.channel.Channel(config, sub)
-        channel.run()
+        channel.make_plans()
+        channel.follow_through()
     if summary_logger.poca_email_handler:
         summary_logger.poca_email_handler.close()
         outcome = summary_logger.poca_email_handler.outcome
