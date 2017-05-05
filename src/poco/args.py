@@ -23,4 +23,6 @@ def get_args():
                         help='Output to file in poca config directory')
     parser.add_argument('-e', '--email', action='store_true', default=False,
                         help='Output to email (set in config)')
+    parser.add_argument('-c', '--config',
+                        help='Use alternate config directory')
     return parser.parse_args()

@@ -32,7 +32,7 @@ def confquit(msg):
 class Config:
     '''Collection of all configuration options'''
     def __init__(self, args):
-        self.paths = Paths()
+        self.paths = Paths(args)
         self.args = args
         xml_root = self.get_xml()
         self.xml = xml_root
@@ -56,12 +56,21 @@ class Config:
 
 class Paths:
     '''Returns a dictionary with path settings'''
-    def __init__(self):
-        self.config_dir = path.expanduser(path.join('~', '.poca'))
+    def __init__(self, args):
+        if args.config:
+            self.config_dir = self.expandall(args.config)
+        else:
+            self.config_dir = self.expandall(path.join('~', '.poca'))
         self.config_file = path.join(self.config_dir, 'poca.xml')
         self.db_dir = path.join(self.config_dir, 'db')
         self.log_file = path.join(self.config_dir, 'poca.log')
         self.test_paths()
+
+    def expandall(self, _path):
+        '''turn var into full absolute path'''
+        _path = path.expandvars(path.expanduser(_path))
+        _path = path.abspath(_path)
+        return _path
 
     def test_paths(self):
         '''Checks for presence of ~/.poca and ~/.poca/poca.xml'''

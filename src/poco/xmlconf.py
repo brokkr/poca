@@ -13,28 +13,35 @@ from poco.outcome import Outcome
 
 
 TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
-<poca version="0.7">
+<poca version="0.8">
 
     <!-- Please see detailed configuration documentation online:
      https://github.com/brokkr/poca/wiki/Configuration -->
 
+    <!-- The meaning of the settings options are briefly as follows:
+    * base_dir: directory containing the individual subscription folders
+    * id3encoding: encoding to use on metadata (utf8 or latin1)
+    * id3removev1: should we remove id3v1, only keeping v2 (yes or no)
+    * useragent: _fallback_ user agent if connection is rejected for
+      default python user agent. Leave empty not to use a fallback.
+    * email logging setup not included by default, see wiki for details.
+    -->
+
     <settings>
-
-        <!-- The meaning of the settings options are briefly as follows:
-        * base_dir: directory containing the individual subscription folders
-        * id3encoding: encoding to use on metadata (utf8 or latin1)
-        * id3removev1: should we remove id3v1, only keeping v2 (yes or no)
-        * useragent: _fallback_ user agent if connection is rejected for
-          default python user agent. Leave empty not to use a fallback.
-        * email logging setup not included by default, see wiki for details.
-        -->
-
         <base_dir>/tmp/poca</base_dir>
         <id3encoding>utf8</id3encoding>
         <id3removev1>yes</id3removev1>
         <useragent></useragent>
-
     </settings>
+
+    <!-- defaults take the same options as any single subscription. a
+    setting here, e.g. max_number, is applied to all subscriptions but
+    always overruled by sub-specific settings. non-overruling settings in
+    metadata and filters are combined, e.g. a sub-specific 'artist' tag and
+    a global 'genre' tag -->
+
+    <defaults>
+    </defaults>
 
     <subscriptions>
 
