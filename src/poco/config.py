@@ -7,7 +7,7 @@
 # the Free Software Foundation, either version 3 of the License,
 # or (at your option) any later version.
 
-"""A terrible, horrible, not good, very bad configuration parser"""
+"""A config parser using lxml objectify and XPath"""
 
 import sys
 from os import path
