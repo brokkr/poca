@@ -13,7 +13,7 @@ import argparse
 from poco import about
 
 
-def get_args():
+def get_poca_args():
     '''Returns arguments from a command line argument parser'''
     blurb = "Poca " + about.VERSION + " : " + about.DESCRIPTION
     parser = argparse.ArgumentParser(description=blurb)
@@ -25,4 +25,16 @@ def get_args():
                         help='Output to email (set in config)')
     parser.add_argument('-c', '--config',
                         help='Use alternate config directory')
+    return parser.parse_args()
+
+def get_poca_subscribe_args():
+    '''Returns arguments from a command line argument parser'''
+    blurb = "poca-subscribe " + about.VERSION + " : " + about.DESCRIPTION_SUB
+    parser = argparse.ArgumentParser(description=blurb)
+    parser.add_argument('-d', '--delete',
+                        help='Remove subscription, delete audio files')
+    parser.add_argument('-a', '--add',
+                        help='Add url to list of subscriptions')
+    parser.add_argument('-s', '--search',
+                        help='Search for title in podcast database')
     return parser.parse_args()

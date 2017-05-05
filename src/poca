@@ -15,7 +15,7 @@ import poco
 
 def main():
     '''Main script'''
-    args = poco.args.get_args()
+    args = poco.args.get_poca_args()
     stream_logger = poco.loggers.start_streamlogger(args)
     config = poco.config.Config(args)
     summary_logger = poco.loggers.start_summarylogger(args, config.paths,
