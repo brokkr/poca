@@ -15,9 +15,23 @@ import poco
 
 def main():
     '''Main script'''
-    args = poco.args.get_args()
+    args = poco.args.get_poca_subscribe_args()
     stream_logger = poco.loggers.start_streamlogger(args)
     config = poco.config.Config(args)
+
+
+def search(root, search_term):
+    search_str = './subscriptions/subscription[contains(title, "%s")]' % searchterm
+    results = root.xpath(search_str)
+    return results
+
+def delete(root, search_term):
+    results = search(root, search_term)
+    for result in results:
+        root.subscriptions.remove(result)
+    root_str = etree.tostring(root, pretty_print=True, xml_declaration=True)
+    with open('/tmp/test.xml') as f:
+        f.write(root_str)
 
 if __name__ == '__main__':
     try:
