@@ -13,7 +13,7 @@
 
 import os
 import shutil
-from lxml import etree
+from lxml import etree, objectify
 import poco
 
 def main():
@@ -24,6 +24,8 @@ def main():
     config = poco.config.Config(args)
     if args.delete:
         delete(config, args.delete)
+    if args.add:
+        add(config, args.add)
 
 
 def search(root, search_term):
@@ -51,10 +53,22 @@ def delete(config, search_term):
             removals.append(result.title.text)
     if not removals:
         return
-    root_str = etree.tostring(config.xml, pretty_print=True, 
+    root_str = etree.tostring(config.xml, pretty_print=True,
                               xml_declaration=True)
     with open(config.paths.config_file, 'wb') as f:
         f.write(root_str)
+
+def add(config, title):
+    '''A quick and dirty add-a-sub function'''
+    new_sub = objectify.SubElement(config.xml.subscriptions, "subscription")
+    setattr(new_sub, 'title', title)
+    new_url = input("Please enter the url of \"%s\": " % title)
+    setattr(new_sub, 'url', new_url)
+    objectify.deannotate(new_sub, cleanup_namespaces=True)
+    root_str = etree.tostring(config.xml, pretty_print=True)
+    with open(config.paths.config_file, 'wb') as f:
+        f.write(root_str)
+
 
 if __name__ == '__main__':
     try:
