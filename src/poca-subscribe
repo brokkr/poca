@@ -11,26 +11,49 @@
 """A subscription management tool for poca"""
 
 
+import os
+import shutil
+from lxml import etree
 import poco
 
 def main():
     '''Main script'''
     args = poco.args.get_poca_subscribe_args()
+    args.quiet, args.config = (False, False)
     stream_logger = poco.loggers.start_streamlogger(args)
     config = poco.config.Config(args)
+    if args.delete:
+        delete(config, args.delete)
 
 
 def search(root, search_term):
-    search_str = './subscriptions/subscription[contains(title, "%s")]' % searchterm
+    search_str = './subscriptions/subscription[contains(title, "%s")]' % search_term
     results = root.xpath(search_str)
     return results
 
-def delete(root, search_term):
-    results = search(root, search_term)
+def delete(config, search_term):
+    '''Remove xml subscription and delete audio and log files'''
+    results = search(config.xml, search_term)
+    removals = []
     for result in results:
-        root.subscriptions.remove(result)
-    root_str = etree.tostring(root, pretty_print=True, xml_declaration=True)
-    with open('/tmp/test.xml') as f:
+        verify = input("\"%s\" matches your query. "
+                       "Remove subscription (Y/n)? " % result.title)
+        if not verify or verify.lower() == 'y':
+            config.xml.subscriptions.remove(result)
+            sub_dir = os.path.join(config.settings.base_dir.text,
+                                   result.title.text)
+            db_file = os.path.join(config.paths.db_dir, result.title.text)
+            try:
+                shutil.rmtree(sub_dir)
+                os.remove(db_file)
+            except FileNotFoundError:
+                pass
+            removals.append(result.title.text)
+    if not removals:
+        return
+    root_str = etree.tostring(config.xml, pretty_print=True, 
+                              xml_declaration=True)
+    with open(config.paths.config_file, 'wb') as f:
         f.write(root_str)
 
 if __name__ == '__main__':
