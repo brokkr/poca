@@ -20,5 +20,6 @@ from . import files
 from . import id3v24_frames
 from . import history
 from . import loggers
+from . import subscribe
 from . import xmlconf
 from . import tag
