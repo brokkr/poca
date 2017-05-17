@@ -15,10 +15,10 @@ import shutil
 from lxml import etree, objectify
 
 
-def search(root, search_term):
+def search(root, search_tag, search_term):
     '''Takes a query and returns subscriptions with matching titles'''
-    search_str = './subscriptions/subscription[contains(title, "%s")]' % \
-                 search_term
+    search_str = './subscriptions/subscription[contains(%s, "%s")]' % \
+                 (search_tag, search_term)
     results = root.xpath(search_str)
     return results
 
@@ -30,7 +30,10 @@ def write(config):
 
 def delete(config, args):
     '''Remove xml subscription and delete audio and log files'''
-    results = search(config.xml, args.title)
+    if args.title:
+        results = search(config.xml, 'title', args.title)
+    elif args.url:
+        results = search(config.xml, 'url', args.url)
     if not results:
         print("No titles match your query.")
         return
