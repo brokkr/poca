@@ -23,10 +23,12 @@ def main():
     if args.cmd_name == 'delete':
         poco.subscribe.delete(config, args)
     elif args.cmd_name == 'add':
-        sub_dic = poco.subscribe.user_input_add_sub()
-        poco.subscribe.add_sub(config, sub_dic)
+        sub_dic, sub_category = poco.subscribe.user_input_add_sub()
+        poco.subscribe.add_sub(config, sub_category, sub_dic)
     elif args.cmd_name == 'list':
         poco.subscribe.list_subs(config)
+    elif args.cmd_name == 'state':
+        poco.subscribe.set_state(config)
     elif args.cmd_name == 'search':
         pass
 

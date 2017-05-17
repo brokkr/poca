@@ -59,13 +59,16 @@ def user_input_add_sub():
         sub_dic['url'] = input("* Url of subscription? ")
     sub_dic['max_number'] = input("Maximum number of files in subscription? ")
     sub_dic['from_the_top'] = input("Get earliest entries first (yes/No)? ")
+    sub_category = input("Category for subscription? ")
     print("To add metadata or filters settings, please edit poca.xml")
     sub_dic = {key: sub_dic[key] for key in sub_dic if sub_dic[key]}
-    return sub_dic
+    return (sub_dic, sub_category)
 
-def add_sub(config, sub_dic):
+def add_sub(config, sub_category, sub_dic):
     '''A quick and dirty add-a-sub function'''
     new_sub = objectify.SubElement(config.xml.subscriptions, "subscription")
+    if sub_category:
+        new_sub.set('category', sub_category)
     for key in sub_dic:
         setattr(new_sub, key, sub_dic[key])
     objectify.deannotate(new_sub, cleanup_namespaces=True)
@@ -73,8 +76,39 @@ def add_sub(config, sub_dic):
 
 def list_subs(config):
     '''A simple columned output of subscriptions and their urls'''
+    subs_lst = config.subs.xpath('./subscription')
+    cats_dic = {sub.get('category'): [] for sub in subs_lst}
+    for sub in subs_lst:
+        cats_dic[sub.get('category')].append(sub)
+    for key in cats_dic:
+        if key:
+            print(key.upper())
+            print(''.ljust(len(key),'-'))
+        else:
+            print('NO CATEGORY')
+            print(''.ljust(11,'-'))
+        for sub in cats_dic[key]:
+            title = sub.title.text[:30].ljust(35)
+            print(title, sub.url)
+        print()
+
+def set_state(config):
     subs_lst = config.xml.xpath('./subscriptions/subscription')
     for sub in subs_lst:
-        title = sub.title.text[:30].ljust(35)
-        print(title, sub.url)
-
+        state = sub.get('state') if 'state' in sub.attrib else 'active'
+        state_input = input("%s is currently %s. Set to active (a) "
+                            "or inactive (i)? " % (sub.title.text, state))
+        state_dic = {'a': 'active', 'i': 'inactive'}
+        try:
+            state = state_dic[state_input]
+        except KeyError:
+            continue
+        sub.set('state', state)
+        if state_input == 'i':
+            sub_dir = os.path.join(config.settings.base_dir.text,
+                                   sub.title.text)
+            try:
+                shutil.rmtree(sub_dir)
+            except FileNotFoundError:
+                pass
+    write(config)

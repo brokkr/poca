@@ -20,7 +20,9 @@ def main():
     config = poco.config.Config(args)
     summary_logger = poco.loggers.start_summarylogger(args, config.paths,
                                                       config.settings)
-    for sub in config.subs:
+    xp_str = './subscription[not(@state="inactive")][title][url]'
+    valid_subs = config.subs.xpath(xp_str)
+    for sub in valid_subs:
         channel = poco.channel.Channel(config, sub)
         channel.make_plans()
         channel.follow_through()
