@@ -31,10 +31,12 @@ def get_poca_subscribe_args():
     '''Returns arguments from a command line argument parser'''
     blurb = "poca-subscribe " + about.VERSION + " : " + about.DESCRIPTION_SUB
     parser = argparse.ArgumentParser(description=blurb)
+    parser.add_argument('-c', '--config',
+                        help='Use alternate config directory')
     parser.add_argument('-d', '--delete',
                         help='Remove subscription, delete audio files')
     parser.add_argument('-a', '--add',
-                        help='Add url to list of subscriptions')
+                        help='Add title to list of subscriptions')
     parser.add_argument('-s', '--search',
                         help='Search for title in podcast database')
     return parser.parse_args()
