@@ -22,9 +22,15 @@ def search(root, search_term):
     results = root.xpath(search_str)
     return results
 
-def delete(config, search_term):
+def write(config):
+    '''Writes the resulting config file back to poca.xml'''
+    root_str = etree.tostring(config.xml, pretty_print=True)
+    with open(config.paths.config_file, 'wb') as f:
+        f.write(root_str)
+
+def delete(config, args):
     '''Remove xml subscription and delete audio and log files'''
-    results = search(config.xml, search_term)
+    results = search(config.xml, args.title)
     if not results:
         print("No titles match your query.")
         return
@@ -43,18 +49,32 @@ def delete(config, search_term):
                 pass
     write(config)
 
-def add(config, title):
+def user_input_add_sub():
+    '''Get user input for new subscription'''
+    sub_dic = {'title': '', 'url': ''}
+    print("Press enter to skip setting (except * mandatory)")
+    while not sub_dic['title']:
+        sub_dic['title'] = input("* Title of subscription? ")
+    while not sub_dic['url']:
+        sub_dic['url'] = input("* Url of subscription? ")
+    sub_dic['max_number'] = input("Maximum number of files in subscription? ")
+    sub_dic['from_the_top'] = input("Get earliest entries first (yes/No)? ")
+    print("To add metadata or filters settings, please edit poca.xml")
+    sub_dic = {key: sub_dic[key] for key in sub_dic if sub_dic[key]}
+    return sub_dic
+
+def add_sub(config, sub_dic):
     '''A quick and dirty add-a-sub function'''
     new_sub = objectify.SubElement(config.xml.subscriptions, "subscription")
-    setattr(new_sub, 'title', title)
-    new_url = input("Please enter the url of \"%s\": " % title)
-    setattr(new_sub, 'url', new_url)
+    for key in sub_dic:
+        setattr(new_sub, key, sub_dic[key])
     objectify.deannotate(new_sub, cleanup_namespaces=True)
     write(config)
 
-def write(config):
-    '''Writes the resulting config file back to poca.xml'''
-    root_str = etree.tostring(config.xml, pretty_print=True)
-    with open(config.paths.config_file, 'wb') as f:
-        f.write(root_str)
+def list_subs(config):
+    '''A simple columned output of subscriptions and their urls'''
+    subs_lst = config.xml.xpath('./subscriptions/subscription')
+    for sub in subs_lst:
+        title = sub.title.text[:30].ljust(35)
+        print(title, sub.url)
 

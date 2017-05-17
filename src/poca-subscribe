@@ -17,14 +17,18 @@ import poco
 def main():
     '''Main script'''
     args = poco.args.get_poca_subscribe_args()
-    args.quiet, args.config = (False, False)
+    args.quiet = False
     stream_logger = poco.loggers.start_streamlogger(args)
     config = poco.config.Config(args)
-    if args.delete:
-        poco.subscribe.delete(config, args.delete)
-    elif args.add:
-        poco.subscribe.add(config, args.add)
-
+    if args.cmd_name == 'delete':
+        poco.subscribe.delete(config, args)
+    elif args.cmd_name == 'add':
+        sub_dic = poco.subscribe.user_input_add_sub()
+        poco.subscribe.add_sub(config, sub_dic)
+    elif args.cmd_name == 'list':
+        poco.subscribe.list_subs(config)
+    elif args.cmd_name == 'search':
+        pass
 
 if __name__ == '__main__':
     try:

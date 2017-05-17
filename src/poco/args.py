@@ -33,10 +33,10 @@ def get_poca_subscribe_args():
     parser = argparse.ArgumentParser(description=blurb)
     parser.add_argument('-c', '--config',
                         help='Use alternate config directory')
-    parser.add_argument('-d', '--delete',
-                        help='Remove subscription, delete audio files')
-    parser.add_argument('-a', '--add',
-                        help='Add title to list of subscriptions')
-    parser.add_argument('-s', '--search',
-                        help='Search for title in podcast database')
+    subparsers = parser.add_subparsers(dest='cmd_name', help='Available commands')
+    add_parser = subparsers.add_parser('add', help='Add a new subscription interactively')
+    del_parser = subparsers.add_parser('delete', help='Remove subscription, delete files')
+    del_parser.add_argument('-t', '--title', help='Match against subscription title')
+    search_parser = subparsers.add_parser('search', help='Search for title in podcast database')
+    list_parser = subparsers.add_parser('list', help='List current subscriptions')
     return parser.parse_args()
