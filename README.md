@@ -9,8 +9,8 @@ With Poca you can set custom options for each individual subscription.
    before deleting old episodes to make room for new ones.
  * **Override ID3 metadata**. If you want 'Savage Love' to have Dan 
    Savage in the artist field (rather than The Stranger), poca will 
-   automatically update the metadata upon download of each new episode. Or tag
-   all your podcasts with 'podcast' as genre. All
+   automatically update the metadata upon download of each new episode. Or set
+   'genre' to be overridden by 'podcast' as a default. All
    [fields](https://github.com/brokkr/poca/wiki/ID3-frames) are open.
  * **Filter a feed** using criteria such as filename and title, or the hour,
    weekday or date of publishing. Only want news reports in the morning or on
@@ -22,10 +22,14 @@ With Poca you can set custom options for each individual subscription.
  * **Keeping track**. Poca logs downloads and removals to a local file so you
    easily see what's changed. Or configure it with an SMTP server and get
    notified when a feed stops working (new in 0.7).
+ * **Manage your subscriptions** by editing an easy-to-understand xml file. Or use
+   the accompanying tool to add, delete, and sort them (new in 0.8)
 
 Poca also: has excellent unicode support for feeds, filenames and tags, gets 
-cover images for feeds, has the ability to spoof user agents, remembers which
-downloads actually completed, and more. See the [Configuration](https://github.com/brokkr/poca/wiki/Configuration) section of the
+cover images for feeds, has the ability to spoof user agents, can pause your
+subscriptions, remembers which downloads actually completed, and more. 
+
+See the [Configuration](https://github.com/brokkr/poca/wiki/Configuration) section of the
 wiki for more details on features.
 
 ### Interface
@@ -57,6 +61,6 @@ To remove Poca - having installed it using pip - simply do:
 
 ### Dependencies
  * You will need Python 3 for setup and running the program.
- * The following third-party modules are required: feedparser, mutagen.
+ * The following third-party modules are required: feedparser, lxml, mutagen.
  * Pip can install both of these using 'pip3 install [name of module]' 
 
