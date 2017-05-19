@@ -15,11 +15,7 @@ from distutils.core import setup
 
 setup(
     name='poca',
-<<<<<<< HEAD
-    version='rev281',
-=======
-    version='rev280',
->>>>>>> c8d6f6eeaec384384c75701675ae7b00893fe390
+    version='rev284',
     license='GPL3',
     description='a command line podcast client',
     long_description='A cron-friendly, disk-space-conscious, command line'
