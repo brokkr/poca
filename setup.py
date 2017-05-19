@@ -15,7 +15,7 @@ from distutils.core import setup
 
 setup(
     name='poca',
-    version='rev287',
+    version='rev288',
     license='GPL3',
     description='a command line podcast client',
     long_description='A cron-friendly, disk-space-conscious, command line'
@@ -26,7 +26,8 @@ setup(
     scripts=['src/poca', 'src/poca-subscribe'],
     packages=['poco'],
     package_dir={'poco': 'src/poco'},
-    data_files=[('share/man/man1', ["man/poca.1"])],
+    data_files=[('share/man/man1', ["man/poca.1"]),
+                ('share/man/man1', ["man/poca-subscribe.1"])],
     requires=['feedparser', 'lxml', 'mutagen'],
     provides=['poco'],
     platforms=['POSIX'],
