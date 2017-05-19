@@ -46,6 +46,10 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
     <subscriptions>
 
         <!-- The meaning of the subscription options are brifly as follows:
+        * category: a category attribute on a subscription tag is helpful in 
+                    organizing the output of 'poca-subscribe list'.
+        * state: a state attribute is either 'active' or 'inactive'. inactive
+                 subs are not updated. subs without state attribute are active.
         * title: Name used for the folder of the subscription (required)
         * url: The address of the rss feed (required)
         * max_number: Max number of files to keep in subscription (optional)
@@ -60,7 +64,7 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
           * after_date: Only use entries published after date specified.
         -->
 
-        <subscription>
+        <subscription category="news">
             <title>example 1 - basic unlimited</title>
             <url>http://www.npr.org/rss/podcast.php?id=500005</url>
         </subscription>
@@ -82,7 +86,7 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
             </metadata>
         </subscription>
 
-        <subscription>
+        <subscription state="inactive">
             <title>example 4 - filter based on weekday of publishing (only tuesdays)</title>
             <url>http://www.bbc.co.uk/programmes/p002vsnk/episodes/downloads.rss</url>
             <max_number>2</max_number>
