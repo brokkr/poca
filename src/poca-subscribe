@@ -28,7 +28,7 @@ def main():
     elif args.cmd_name == 'list':
         poco.subscribe.list_subs(config)
     elif args.cmd_name == 'toggle':
-        poco.subscribe.toggle(config)
+        poco.subscribe.toggle(config, args)
 
 if __name__ == '__main__':
     try:

@@ -37,9 +37,11 @@ def get_poca_subscribe_args():
                  description='\'poca-subscribe command --help\' for futher '
                              'information')
     add_parser = subparsers.add_parser('add', help='Add a new subscription interactively')
+    list_parser = subparsers.add_parser('list', help='List current subscriptions')
     del_parser = subparsers.add_parser('delete', help='Remove subscription, delete files')
     del_parser.add_argument('-t', '--title', help='Match against subscription title')
     del_parser.add_argument('-u', '--url', help='Match against subscription url')
-    list_parser = subparsers.add_parser('list', help='List current subscriptions')
-    state_parser = subparsers.add_parser('toggle', help='Set state of current subscriptions')
+    toggle_parser = subparsers.add_parser('toggle', help='Set state of current subscriptions')
+    toggle_parser.add_argument('-t', '--title', help='Match against subscription title')
+    toggle_parser.add_argument('-u', '--url', help='Match against subscription url')
     return parser.parse_args()

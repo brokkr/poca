@@ -34,13 +34,17 @@ def delete(config, args):
         results = search(config.xml, 'title', args.title)
     elif args.url:
         results = search(config.xml, 'url', args.url)
+    else:
+        results = config.xml.subscriptions.xpath('./subscription')
     if not results:
         print("No titles match your query.")
         return
     for result in results:
         verify = input("\"%s\" matches your query. "
-                       "Remove subscription (Y/n)? " % result.title)
-        if not verify or verify.lower() == 'y':
+                       "Remove subscription (y/N)? " % result.title)
+        if not verify or verify.lower() != 'y':
+            continue
+        else:
             config.xml.subscriptions.remove(result)
             sub_dir = os.path.join(config.settings.base_dir.text,
                                    result.title.text)
@@ -95,21 +99,29 @@ def list_subs(config):
             print(title, sub.url)
         print()
 
-def toggle(config):
-    subs_lst = config.xml.xpath('./subscriptions/subscription')
-    for sub in subs_lst:
-        state = sub.get('state') if 'state' in sub.attrib else 'active'
+def toggle(config, args):
+    '''Toggle subscription state between 'active' and 'inactive' '''
+    if args.title:
+        results = search(config.xml, 'title', args.title)
+    elif args.url:
+        results = search(config.xml, 'url', args.url)
+    else:
+        results = config.xml.subscriptions.xpath('./subscription')
+    if not results:
+        print("No titles match your query.")
+    for result in results:
+        state = result.get('state') if 'state' in result.attrib else 'active'
         state_input = input("%s is currently %s. Set to active (a) "
-                            "or inactive (i)? " % (sub.title.text, state))
+                            "or inactive (i)? " % (result.title.text, state))
         state_dic = {'a': 'active', 'i': 'inactive'}
         try:
             state = state_dic[state_input]
         except KeyError:
             continue
-        sub.set('state', state)
+        result.set('state', state)
         if state_input == 'i':
             sub_dir = os.path.join(config.settings.base_dir.text,
-                                   sub.title.text)
+                                   result.title.text)
             try:
                 shutil.rmtree(sub_dir)
             except FileNotFoundError:
