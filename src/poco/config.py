@@ -41,7 +41,7 @@ class Config:
             self.settings[element.tag] = element
         defaults = xml_root.xpath('./defaults')
         self.defaults = defaults[0] if len(defaults) > 0 else DEFAULTS
-        self.subs = xml_root.xpath('./subscriptions/subscription[title][url]')
+        self.subs = self.xml.subscriptions
 
     def get_xml(self):
         '''Returns the XML tree root harvested from the users poca.xml file.'''

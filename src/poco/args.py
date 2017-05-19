@@ -42,4 +42,5 @@ def get_poca_subscribe_args():
     del_parser.add_argument('-u', '--url', help='Match against subscription url')
     search_parser = subparsers.add_parser('search', help='Search for title in podcast database')
     list_parser = subparsers.add_parser('list', help='List current subscriptions')
+    state_parser = subparsers.add_parser('state', help='Set state of current subscriptions')
     return parser.parse_args()
