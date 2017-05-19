@@ -95,7 +95,7 @@ def list_subs(config):
             print(title, sub.url)
         print()
 
-def set_state(config):
+def toggle(config):
     subs_lst = config.xml.xpath('./subscriptions/subscription')
     for sub in subs_lst:
         state = sub.get('state') if 'state' in sub.attrib else 'active'

@@ -27,10 +27,8 @@ def main():
         poco.subscribe.add_sub(config, sub_category, sub_dic)
     elif args.cmd_name == 'list':
         poco.subscribe.list_subs(config)
-    elif args.cmd_name == 'state':
-        poco.subscribe.set_state(config)
-    elif args.cmd_name == 'search':
-        pass
+    elif args.cmd_name == 'toggle':
+        poco.subscribe.toggle(config)
 
 if __name__ == '__main__':
     try:

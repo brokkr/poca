@@ -1,37 +1,47 @@
-.TH poca 1 User Manuals
+.TH poca 1
 .SH NAME
 poca \- A command line podcast client written in Python
 .SH SYNOPSIS
-\fBpoca [-h] [-q] [-l]
+\fBpoca [-h] [-c CONFIG_DIR] [-q] [-l] [-e]
 \f1
 .SH DESCRIPTION
-\fIPoca\f1 is a command line podcast client, written in Python. It attemps to "do one thing and do it well": Maintaing a number of podcast subscriptions in a user designated directory.
-
-Functionality-wise, the focus is - as the name hints at - to reign in its appetite: Subscribing to a feed should not mean simply downloading each new episode until the harddrive is groaning under the weight; rather it should mean having the latest episodes available while old ones are automatically phased out. This is done by specifying the amount of disk space allocated to each feed.
+\fIPoca\f1 is a command line podcast aggregator with a focus on user control. It allows the user to manage and customize their subscriptions, setting limits on the number of files, filtering feeds, automatically adjusting metadata and more.
 .SH OPTIONS
 .TP
 \fB-h\f1, \fB--help\f1
 Show help message and exit.
+.TP
+\fB-c\f1, \fB--config\f1 \fICONFIG_DIR\f1
+Use alternative configuration directory. Default is ~/.poca.
 .TP
 \fB-q\f1, \fB--quiet\f1
 Run in quiet mode. This turns off all printing to standard output which is useful when running the program as a cron job. Quiet mode does not conflict with using the logging option.
 .TP
 \fB-l\f1, \fB--logfile\f1
 Enable logging to the file 'poca.log' in the ~/.poca directory.
+.TP
+\fB-e\f1, \fB--email\f1
+Enable email logging. Requires valid email configuration in poca.xml.
 .SH FILES
-\fI$HOME/.poca\f1 is the user-specific configuration directory for \fIPoca\f1.
+\fI$HOME/.poca\f1 is the default user-specific configuration directory for \fIPoca\f1.
 
-\fI$HOME/.poca/poca.xml\f1 is the configuration file. It is written in a custom XML format, designed to be fairly intuitive. The 'settings' section has options such as where to download the audio files and optional id3 tagging and email account options. The subscriptions section contains all the subscriptions, with info about the desired title, the drive space allocated to the subscription and optional id3 tags (for supplanting or supplementing that contained in the downloaded file). For more information on the configuration file, please see \fBhttps://github.com/brokkr/poca/wiki/Configuration\f1.
+\fIpoca.xml\f1 is poca's configuration file. It is written in a custom XML format, designed to be fairly intuitive. It has three main components:
 
-\fI/etc/poca.example.xml\f1 is the supplied example configuration file. Copy it to $HOME/.poca/poca.xml and edit it to suit your needs.
+The 'settings' section has options such as where to download the audio files and optional id3 tagging and email account options.
 
-\fI$HOME/.poca/db/*\f1 is the program's memory. These files - one for each subscription - keep track of what files are currently held.
+The 'defaults' section contains subscription settings, like the maxmimum number of files to download, and apply them globally.
 
-\fI$HOME/.poca/poca.log\f1 is the log file (plaintext). The program writes all output to this file, if the -l switch is used.
+The 'subscriptions' section contains all the subscriptions in individual 'subscription' nodes.
+
+For more information on the configuration file, please see \fBhttps://github.com/brokkr/poca/wiki/Configuration\f1.
+
+\fI$CONFIG_DIR/db/*\f1 is the program's memory. These files - one for each subscription - keep track of what files are currently held.
+
+\fI$CONFIG_DIR/poca.log\f1 is the log file (plaintext). The program writes all output to this file, if the -l switch is used.
 .SH AUTHOR
 \fIPoca\f1 was written by Mads Michelsen <mail@brokkr.net>. For more information go to \fBhttps://github.com/brokkr/poca\f1
 .SH COPYRIGHT
-Copyright 2010-2016 Mads Michelsen
+Copyright 2010-2017 Mads Michelsen
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
@@ -40,5 +50,3 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program. If not, see \fBhttp://www.gnu.org/licenses/\f1
 .SH BUGS
 The author is grateful for any notification of bugs and/or requests. Please go to \fBhttps://github.com/brokkr/poca/issues\f1 to report.
-.SH COMMENTS
-This man page was written using \fBxml2man(1)\f1 by Oliver Kurth <oku@masqmail.cx>.

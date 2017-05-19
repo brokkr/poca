@@ -40,7 +40,6 @@ def get_poca_subscribe_args():
     del_parser = subparsers.add_parser('delete', help='Remove subscription, delete files')
     del_parser.add_argument('-t', '--title', help='Match against subscription title')
     del_parser.add_argument('-u', '--url', help='Match against subscription url')
-    search_parser = subparsers.add_parser('search', help='Search for title in podcast database')
     list_parser = subparsers.add_parser('list', help='List current subscriptions')
-    state_parser = subparsers.add_parser('state', help='Set state of current subscriptions')
+    state_parser = subparsers.add_parser('toggle', help='Set state of current subscriptions')
     return parser.parse_args()

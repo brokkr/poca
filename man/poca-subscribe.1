@@ -1,0 +1,40 @@
+.TH poca-subscribe 1
+.SH NAME
+poca-subscribe \- a subscription management tool for poca
+.SH SYNOPSIS
+\fBpoca [-h] [-c CONFIG_DIR] {add,delete,list,toggle}
+\f1
+.SH DESCRIPTION
+\fIPoca-subscribe\f1 is a tool to make small adjustments to poca.xml, the main configuration file for poca.
+.SH OPTIONS
+.TP
+\fB-h\f1, \fB--help\f1
+Show help message and exit.
+.TP
+\fB-c\f1, \fB--config\f1 \fICONFIG_DIR\f1
+Use alternative configuration directory. Default is ~/.poca.
+.SH COMMANDS
+.TP
+\fBadd\f1
+Add a subscription by way of a setup assistant
+.TP
+\fBdelete\f1
+Go through subscriptions one at time to delete or keep. Use [-t TITLE] or [-u URL] to narrow matching.
+.TP
+\fBlist\f1
+List all subscriptions. Grouped by subscriptions' category attribute is any.
+.TP
+\fBtoggle\f1
+Go through subscriptions one at time to set state (active or inactive). Use [-t TITLE] or [-u URL] to narrow matching.
+.SH AUTHOR
+\fIPoca-subscribe\f1 was written by Mads Michelsen <mail@brokkr.net>. For more information go to \fBhttps://github.com/brokkr/poca\f1
+.SH COPYRIGHT
+Copyright 2010-2017 Mads Michelsen
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program. If not, see \fBhttp://www.gnu.org/licenses/\f1
+.SH BUGS
+The author is grateful for any notification of bugs and/or requests. Please go to \fBhttps://github.com/brokkr/poca/issues\f1 to report.
