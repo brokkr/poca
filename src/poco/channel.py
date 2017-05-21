@@ -12,6 +12,7 @@
 import os
 import re
 import sys
+import time
 from copy import deepcopy
 
 import feedparser
@@ -254,8 +255,9 @@ class Wanted():
 
     def match_date(self, dic, filter_text):
         '''Only return episodes published after a specific date'''
+        filter_date = time.strptime(filter_text, '%Y-%m-%d')
         self.lst = [x for x in self.lst if dic[x]['published_parsed'] >
-                   filter_text]
+                   filter_date]
 
     def match_hour(self, dic, filter_text):
         '''Only return episodes published at a specific hour of the day'''
