@@ -50,7 +50,7 @@ def start_summarylogger(args, paths, prefs):
         logger.poca_file_handler = file_handler
     if args.email and hasattr(prefs, 'email'):
         bsmtp_handler = BufferSMTPHandler(prefs.email, paths)
-        loglevel = logging.ERROR if prefs.email['only_error'] == 'no' \
+        loglevel = logging.ERROR if prefs.email['only_error'] == 'yes' \
                    else logging.INFO
         bsmtp_handler.setLevel(loglevel)
         logger.addHandler(bsmtp_handler)
