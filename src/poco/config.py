@@ -16,13 +16,13 @@ from lxml import etree, objectify
 from poco import files, output, xmlconf
 
 
-SETTINGS = objectify.Element("settings")
-DEFAULTS = objectify.Element("defaults")
 E = objectify.E
 DEFAULT_SETTINGS = E.root(E.base_dir('/tmp/poca'),
                           E.id3encoding('utf8'),
                           E.id3removev1('yes'),
                           E.useragent(''))
+DEFAULTS = objectify.Element("defaults")
+SUBS = objectify.Element("subscriptions")
 
 def confquit(msg):
     '''Something wasn't right about the preferences. Leave'''
@@ -32,21 +32,21 @@ def confquit(msg):
 class Config:
     '''Collection of all configuration options'''
     def __init__(self, args):
-        self.paths = Paths(args)
         self.args = args
-        xml_root = self.get_xml()
-        self.xml = xml_root
+        self.paths = Paths(args)
+        self.xml = self.get_xml()
         self.settings = DEFAULT_SETTINGS
-        for element in xml_root.xpath('./settings/*'):
+        for element in self.xml.xpath('./settings/*'):
             self.settings[element.tag] = element
-        defaults = xml_root.xpath('./defaults')
-        self.defaults = defaults[0] if len(defaults) > 0 else DEFAULTS
-        self.subs = self.xml.subscriptions
+        defaults = self.xml.find('defaults')
+        self.defaults = defaults if defaults is not None else DEFAULTS
+        subs = self.xml.find('subscriptions')
+        self.subs = subs if subs is not None else SUBS
 
     def get_xml(self):
         '''Returns the XML tree root harvested from the users poca.xml file.'''
         try:
-            with open(self.paths.config_file, 'rb') as f:
+            with open(self.paths.config_file, 'r') as f:
                 xml_object = objectify.parse(f)
             return xml_object.getroot()
         except etree.XMLSyntaxError as e:
@@ -55,7 +55,7 @@ class Config:
             confquit(msg)
 
 class Paths:
-    '''Returns a dictionary with path settings'''
+    '''A data-holder object for all program paths'''
     def __init__(self, args):
         if args.config:
             self.config_dir = self.expandall(args.config)

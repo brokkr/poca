@@ -19,10 +19,10 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
      https://github.com/brokkr/poca/wiki/Configuration -->
 
     <!-- The meaning of the settings options are briefly as follows:
-    * base_dir: directory containing the individual subscription folders
-    * id3encoding: encoding to use on metadata (utf8 or latin1)
-    * id3removev1: should we remove id3v1, only keeping v2 (yes or no)
-    * useragent: _fallback_ user agent if connection is rejected for
+    * base_dir: Directory containing the individual subscription folders
+    * id3encoding: Encoding to use on metadata (utf8 or latin1)
+    * id3removev1: Should we remove id3v1, only keeping v2 (yes or no)
+    * useragent: _Fallback_ user agent if connection is rejected for
       default python user agent. Leave empty not to use a fallback.
     * email logging setup not included by default, see wiki for details.
     -->
@@ -34,9 +34,9 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
         <useragent></useragent>
     </settings>
 
-    <!-- defaults take the same options as any single subscription. a
+    <!-- Defaults take the same options as any single subscription. A
     setting here, e.g. max_number, is applied to all subscriptions but
-    always overruled by sub-specific settings. non-overruling settings in
+    always overruled by sub-specific settings. Non-overruling settings in
     metadata and filters are combined, e.g. a sub-specific 'artist' tag and
     a global 'genre' tag -->
 
@@ -46,9 +46,9 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
     <subscriptions>
 
         <!-- The meaning of the subscription options are brifly as follows:
-        * category: a category attribute on a subscription tag is helpful in 
+        * category: A category attribute on a subscription tag is helpful in 
                     organizing the output of 'poca-subscribe list'.
-        * state: a state attribute is either 'active' or 'inactive'. inactive
+        * state: A state attribute is either 'active' or 'inactive'. inactive
                  subs are not updated. subs without state attribute are active.
         * title: Name used for the folder of the subscription (required)
         * url: The address of the rss feed (required)
