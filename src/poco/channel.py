@@ -201,7 +201,8 @@ class Feed:
                             for entry in doc.entries}
             except (KeyError, AttributeError):
                 self.outcome = Outcome(False, 'Cant find entries in feed.')
-        if hasattr(sub, 'from_the_top'):
+        from_the_top = sub.find('from_the_top') or 'no'
+        if from_the_top == 'yes':
             self.lst.reverse()
         try:
             self.image = doc.feed.image['href']
@@ -212,7 +213,8 @@ class Combo:
     '''Constructs a container holding all combined feed and jar
     entries. Copies feed then adds non-duplicates from jar'''
     def __init__(self, feed, jar, sub, sub_dir):
-        if hasattr(sub, 'from_the_top'):
+        from_the_top = sub.find('from_the_top') or 'no'
+        if from_the_top == 'yes':
             self.lst = list(jar.lst)
             self.lst.extend(uid for uid in feed.lst if uid not in jar.lst)
         else:
