@@ -47,7 +47,7 @@ def download_file(url, file_path, settings):
         if not settings.useragent:
             return Outcome(False, str(e))
         try:
-            fakeheaders = {"User-Agent" : settings.useragent}
+            fakeheaders = {"User-Agent" : settings.useragent.text}
             request = urllib.request.Request(url, headers=fakeheaders)
             u = urllib.request.urlopen(request)
         except urllib.error.HTTPError as e:

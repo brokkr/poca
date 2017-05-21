@@ -24,8 +24,8 @@ def search(root, search_tag, search_term):
 
 def write(config):
     '''Writes the resulting config file back to poca.xml'''
-    root_str = etree.tostring(config.xml, pretty_print=True)
-    with open(config.paths.config_file, 'wb') as f:
+    root_str = etree.tostring(config.xml, encoding='unicode', pretty_print=True)
+    with open(config.paths.config_file, 'w') as f:
         f.write(root_str)
 
 def delete(config, args):
