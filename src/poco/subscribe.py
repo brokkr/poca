@@ -90,14 +90,25 @@ def list_subs(config):
         cats_dic[sub.get('category')].append(sub)
     for key in cats_dic:
         if key:
-            print(key.upper())
-            print(''.ljust(len(key),'-'))
+            heading = key.upper()
         else:
-            print('NO CATEGORY')
-            print(''.ljust(11,'-'))
+            heading = 'NO CATEGORY'
+        state = 'STATE'
+        max_no = 'MAX NO'
+        url = 'URL'
+        print(heading.ljust(32), state.ljust(10), max_no.ljust(8), url)
+        heading_line = ''.ljust(len(heading),'-').ljust(32)
+        state_line = ''.ljust(5,'-').ljust(10)
+        maxno_line = ''.ljust(6,'-').ljust(8)
+        url_line = ''.ljust(3,'-')
+        print(heading_line, state_line, maxno_line, url_line)
         for sub in cats_dic[key]:
-            title = sub.title.text[:30].ljust(35)
-            print(title, sub.url)
+            title = sub.title.text[:30].ljust(32)
+            state = sub.get('state') or 'active'
+            state = state.ljust(10)
+            max_no = sub.find('max_number') or ''
+            max_no = str(max_no).ljust(8)
+            print(title, state, max_no, sub.url)
         print()
 
 def toggle(config, args):
