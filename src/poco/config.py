@@ -83,7 +83,9 @@ class Paths:
             confquit(outcome.msg)
 
 class Sub:
+    '''Legacy class to avoid breakage with old saved subs'''
     pass
 
 class Prefs:
+    '''Legacy class to avoid breakage with old saved subs'''
     pass
