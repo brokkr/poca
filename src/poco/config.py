@@ -81,3 +81,9 @@ class Paths:
         if not path.isfile(self.config_file):
             outcome = xmlconf.write_template(self.config_file)
             confquit(outcome.msg)
+
+class Sub:
+    pass
+
+class Prefs:
+    pass
