@@ -7,7 +7,7 @@
 # the Free Software Foundation, either version 3 of the License,
 # or (at your option) any later version.
 
-"""Provides class used to return results of operations"""
+"""Provides namedtuple used to return results of operations"""
 
 from collections import namedtuple
 

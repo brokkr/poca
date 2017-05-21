@@ -21,13 +21,6 @@ def conffatal(msg):
     STREAM.fatal(msg)
 
 # subscription error reporting
-def subfatal(title, outcome):
-    '''Fatal errors encountered processing a specific subscription'''
-    err = "\N{Heavy Exclamation Mark Symbol}"
-    msg = title + '. ' + err + 'FATAL' + err + ' ' + outcome.msg
-    STREAM.fatal(msg)
-    SUMMARY.fatal(msg)
-
 def suberror(title, outcome):
     '''Non-fatal errors encountered processing a specific subscription'''
     err = "\N{Heavy Exclamation Mark Symbol}"

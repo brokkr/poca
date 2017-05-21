@@ -33,6 +33,7 @@ class Channel:
         self.sub_dir = os.path.join(config.settings.base_dir.text,
                                     self.sub.title.text)
         self.ctitle = self.sub.title.text.upper()
+        self.outcome = Outcome(True, '')
 
     def extend(self, base, extension):
         '''extend lxml objectify subelements'''
@@ -44,19 +45,25 @@ class Channel:
     def make_plans(self):
         '''Calculate what files to get and what files to dump'''
         # see that we can write to the designated directory
-        outcome = files.check_path(self.sub_dir)
-        self.check_outcome(outcome)
+        self.outcome = files.check_path(self.sub_dir)
+        if not self.outcome.success:
+            output.suberror(self.ctitle, outcome)
+            return
 
         # get jar and check for user deleted files
         self.udeleted = []
-        self.jar, outcome = history.get_subjar(self.config.paths, self.sub)
-        self.check_outcome(outcome)
+        self.jar, self.outcome = history.get_subjar(self.config.paths,
+                                                    self.sub)
+        if not self.outcome.success:
+            output.suberror(self.ctitle, outcome)
+            return
         self.check_jar()
 
         # get feed, combine with jar and filter the lot
         self.feed = Feed(self.sub, self.jar, self.udeleted)
-        if not self.feed.outcome.success:
-            output.suberror(self.ctitle, self.feed.outcome)
+        self.outcome = self.feed.outcome
+        if not self.outcome.success:
+            output.suberror(self.ctitle, self.outcome)
             return
         self.combo = Combo(self.feed, self.jar, self.sub, self.sub_dir)
         self.wanted = Wanted(self.sub, self.combo, self.jar.del_lst)
@@ -78,6 +85,9 @@ class Channel:
         for uid in self.unwanted:
             entry = self.jar.dic[uid]
             self.remove(uid, entry)
+            if not self.outcome.success:
+                output.suberror(self.ctitle, self.outcome)
+                return
 
         # loop through wanted (list) entries to acquire
         for uid in self.wanted.lst:
@@ -113,6 +123,7 @@ class Channel:
                 self.jar.del_dic[uid] = self.jar.dic.pop(uid)
         self.jar.lst = [x for x in self.jar.lst if x not in self.jar.del_lst]
         self.jar.save()
+        # currently no jar-save checks
 
     def acquire(self, uid, entry):
         '''Get new entries, tag them and add to history'''
@@ -136,26 +147,20 @@ class Channel:
         '''Add new entry to jar'''
         self.jar.lst.insert(wantedindex, uid)
         self.jar.dic[uid] = entry
-        outcome = self.jar.save()
-        self.check_outcome(outcome)
+        self.outcome = self.jar.save()
+        # currently no jar-save checks
 
     def remove(self, uid, entry):
         '''Deletes the file and removes the entry from the jar'''
         output.removing(entry)
-        outcome = files.delete_file(entry['poca_abspath'])
-        self.check_outcome(outcome)
+        self.outcome = files.delete_file(entry['poca_abspath'])
+        if not self.outcome.success:
+            return
         self.jar.lst.remove(uid)
         del(self.jar.dic[uid])
-        outcome = self.jar.save()
-        self.check_outcome(outcome)
+        self.outcome = self.jar.save()
+        # currently no jar-save checks
         self.removed.append(entry)
-
-    def check_outcome(self, outcome):
-        '''Check for fatal sub issues'''
-        if not outcome.success:
-            output.subfatal(self.ctitle, outcome)
-            sys.exit()
-
 
 class Feed:
     '''Constructs a container for feed entries'''
@@ -165,8 +170,6 @@ class Feed:
         if sub != jar.sub or udeleted:
             self.etag = None
         doc = self.update(sub)
-        if not self.outcome.success:
-            return
         self.set_entries(doc, sub)
 
     def update(self, sub):

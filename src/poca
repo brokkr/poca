@@ -25,7 +25,11 @@ def main():
     for sub in valid_subs:
         channel = poco.channel.Channel(config, sub)
         channel.make_plans()
+        if not channel.outcome.success:
+            continue
         channel.follow_through()
+        if not channel.outcome.success:
+            continue
     if summary_logger.poca_email_handler:
         summary_logger.poca_email_handler.close()
         outcome = summary_logger.poca_email_handler.outcome
