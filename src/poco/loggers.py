@@ -15,6 +15,7 @@ import smtplib
 import socket
 from email.mime.text import MIMEText
 from email.header import Header
+from lxml import etree
 
 from poco import history
 from poco.outcome import Outcome
@@ -39,7 +40,7 @@ def start_streamlogger(args):
         logger.addHandler(stream_handler)
     return logger
 
-def start_summarylogger(args, paths, prefs):
+def start_summarylogger(args, paths, settings):
     '''Starts up the summary logger (for use in file and email logging)'''
     logger = get_logger('POCASUMMARY')
     logger.poca_file_handler = None
@@ -48,9 +49,9 @@ def start_summarylogger(args, paths, prefs):
         file_handler = get_file_handler(paths)
         logger.addHandler(file_handler)
         logger.poca_file_handler = file_handler
-    if args.email and hasattr(prefs, 'email'):
-        bsmtp_handler = BufferSMTPHandler(prefs.email, paths)
-        loglevel = logging.ERROR if prefs.email['only_error'] == 'yes' \
+    if args.email and settings.find('email[fromaddr][toaddr]'):
+        bsmtp_handler = BufferSMTPHandler(settings.email, paths)
+        loglevel = logging.ERROR if settings.email['only_error'] == 'yes' \
                    else logging.INFO
         bsmtp_handler.setLevel(loglevel)
         logger.addHandler(bsmtp_handler)
