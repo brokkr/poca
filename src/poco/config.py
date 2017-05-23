@@ -12,36 +12,54 @@
 import sys
 from os import path
 from lxml import etree, objectify
+from copy import deepcopy
 
 from poco import files, output, xmlconf
 
 
 E = objectify.E
-DEFAULT_SETTINGS = E.root(E.base_dir('/tmp/poca'),
-                          E.id3encoding('utf8'),
-                          E.id3removev1('yes'),
-                          E.useragent(''))
-DEFAULTS = objectify.Element("defaults")
-SUBS = objectify.Element("subscriptions")
+DEFAULT_XML = E.poca(
+                     E.settings(
+                                E.base_dir('/tmp/poca'),
+                                E.id3encoding('utf8'),
+                                E.id3removev1('yes'),
+                                E.useragent(''),
+                                E.email(
+                                        E.only_errors('no'),
+                                        E.threshold(1),
+                                        E.host('localhost'),
+                                        E.starttls('no')
+                                       )
+                               ),
+                      E.defaults(),
+                      E.subscriptions()
+                     )
 
 def confquit(msg):
     '''Something wasn't right about the preferences. Leave'''
     output.conffatal(msg)
     sys.exit()
 
+def merge(user_el, default_el):
+   '''Updating one lxml objectify elements with another'''
+   for child in user_el.iterchildren():
+       default_child = default_el.find(child.tag)
+       if default_child is None:
+           default_el.append(child)
+           continue
+       if isinstance(child, objectify.StringElement):
+           default_el.replace(default_child, child)
+       elif isinstance(child, objectify.ObjectifiedElement):
+           merge(child, default_child)
+
 class Config:
     '''Collection of all configuration options'''
     def __init__(self, args):
         self.args = args
         self.paths = Paths(args)
-        self.xml = self.get_xml()
-        self.settings = DEFAULT_SETTINGS
-        for element in self.xml.xpath('./settings/*'):
-            self.settings[element.tag] = element
-        defaults = self.xml.find('defaults')
-        self.defaults = defaults if defaults is not None else DEFAULTS
-        subs = self.xml.find('subscriptions')
-        self.subs = subs if subs is not None else SUBS
+        self.xml = deepcopy(DEFAULT_XML)
+        user_xml = self.get_xml()
+        merge(user_xml, self.xml)
 
     def get_xml(self):
         '''Returns the XML tree root harvested from the users poca.xml file.'''
