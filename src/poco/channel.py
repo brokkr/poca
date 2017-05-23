@@ -19,44 +19,37 @@ import feedparser
 
 from poco import files, history, entryinfo, output, tag
 from poco.outcome import Outcome
+from poco.config import merge
 
 
 class Channel:
     '''A class for a single subscription/channel. Creates the containers
     first, then acts on them and updates the db as it goes.'''
-    def __init__(self, config, sub):
-        self.config = config
-        defaults = deepcopy(config.defaults)
-        self.extend(sub, defaults)
-        for element in defaults.xpath('./metadata|./filters'):
-            self.extend(sub[element.tag], element)
-        self.sub = sub
-        self.sub_dir = os.path.join(config.settings.base_dir.text,
+    def __init__(self, conf, sub):
+        self.conf = conf
+        defaults = deepcopy(conf.xml.defaults)
+        merge(sub, defaults)
+        defaults.tag = "subscription"
+        self.sub = defaults
+        self.sub_dir = os.path.join(conf.xml.settings.base_dir.text,
                                     self.sub.title.text)
         self.ctitle = self.sub.title.text.upper()
         self.outcome = Outcome(True, '')
-
-    def extend(self, base, extension):
-        '''extend lxml objectify subelements'''
-        base_set = {el.tag for el in base.iterchildren()}
-        extend_set = {el.tag for el in extension.iterchildren()}
-        additions = extend_set.difference(base_set)
-        base.extend([extension[el_tag] for el_tag in additions])
 
     def make_plans(self):
         '''Calculate what files to get and what files to dump'''
         # see that we can write to the designated directory
         self.outcome = files.check_path(self.sub_dir)
         if not self.outcome.success:
-            output.suberror(self.ctitle, outcome)
+            output.suberror(self.ctitle, self.outcome)
             return
 
         # get jar and check for user deleted files
         self.udeleted = []
-        self.jar, self.outcome = history.get_subjar(self.config.paths,
+        self.jar, self.outcome = history.get_subjar(self.conf.paths,
                                                     self.sub)
         if not self.outcome.success:
-            output.suberror(self.ctitle, outcome)
+            output.suberror(self.ctitle, self.outcome)
             return
         self.check_jar()
 
@@ -106,7 +99,7 @@ class Channel:
         # download cover image
         if self.downed and self.feed.image:
             outcome = files.download_img_file(self.feed.image, self.sub_dir,
-                                              self.config.settings)
+                                              self.conf.xml.settings)
 
         # print summary of operations in file log
         output.summary(self.ctitle, self.udeleted, self.removed,
@@ -132,9 +125,11 @@ class Channel:
         output.downloading(entry)
         wantedindex = self.wanted.lst.index(uid) - len(self.failed)
         outcome = files.download_file(entry['poca_url'],
-                                      entry['poca_abspath'], self.config.settings)
+                                      entry['poca_abspath'],
+                                      self.conf.xml.settings)
         if outcome.success:
-            outcome = tag.tag_audio_file(self.config.settings, self.sub, entry)
+            outcome = tag.tag_audio_file(self.conf.xml.settings,
+                                         self.sub, entry)
             if not outcome.success:
                 output.tag_fail(outcome)
                 # add to failed?
@@ -257,7 +252,7 @@ class Wanted():
         '''Only return episodes published after a specific date'''
         filter_date = time.strptime(filter_text, '%Y-%m-%d')
         self.lst = [x for x in self.lst if dic[x]['published_parsed'] >
-                   filter_date]
+                    filter_date]
 
     def match_hour(self, dic, filter_text):
         '''Only return episodes published at a specific hour of the day'''

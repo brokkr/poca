@@ -17,13 +17,13 @@ def main():
     '''Main script'''
     args = poco.args.get_poca_args()
     stream_logger = poco.loggers.start_streamlogger(args)
-    config = poco.config.Config(args)
-    summary_logger = poco.loggers.start_summarylogger(args, config.paths,
-                                                      config.settings)
+    conf = poco.config.Config(args)
+    summary_logger = poco.loggers.start_summarylogger(args, conf.paths,
+                                                      conf.xml.settings)
     xp_str = './subscription[not(@state="inactive")][title][url]'
-    valid_subs = config.subs.xpath(xp_str)
+    valid_subs = conf.xml.subscriptions.xpath(xp_str)
     for sub in valid_subs:
-        channel = poco.channel.Channel(config, sub)
+        channel = poco.channel.Channel(conf, sub)
         channel.make_plans()
         if not channel.outcome.success:
             continue

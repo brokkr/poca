@@ -47,10 +47,16 @@ def merge(user_el, default_el):
        if default_child is None:
            default_el.append(child)
            continue
-       if isinstance(child, objectify.StringElement):
+       if isinstance(child, objectify.ObjectifiedDataElement):
            default_el.replace(default_child, child)
        elif isinstance(child, objectify.ObjectifiedElement):
            merge(child, default_child)
+
+def pretty_print(el):
+    '''Debug helper function'''
+    objectify.deannotate(el, cleanup_namespaces=True)
+    pretty_xml = etree.tostring(el, encoding='unicode', pretty_print=True)
+    print(pretty_xml)
 
 class Config:
     '''Collection of all configuration options'''
