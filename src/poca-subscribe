@@ -19,16 +19,16 @@ def main():
     args = poco.args.get_poca_subscribe_args()
     args.quiet = False
     stream_logger = poco.loggers.start_streamlogger(args)
-    config = poco.config.Config(args)
+    conf = poco.config.Config(args)
     if args.cmd_name == 'delete':
-        poco.subscribe.delete(config, args)
+        poco.subscribe.delete(conf, args)
     elif args.cmd_name == 'add':
         sub_dic, sub_category = poco.subscribe.user_input_add_sub()
-        poco.subscribe.add_sub(config, sub_category, sub_dic)
+        poco.subscribe.add_sub(conf, sub_category, sub_dic)
     elif args.cmd_name == 'list':
-        poco.subscribe.list_subs(config)
+        poco.subscribe.list_subs(conf)
     elif args.cmd_name == 'toggle':
-        poco.subscribe.toggle(config, args)
+        poco.subscribe.toggle(conf, args)
 
 if __name__ == '__main__':
     try:
