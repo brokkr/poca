@@ -23,21 +23,22 @@ def search(root, search_tag, search_term):
     results = root.xpath(search_str)
     return results
 
-def write(config):
-    '''Writes the resulting config file back to poca.xml'''
-    root_str = etree.tostring(config.xml, encoding='unicode',
+def write(conf):
+    '''Writes the resulting conf file back to poca.xml'''
+    objectify.deannotate(conf.xml, cleanup_namespaces=True)
+    root_str = etree.tostring(conf.xml, encoding='unicode',
                               pretty_print=True)
-    with open(config.paths.config_file, 'w') as f:
+    with open(conf.paths.config_file, 'w') as f:
         f.write(root_str)
 
-def delete(config, args):
+def delete(conf, args):
     '''Remove xml subscription and delete audio and log files'''
     if args.title:
-        results = search(config.xml, 'title', args.title)
+        results = search(conf.xml, 'title', args.title)
     elif args.url:
-        results = search(config.xml, 'url', args.url)
+        results = search(conf.xml, 'url', args.url)
     else:
-        results = config.xml.subscriptions.xpath('./subscription')
+        results = conf.xml.subscriptions.xpath('./subscription')
     if not results:
         print("No titles match your query.")
         return
@@ -47,16 +48,16 @@ def delete(config, args):
         if not verify or verify.lower() != 'y':
             continue
         else:
-            config.xml.subscriptions.remove(result)
-            sub_dir = os.path.join(config.settings.base_dir.text,
+            conf.xml.subscriptions.remove(result)
+            sub_dir = os.path.join(conf.xml.settings.base_dir.text,
                                    result.title.text)
-            db_file = os.path.join(config.paths.db_dir, result.title.text)
+            db_file = os.path.join(conf.paths.db_dir, result.title.text)
             try:
                 shutil.rmtree(sub_dir)
                 os.remove(db_file)
             except FileNotFoundError:
                 pass
-    write(config)
+    write(conf)
 
 def user_input_add_sub():
     '''Get user input for new subscription'''
@@ -73,19 +74,18 @@ def user_input_add_sub():
     sub_dic = {key: sub_dic[key] for key in sub_dic if sub_dic[key]}
     return (sub_dic, sub_category)
 
-def add_sub(config, sub_category, sub_dic):
+def add_sub(conf, sub_category, sub_dic):
     '''A quick and dirty add-a-sub function'''
-    new_sub = objectify.SubElement(config.xml.subscriptions, "subscription")
+    new_sub = objectify.SubElement(conf.xml.subscriptions, "subscription")
     if sub_category:
         new_sub.set('category', sub_category)
     for key in sub_dic:
         setattr(new_sub, key, sub_dic[key])
-    objectify.deannotate(new_sub, cleanup_namespaces=True)
-    write(config)
+    write(conf)
 
-def list_subs(config):
+def list_subs(conf):
     '''A simple columned output of subscriptions and their urls'''
-    subs_lst = config.subs.xpath('./subscription')
+    subs_lst = conf.xml.subscriptions.xpath('./subscription')
     cats_dic = {sub.get('category'): [] for sub in subs_lst}
     for sub in subs_lst:
         cats_dic[sub.get('category')].append(sub)
@@ -112,14 +112,14 @@ def list_subs(config):
             print(title, state, max_no, sub.url)
         print()
 
-def toggle(config, args):
+def toggle(conf, args):
     '''Toggle subscription state between 'active' and 'inactive' '''
     if args.title:
-        results = search(config.xml, 'title', args.title)
+        results = search(conf.xml, 'title', args.title)
     elif args.url:
-        results = search(config.xml, 'url', args.url)
+        results = search(conf.xml, 'url', args.url)
     else:
-        results = config.xml.subscriptions.xpath('./subscription')
+        results = conf.xml.subscriptions.xpath('./subscription')
     if not results:
         print("No titles match your query.")
     for result in results:
@@ -133,10 +133,10 @@ def toggle(config, args):
             continue
         result.set('state', state)
         if state_input == 'i':
-            sub_dir = os.path.join(config.settings.base_dir.text,
+            sub_dir = os.path.join(conf.xml.settings.base_dir.text,
                                    result.title.text)
             try:
                 shutil.rmtree(sub_dir)
             except FileNotFoundError:
                 pass
-    write(config)
+    write(conf)
