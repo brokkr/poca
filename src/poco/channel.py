@@ -19,7 +19,7 @@ import feedparser
 
 from poco import files, history, entryinfo, output, tag
 from poco.outcome import Outcome
-from poco.config import merge
+from poco.config import merge, pretty_print
 
 
 class Channel:
@@ -28,7 +28,7 @@ class Channel:
     def __init__(self, conf, sub):
         self.conf = conf
         defaults = deepcopy(conf.xml.defaults)
-        merge(sub, defaults)
+        merge(sub, defaults, conf.xml.defaults)
         defaults.tag = "subscription"
         self.sub = defaults
         self.sub_dir = os.path.join(conf.xml.settings.base_dir.text,

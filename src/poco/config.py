@@ -40,17 +40,18 @@ def confquit(msg):
     output.conffatal(msg)
     sys.exit()
 
-def merge(user_el, default_el):
+def merge(user_el, new_el, default_el):
    '''Updating one lxml objectify elements with another'''
    for child in user_el.iterchildren():
+       new_child = new_el.find(child.tag)
        default_child = default_el.find(child.tag)
        if default_child is None:
-           default_el.append(child)
+           new_el.append(child)
            continue
        if isinstance(child, objectify.ObjectifiedDataElement):
-           default_el.replace(default_child, child)
+           new_el.replace(new_child, child)
        elif isinstance(child, objectify.ObjectifiedElement):
-           merge(child, default_child)
+           merge(child, new_child, default_child)
 
 def pretty_print(el):
     '''Debug helper function'''
@@ -65,7 +66,7 @@ class Config:
         self.paths = Paths(args)
         self.xml = deepcopy(DEFAULT_XML)
         user_xml = self.get_xml()
-        merge(user_xml, self.xml)
+        merge(user_xml, self.xml, DEFAULT_XML)
 
     def get_xml(self):
         '''Returns the XML tree root harvested from the users poca.xml file.'''
