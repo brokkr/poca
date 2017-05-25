@@ -49,7 +49,7 @@ def start_summarylogger(args, paths, settings):
         file_handler = get_file_handler(paths)
         logger.addHandler(file_handler)
         logger.poca_file_handler = file_handler
-    if args.email and settings.find('email[fromaddr][toaddr]'):
+    if args.email and settings.find('email[fromaddr][toaddr]') is not None:
         bsmtp_handler = BufferSMTPHandler(settings.email, paths)
         loglevel = logging.ERROR if settings.email['only_error'] == 'yes' \
                    else logging.INFO
