@@ -11,37 +11,41 @@
 """Functions for subscription management for poca"""
 
 
-import os
-import shutil
 from lxml import etree, objectify
 
+from poco import files
 
-def search(root, search_tag, search_term):
+
+def search(xml, args):
     '''Takes a query and returns subscriptions with matching titles'''
+    if args.title:
+        search_tuple = ('title', args.title)
+    elif args.url:
+        search_tuple = ('url', args.url)
+    else:
+        return xml.xpath('./subscriptions/subscription')
     search_str = './subscriptions/subscription[contains(%s, "%s")]' % \
-                 (search_tag, search_term)
-    results = root.xpath(search_str)
+                 search_tuple
+    results = xml.xpath(search_str)
+    if not results:
+        print("No titles match your query.")
     return results
+
+def pretty_print(el):
+    '''Debug helper function'''
+    objectify.deannotate(el, cleanup_namespaces=True)
+    pretty_xml = etree.tostring(el, encoding='unicode', pretty_print=True)
+    return pretty_xml
 
 def write(conf):
     '''Writes the resulting conf file back to poca.xml'''
-    objectify.deannotate(conf.xml, cleanup_namespaces=True)
-    root_str = etree.tostring(conf.xml, encoding='unicode',
-                              pretty_print=True)
+    root_str = pretty_print(conf.xml)
     with open(conf.paths.config_file, 'w') as f:
         f.write(root_str)
 
 def delete(conf, args):
     '''Remove xml subscription and delete audio and log files'''
-    if args.title:
-        results = search(conf.xml, 'title', args.title)
-    elif args.url:
-        results = search(conf.xml, 'url', args.url)
-    else:
-        results = conf.xml.subscriptions.xpath('./subscription')
-    if not results:
-        print("No titles match your query.")
-        return
+    results = search(conf.xml, args)
     for result in results:
         verify = input("\"%s\" matches your query. "
                        "Remove subscription (y/N)? " % result.title)
@@ -49,14 +53,24 @@ def delete(conf, args):
             continue
         else:
             conf.xml.subscriptions.remove(result)
-            sub_dir = os.path.join(conf.xml.settings.base_dir.text,
-                                   result.title.text)
-            db_file = os.path.join(conf.paths.db_dir, result.title.text)
-            try:
-                shutil.rmtree(sub_dir)
-                os.remove(db_file)
-            except FileNotFoundError:
-                pass
+            files.delete_sub(conf, result.title.text, reset=True)
+    write(conf)
+
+def toggle(conf, args):
+    '''Toggle subscription state between 'active' and 'inactive' '''
+    results = search(conf.xml, args)
+    for result in results:
+        state = result.get('state') if 'state' in result.attrib else 'active'
+        state_input = input("%s is currently %s. Set to active (a) "
+                            "or inactive (i)? " % (result.title.text, state))
+        state_dic = {'a': 'active', 'i': 'inactive'}
+        try:
+            state = state_dic[state_input]
+        except KeyError:
+            continue
+        result.set('state', state)
+        if state_input == 'i':
+            files.delete_sub(conf, result.title.text)
     write(conf)
 
 def user_input_add_sub():
@@ -104,39 +118,12 @@ def list_subs(conf):
         url_line = ''.ljust(3,'-')
         print(heading_line, state_line, maxno_line, url_line)
         for sub in cats_dic[key]:
-            title = sub.title.text[:30].ljust(32)
+            title = sub.find('title') or '[no title]'
+            title = str(title)[:30].ljust(32)
             state = sub.get('state') or 'active'
             state = state.ljust(10)
             max_no = sub.find('max_number') or ''
             max_no = str(max_no).ljust(8)
-            print(title, state, max_no, sub.url)
+            url = str(sub.find('url') or '[no url]')
+            print(title, state, max_no, url)
         print()
-
-def toggle(conf, args):
-    '''Toggle subscription state between 'active' and 'inactive' '''
-    if args.title:
-        results = search(conf.xml, 'title', args.title)
-    elif args.url:
-        results = search(conf.xml, 'url', args.url)
-    else:
-        results = conf.xml.subscriptions.xpath('./subscription')
-    if not results:
-        print("No titles match your query.")
-    for result in results:
-        state = result.get('state') if 'state' in result.attrib else 'active'
-        state_input = input("%s is currently %s. Set to active (a) "
-                            "or inactive (i)? " % (result.title.text, state))
-        state_dic = {'a': 'active', 'i': 'inactive'}
-        try:
-            state = state_dic[state_input]
-        except KeyError:
-            continue
-        result.set('state', state)
-        if state_input == 'i':
-            sub_dir = os.path.join(conf.xml.settings.base_dir.text,
-                                   result.title.text)
-            try:
-                shutil.rmtree(sub_dir)
-            except FileNotFoundError:
-                pass
-    write(conf)

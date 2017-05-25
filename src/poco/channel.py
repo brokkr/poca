@@ -19,7 +19,7 @@ import feedparser
 
 from poco import files, history, entryinfo, output, tag
 from poco.outcome import Outcome
-from poco.config import merge, pretty_print
+from poco.config import merge
 
 
 class Channel:

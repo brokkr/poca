@@ -53,12 +53,6 @@ def merge(user_el, new_el, default_el):
        elif isinstance(child, objectify.ObjectifiedElement):
            merge(child, new_child, default_child)
 
-def pretty_print(el):
-    '''Debug helper function'''
-    objectify.deannotate(el, cleanup_namespaces=True)
-    pretty_xml = etree.tostring(el, encoding='unicode', pretty_print=True)
-    print(pretty_xml)
-
 class Config:
     '''Collection of all configuration options'''
     def __init__(self, args):

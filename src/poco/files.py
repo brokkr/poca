@@ -11,6 +11,7 @@
 
 import os
 import sys
+import shutil
 import signal
 import socket
 import urllib.request
@@ -101,6 +102,20 @@ def delete_file(file_path):
         return Outcome(True, file_path + ': File was successfully deleted')
     except OSError as e:
         return Outcome(False, file_path + ': ' + str(e))
+
+def delete_sub(conf, title, reset=False):
+    '''Delete subscription files (optionally including history)'''
+    sub_dir = os.path.join(conf.xml.settings.base_dir.text, title)
+    db_file = os.path.join(conf.paths.db_dir, title)
+    try:
+        shutil.rmtree(sub_dir)
+    except FileNotFoundError:
+        pass
+    if reset:
+        try:
+            os.remove(db_file)
+        except FileNotFoundError:
+            pass
 
 def check_path(check_dir):
     '''Create a directory'''
