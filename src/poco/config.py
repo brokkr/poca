@@ -56,12 +56,15 @@ def merge(user_el, new_el, default_el):
 
 class Config:
     '''Collection of all configuration options'''
-    def __init__(self, args):
+    def __init__(self, args, merge_default=False):
         self.args = args
         self.paths = Paths(args)
-        self.xml = deepcopy(DEFAULT_XML)
-        user_xml = self.get_xml()
-        merge(user_xml, self.xml, DEFAULT_XML)
+        if merge_default:
+            self.xml = deepcopy(DEFAULT_XML)
+            user_xml = self.get_xml()
+            merge(user_xml, self.xml, DEFAULT_XML)
+        else:
+            self.xml = self.get_xml()
 
     def get_xml(self):
         '''Returns the XML tree root harvested from the users poca.xml file.'''

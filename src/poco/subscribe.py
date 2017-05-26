@@ -90,6 +90,8 @@ def user_input_add_sub():
 
 def add_sub(conf, sub_category, sub_dic):
     '''A quick and dirty add-a-sub function'''
+    if conf.xml.find('subscriptions') is None:
+        objectify.SubElement(conf.xml, "subscriptions")
     new_sub = objectify.SubElement(conf.xml.subscriptions, "subscription")
     if sub_category:
         new_sub.set('category', sub_category)
@@ -99,7 +101,7 @@ def add_sub(conf, sub_category, sub_dic):
 
 def list_subs(conf):
     '''A simple columned output of subscriptions and their urls'''
-    subs_lst = conf.xml.subscriptions.xpath('./subscription')
+    subs_lst = conf.xml.xpath('./subscriptions/subscription')
     cats_dic = {sub.get('category'): [] for sub in subs_lst}
     for sub in subs_lst:
         cats_dic[sub.get('category')].append(sub)

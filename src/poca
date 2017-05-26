@@ -17,7 +17,7 @@ def main():
     '''Main script'''
     args = poco.args.get_poca_args()
     stream_logger = poco.loggers.start_streamlogger(args)
-    conf = poco.config.Config(args)
+    conf = poco.config.Config(args, merge_default=True)
     summary_logger = poco.loggers.start_summarylogger(args, conf.paths,
                                                       conf.xml.settings)
     xp_str = './subscription[not(@state="inactive")][title][url]'
