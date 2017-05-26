@@ -29,6 +29,7 @@ DEFAULT_XML = E.poca(
                                         E.threshold(1),
                                         E.host('localhost'),
                                         E.starttls('no')
+                                        E.password('')
                                        )
                                ),
                       E.defaults(),

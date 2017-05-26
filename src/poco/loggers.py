@@ -51,7 +51,7 @@ def start_summarylogger(args, paths, settings):
         logger.poca_file_handler = file_handler
     if args.email and settings.find('email[fromaddr][toaddr]') is not None:
         bsmtp_handler = BufferSMTPHandler(settings.email, paths)
-        loglevel = logging.ERROR if settings.email['only_error'] == 'yes' \
+        loglevel = logging.ERROR if settings.email.only_error == 'yes' \
                    else logging.INFO
         bsmtp_handler.setLevel(loglevel)
         logger.addHandler(bsmtp_handler)
@@ -92,12 +92,12 @@ class BufferSMTPHandler(handlers.BufferingHandler):
         for record in self.buffer:
             body = body + self.format(record) + "\r\n"
         msg = MIMEText(body.encode('utf-8'), _charset="utf-8")
-        msg['From'] = self.email['fromaddr']
-        msg['To'] = self.email['toaddr']
+        msg['From'] = self.email.fromaddr.text
+        msg['To'] = self.email.toaddr.text
         msg['Subject'] = Header("POCA log")
-        if self.email['starttls'] == 'yes':
+        if self.email.starttls == 'yes':
             try:
-                smtp = smtplib.SMTP(self.email['host'], 587, timeout=10)
+                smtp = smtplib.SMTP(self.email.host.text, 587, timeout=10)
                 ehlo = smtp.ehlo()
             except (ConnectionRefusedError, socket.gaierror, socket.timeout) \
                     as error:
@@ -106,14 +106,14 @@ class BufferSMTPHandler(handlers.BufferingHandler):
                 return
             smtp.starttls()
             try:
-                smtp.login(self.email['fromaddr'], self.email['password'])
+                smtp.login(self.email.fromaddr.text, self.email.password.text)
             except smtplib.SMTPAuthenticationError as error:
                 self.outcome = Outcome(False, str(error))
                 self.save()
                 return
         else:
             try:
-                smtp = smtplib.SMTP(self.email['host'], 25, timeout=10)
+                smtp = smtplib.SMTP(self.email.host.text, 25, timeout=10)
                 ehlo = smtp.ehlo()
             except (ConnectionRefusedError, socket.gaierror, socket.timeout) \
                     as error:
@@ -121,7 +121,7 @@ class BufferSMTPHandler(handlers.BufferingHandler):
                 self.save()
                 return
         try:
-            smtp.sendmail(self.email['fromaddr'], [self.email['toaddr']],
+            smtp.sendmail(self.email.fromaddr.text, [self.email.toaddr.text],
                           msg.as_string())
             self.outcome = Outcome(True, "Succesfully sent email")
         except (smtplib.SMTPException, socket.timeout) as error:
