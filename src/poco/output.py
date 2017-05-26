@@ -91,4 +91,4 @@ def summary(title, udeleted, removed, downed, failed):
         SUMMARY.info(title + '. Downloaded: ' + ', '.join(downed_files))
     if failed:
         failed_files = [x['poca_filename'] for x in failed]
-        SUMMARY.info(title + '. Failed: ' + ', '.join(failed_files))
+        SUMMARY.error(title + '. Failed: ' + ', '.join(failed_files))
