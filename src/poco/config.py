@@ -28,7 +28,7 @@ DEFAULT_XML = E.poca(
                                         E.only_errors('no'),
                                         E.threshold(1),
                                         E.host('localhost'),
-                                        E.starttls('no')
+                                        E.starttls('no'),
                                         E.password('')
                                        )
                                ),
