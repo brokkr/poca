@@ -48,8 +48,8 @@ def delete(conf, args):
     results = search(conf.xml, args)
     for result in results:
         verify = input("\"%s\" matches your query. "
-                       "Remove subscription (y/N)? " % result.title)
-        if not verify or verify.lower() != 'y':
+                       "Remove subscription? (yes/no) " % result.title)
+        if not verify or verify.lower() != 'yes':
             continue
         else:
             conf.xml.subscriptions.remove(result)
@@ -75,14 +75,27 @@ def toggle(conf, args):
 
 def user_input_add_sub():
     '''Get user input for new subscription'''
-    sub_dic = {'title': '', 'url': ''}
+    sub_lst = ['title', 'url', 'max_number', 'from_the_top']
+    sub_dic = dict.fromkeys(sub_lst)
     print("Press enter to skip setting (except * mandatory)")
     while not sub_dic['title']:
         sub_dic['title'] = input("* Title of subscription? ")
     while not sub_dic['url']:
         sub_dic['url'] = input("* Url of subscription? ")
-    sub_dic['max_number'] = input("Maximum number of files in subscription? ")
-    sub_dic['from_the_top'] = input("Get earliest entries first (yes/No)? ")
+    while True:
+        max_number = input("Maximum number of files in subscription? "
+                           "(integer/Enter to skip) ")
+        if max_number:
+            try:
+                sub_dic['max_number'] = int(max_number)
+                break
+            except ValueError:
+                pass
+        else:
+            break
+    while sub_dic['from_the_top'] not in ['', 'yes', 'no']:
+        sub_dic['from_the_top'] = input("Get earliest entries first? "
+                                         "(yes/no/Enter to skip) ")
     sub_category = input("Category for subscription? ")
     print("To add metadata or filters settings, please edit poca.xml")
     sub_dic = {key: sub_dic[key] for key in sub_dic if sub_dic[key]}
