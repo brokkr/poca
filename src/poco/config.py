@@ -21,14 +21,18 @@ E = objectify.E
 DEFAULT_XML = E.poca(
                      E.settings(
                                 E.base_dir('/tmp/poca'),
-                                E.id3encoding('utf8'),
-                                E.id3removev1('yes'),
+                                E.id3encoding('utf8', {'v0': 'latin1',
+                                                       'v1': 'utf8'}),
+                                E.id3removev1('yes', {'v0': 'yes',
+                                                      'v1': 'no'}),
                                 E.useragent(''),
                                 E.email(
-                                        E.only_errors('no'),
+                                        E.only_errors('no', {'v0': 'yes',
+                                                             'v1': 'no'}),
                                         E.threshold(1),
                                         E.host('localhost'),
-                                        E.starttls('no'),
+                                        E.starttls('no', {'v0': 'yes',
+                                                          'v1': 'no'}),
                                         E.password('')
                                        )
                                ),
@@ -42,17 +46,25 @@ def confquit(msg):
     sys.exit()
 
 def merge(user_el, new_el, default_el):
-   '''Updating one lxml objectify elements with another'''
-   for child in user_el.iterchildren():
-       new_child = new_el.find(child.tag)
-       default_child = default_el.find(child.tag)
-       if default_child is None:
-           new_el.append(child)
-           continue
-       if isinstance(child, objectify.ObjectifiedDataElement):
-           new_el.replace(new_child, child)
-       elif isinstance(child, objectify.ObjectifiedElement):
-           merge(child, new_child, default_child)
+    '''Updating one lxml objectify elements with another
+       (with primitive validation)'''
+    for child in user_el.iterchildren():
+        new_child = new_el.find(child.tag)
+        default_child = default_el.find(child.tag)
+        if default_child is None:
+            new_el.append(child)
+            continue
+        if isinstance(child, objectify.ObjectifiedDataElement):
+            right_type = type(child) == type(default_child)
+            valid = child.text in default_child.attrib.values() \
+                    if default_child.attrib else True
+            if all((right_type, valid)):
+                new_el.replace(new_child, child)
+            else:
+                 confquit('%s: %s. Invalid type or value not valid' 
+                          % (child.tag, child.text))
+        elif isinstance(child, objectify.ObjectifiedElement):
+            merge(child, new_child, default_child)
 
 class Config:
     '''Collection of all configuration options'''
@@ -60,6 +72,7 @@ class Config:
         self.args = args
         self.paths = Paths(args)
         if merge_default:
+            objectify.deannotate(DEFAULT_XML)
             self.xml = deepcopy(DEFAULT_XML)
             user_xml = self.get_xml()
             merge(user_xml, self.xml, DEFAULT_XML)
