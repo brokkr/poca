@@ -70,11 +70,7 @@ def get_file_handler(paths):
 class BufferSMTPHandler(handlers.BufferingHandler):
     '''SMTPHandler that send one email per flush'''
     def __init__(self, email, paths):
-        try:
-            threshold = int(email.threshold)
-        except ValueError:
-            threshold = 1
-        handlers.BufferingHandler.__init__(self, threshold)
+        handlers.BufferingHandler.__init__(self, int(email.threshold))
         self.state_jar, outcome = history.get_statejar(paths)
         self.buffer = self.state_jar.buffer
         self.outcome = Outcome(None, '')
