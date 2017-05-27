@@ -15,6 +15,7 @@ from lxml import etree, objectify
 from copy import deepcopy
 
 from poco import files, output, xmlconf
+from poco.outcome import Outcome
 
 
 E = objectify.E
@@ -45,7 +46,7 @@ def confquit(msg):
     output.conffatal(msg)
     sys.exit()
 
-def merge(user_el, new_el, default_el):
+def merge(user_el, new_el, default_el, errors=[]):
     '''Updating one lxml objectify elements with another
        (with primitive validation)'''
     for child in user_el.iterchildren():
@@ -61,10 +62,11 @@ def merge(user_el, new_el, default_el):
             if all((right_type, valid)):
                 new_el.replace(new_child, child)
             else:
-                 confquit('%s: %s. Invalid type or value not valid' 
-                          % (child.tag, child.text))
+                errors.append(Outcome(False, '%s: %s. Value not valid'
+                                      % (child.tag, child.text)))
         elif isinstance(child, objectify.ObjectifiedElement):
-            merge(child, new_child, default_child)
+            merge(child, new_child, default_child, errors=errors)
+    return errors
 
 class Config:
     '''Collection of all configuration options'''
@@ -75,7 +77,9 @@ class Config:
             objectify.deannotate(DEFAULT_XML)
             self.xml = deepcopy(DEFAULT_XML)
             user_xml = self.get_xml()
-            merge(user_xml, self.xml, DEFAULT_XML)
+            errors = merge(user_xml, self.xml, DEFAULT_XML, errors=[])
+            for outcome in errors:
+                confquit(outcome.msg)
         else:
             self.xml = self.get_xml()
 

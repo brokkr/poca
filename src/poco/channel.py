@@ -28,16 +28,20 @@ class Channel:
     def __init__(self, conf, sub):
         self.conf = conf
         defaults = deepcopy(conf.xml.defaults)
-        merge(sub, defaults, conf.xml.defaults)
+        errors = merge(sub, defaults, conf.xml.defaults, errors=[])
+        self.outcome = errors[0] if errors else Outcome(True, '')
         defaults.tag = "subscription"
         self.sub = defaults
         self.sub_dir = os.path.join(conf.xml.settings.base_dir.text,
                                     self.sub.title.text)
         self.ctitle = self.sub.title.text.upper()
-        self.outcome = Outcome(True, '')
 
     def make_plans(self):
         '''Calculate what files to get and what files to dump'''
+        # see if merge did okay
+        if not self.outcome.success:
+            output.suberror(self.ctitle, self.outcome)
+            return
         # see that we can write to the designated directory
         self.outcome = files.check_path(self.sub_dir)
         if not self.outcome.success:
