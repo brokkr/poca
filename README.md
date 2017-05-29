@@ -53,7 +53,9 @@ And then install the generated package (using root privileges)
     pip3 install ./dist/poca-[VERSION].tar.gz
 
 Running 'poca' on a fresh install (no configuration) will place a copy of the 
-example configuration in ~/.poca. Edit it to add your feeds.
+example configuration in ~/.poca. The included feeds are there for illustrative
+purposes. Edit the configuration file, try them out or use `poca-subscribe
+delete` to clear it out.
 
 To remove Poca - having installed it using pip - simply do:
 
