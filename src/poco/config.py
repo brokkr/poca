@@ -22,8 +22,7 @@ E = objectify.E
 DEFAULT_XML = E.poca(
                      E.settings(
                                 E.base_dir('/tmp/poca'),
-                                E.id3encoding('utf8', {'v0': 'latin1',
-                                                       'v1': 'utf8'}),
+                                E.id3v2version(4, {'v0': 3, 'v1': 4}),
                                 E.id3removev1('yes', {'v0': 'yes',
                                                       'v1': 'no'}),
                                 E.useragent(''),

@@ -29,7 +29,7 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 
     <settings>
         <base_dir>/tmp/poca</base_dir>
-        <id3encoding>utf8</id3encoding>
+        <id3v2version>4</id3v2version>
         <id3removev1>yes</id3removev1>
         <useragent></useragent>
     </settings>
