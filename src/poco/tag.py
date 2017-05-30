@@ -18,13 +18,10 @@ from poco.outcome import Outcome
 def tag_audio_file(settings, sub, entry):
     '''Reintroducing id3 tagging using mutagen'''
     # get general metadata settings
-    try:
-        id3v1_dic = {'yes': 0, 'no': 2}
-        id3v1 = id3v1_dic[settings.id3removev1.text]
-        id3encoding_dic = {'latin1': 0, 'utf8': 3}
-        id3encoding = id3encoding_dic[settings.id3encoding]
-    except KeyError:
-        return Outcome(False, 'Bad id3 settings in poca.xml')
+    id3v1_dic = {'yes': 0, 'no': 2}
+    id3v1 = id3v1_dic[settings.id3removev1.text]
+    id3encoding_dic = {'latin1': 0, 'utf8': 3}
+    id3encoding = id3encoding_dic[settings.id3encoding]
     # check for proper header and metadata to apply
     if entry['poca_ext'] != '.mp3':
         return Outcome(True, 'Not an mp3')
