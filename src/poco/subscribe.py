@@ -11,6 +11,7 @@
 """Functions for subscription management for poca"""
 
 
+import time
 import feedparser
 from lxml import etree, objectify
 
@@ -146,14 +147,24 @@ def list_subs(conf):
 
 class Feedstats():
     def __init__(self, url):
-        doc = feedparser.parse(url)
-        self.wdays = [x['published_parsed'].tm_wday for x in doc.entries]
+        '''Publishing stats on an RSRSS feed'''
+        self.url = url
+
+    def get_entries(self):
+        doc = feedparser.parse(self.url)
+        self.doc = doc
+        now = time.localtime()
+        age = lambda x: (time.mktime(now) - time.mktime(x)) / (24*3600)
+        self.entries = [x for x in doc.entries if age(x['published_parsed']) \
+                        < 35]
+
+    def get_pub_schedule(self):
+        wdays = [x['published_parsed'].tm_wday for x in self.entries]
         self.wday_count = {x: 0 for x in range(7)}
-        self.wday_count.update({x: self.wdays.count(x) for x in set(self.wdays)})
-        self.matrix = []
+        self.wday_count.update({x: wdays.count(x) for x in set(wdays)})
+        matrix = ["PUB COUNT / 5 WEEKS"]
         for i in reversed(range(5)):
             line = ['▮' if self.wday_count[x] > i else ' ' for x in range(7)]
-            self.matrix.append(line)
-        self.matrix.append(['M', 'T', 'W', 'T', 'F', 'S', 'S'])
-        self.matrix_str = ['  '.join(line) for line in self.matrix]
-
+            matrix.append('  '.join(line))
+        matrix.append('M  T  W  T  F  S  S')
+        self.pub_schedule = '\n'.join(matrix)
