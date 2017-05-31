@@ -30,7 +30,8 @@ def expand(entry, sub, sub_dir):
         entry['poca_size'] = None
         entry['poca_mb'] = None
     parsed_url = urllib.parse.urlparse(entry['poca_url'])
-    entry['poca_filename'] = path.basename(parsed_url.path)
+    parsed_path = urllib.parse.unquote(parsed_url.path)
+    entry['poca_filename'] = path.basename(parsed_path)
     entry['poca_basename'] = entry['poca_filename'].split('.')[0]
     entry['poca_ext'] = path.splitext(entry['poca_filename'])[1].lower()
     entry['poca_abspath'] = path.join(sub_dir, entry['poca_filename'])
