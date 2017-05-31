@@ -168,3 +168,15 @@ class Feedstats():
             matrix.append('  '.join(line))
         matrix.append('M  T  W  T  F  S  S')
         self.pub_schedule = '\n'.join(matrix)
+
+    def get_average_size(self):
+        self.links = [entry['links'] for entry in self.entries]
+        self.lengths = [enc['length'] for sublist in self.links for enc in
+                        sublist if 'length' in enc]
+        self.get_mean = lambda lst: sum([int(x) for x in lst])/len(lst)
+        if not self.lengths:
+            self.avg_bytes, self_avg_mb = (None, None)
+        else:
+            self.avg_bytes = self.get_mean(self.lengths) 
+            self.avg_mb = round(self.avg_bytes / (1024*1024), 2)
+
