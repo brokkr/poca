@@ -90,10 +90,15 @@ def download_img_file(url, sub_dir, settings):
     except urllib.error.URLError:
         return Outcome(False, 'Couldnt get image')
     subtype = u.headers.get_content_subtype()
-    subtype = subtype.replace('jpeg', 'jpg')
     u.close()
-    file_path = os.path.join(sub_dir, 'cover.' + subtype)
-    return download_file(url, file_path, settings)
+    mime_dic = {'bmp': '.bmp', 'gif': '.gif', 'png': '.png',
+                'jpeg': '.jpg', 'jpg': '.jpg', 'webp': '.webp'}
+    extension = mime_dic[subtype] if subtype in mime_dic else None
+    if extension is None:
+        return Outcome(False, 'Bad image MIME type')
+    else:
+        file_path = os.path.join(sub_dir, 'cover' + extension)
+        return download_file(url, file_path, settings)
 
 def delete_file(file_path):
     '''Deletes a file'''
