@@ -80,6 +80,7 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
             <title>example 3 - override id3 header fields</title>
             <url>http://savagelove.savagelovecast.libsynpro.com/rss</url>
             <max_number>2</max_number>
+            <track_numbering>yes</track_numbering>
             <metadata>
                 <artist>Dan Savage</artist>
                 <genre>podcast</genre>

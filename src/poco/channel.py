@@ -65,6 +65,9 @@ class Channel:
             return
         self.combo = Combo(self.feed, self.jar, self.sub, self.sub_dir)
         self.wanted = Wanted(self.sub, self.combo, self.jar.del_lst)
+        from_the_top = self.sub.find('from_the_top') or 'no'
+        if from_the_top == 'no':
+            self.wanted.lst.reverse()
 
         # inform user of intentions
         self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
@@ -133,7 +136,7 @@ class Channel:
                                       self.conf.xml.settings)
         if outcome.success:
             outcome = tag.tag_audio_file(self.conf.xml.settings,
-                                         self.sub, entry)
+                                         self.sub, self.jar, entry)
             if not outcome.success:
                 output.tag_fail(outcome)
                 # add to failed?
