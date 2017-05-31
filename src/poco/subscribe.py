@@ -11,6 +11,7 @@
 """Functions for subscription management for poca"""
 
 
+import feedparser
 from lxml import etree, objectify
 
 from poco import files
@@ -142,3 +143,17 @@ def list_subs(conf):
             url = str(sub.find('url') or '[no url]')
             print(title, state, max_no, url)
         print()
+
+class Feedstats():
+    def __init__(self, url):
+        doc = feedparser.parse(url)
+        self.wdays = [x['published_parsed'].tm_wday for x in doc.entries]
+        self.wday_count = {x: 0 for x in range(7)}
+        self.wday_count.update({x: self.wdays.count(x) for x in set(self.wdays)})
+        self.matrix = []
+        for i in reversed(range(5)):
+            line = ['▮' if self.wday_count[x] > i else ' ' for x in range(7)]
+            self.matrix.append(line)
+        self.matrix.append(['M', 'T', 'W', 'T', 'F', 'S', 'S'])
+        self.matrix_str = ['  '.join(line) for line in self.matrix]
+
