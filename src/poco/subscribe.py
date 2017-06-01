@@ -14,6 +14,7 @@
 import time
 import feedparser
 from lxml import etree, objectify
+from math import pow
 
 from poco import files
 
@@ -168,3 +169,13 @@ class Feedstats():
             matrix.append('  '.join(line))
         matrix.append('M  T  W  T  F  S  S')
         self.pub_schedule = '\n'.join(matrix)
+
+    def get_avg_length(self):
+        durations = [entry['itunes_duration'].split(':') for entry in 
+                     self.doc.entries if 'itunes_duration' in entry]
+        secs = 0
+        for index,entry in enumerate(durations):
+            secs += pow(60, index) * int(entry)
+        m, s = divmod(secs, 60)
+        h, m = divmod(m, 60)
+        self.avg_length = "%s:%s:%s" % (h, m, s)
