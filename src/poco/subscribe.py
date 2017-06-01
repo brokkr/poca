@@ -194,17 +194,16 @@ class Feedstats():
                    if 'length' in enc]
         get_mean = lambda lst: sum([int(x) for x in lst])/len(lst)
         if not lengths:
-            avg_mb = "n/a"
-        else:
-            avg_bytes = get_mean(lengths)
-            avg_mb = "%s Mb" % int(round(avg_bytes / (1024*1024), 0))
+            return "n/a"
+        avg_bytes = get_mean(lengths)
+        avg_mb = "%s Mb" % int(round(avg_bytes / (1024*1024), 0))
         return avg_mb
 
     def get_avg_length(self):
         duration_entries = [entry for entry in self.doc.entries if 
                             'itunes_duration' in entry]
         if not duration_entries:
-            avg_duration = "n/a"
+            return "n/a"
         durations = [self.itunes2seconds(entry) for entry in duration_entries]
         avg_seconds = int(sum(durations) / len(durations))
         m, s = divmod(avg_seconds, 60)
