@@ -14,6 +14,7 @@
 import time
 import feedparser
 from lxml import etree, objectify
+from math import pow
 
 from poco import files
 
@@ -180,3 +181,22 @@ class Feedstats():
             self.avg_bytes = self.get_mean(self.lengths) 
             self.avg_mb = round(self.avg_bytes / (1024*1024), 2)
 
+    def get_avg_length(self):
+        duration_entries = [entry for entry in self.doc.entries if 
+                            'itunes_duration' in entry]
+        if not duration_entries:
+            self.avg_duration = 'n/a'
+        durations = [self.itunes2seconds(entry) for entry in duration_entries]
+        avg_seconds = int(sum(durations) / len(durations))
+        m, s = divmod(avg_seconds, 60)
+        h, m = divmod(m, 60)
+        self.avg_duration = "%sh " % h if h > 0 else ""
+        self.avg_duration += "%sm" % m
+
+    def itunes2seconds(self, entry):
+        itunes_hms = entry['itunes_duration'].split(':')
+        itunes_hms.reverse()
+        seconds = 0
+        for index,entry in enumerate(itunes_hms):
+            seconds += pow(60, index) * int(entry)
+        return int(seconds)
