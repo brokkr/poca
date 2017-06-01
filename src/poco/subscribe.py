@@ -171,11 +171,21 @@ class Feedstats():
         self.pub_schedule = '\n'.join(matrix)
 
     def get_avg_length(self):
-        durations = [entry['itunes_duration'].split(':') for entry in 
-                     self.doc.entries if 'itunes_duration' in entry]
-        secs = 0
-        for index,entry in enumerate(durations):
-            secs += pow(60, index) * int(entry)
-        m, s = divmod(secs, 60)
+        duration_entries = [entry for entry in self.doc.entries if 
+                            'itunes_duration' in entry]
+        if not duration_entries:
+            self.avg_duration = 'n/a'
+        durations = [self.itunes2seconds(entry) for entry in duration_entries]
+        avg_seconds = int(sum(durations) / len(durations))
+        m, s = divmod(avg_seconds, 60)
         h, m = divmod(m, 60)
-        self.avg_length = "%s:%s:%s" % (h, m, s)
+        self.avg_duration = "%sh " % h if h > 0 else ""
+        self.avg_duration += "%sm" % m
+
+    def itunes2seconds(self, entry):
+        itunes_hms = entry['itunes_duration'].split(':')
+        itunes_hms.reverse()
+        seconds = 0
+        for index,entry in enumerate(itunes_hms):
+            seconds += pow(60, index) * int(entry)
+        return int(seconds)
