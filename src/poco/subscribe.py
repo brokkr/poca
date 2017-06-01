@@ -151,7 +151,7 @@ class Feedstats():
         '''Publishing stats on an RSRSS feed'''
         self.url = url
 
-    def get_entries(self):
+    def set_entries(self):
         doc = feedparser.parse(self.url)
         self.doc = doc
         now = time.localtime()
@@ -159,39 +159,59 @@ class Feedstats():
         self.entries = [x for x in doc.entries if age(x['published_parsed']) \
                         < 35]
 
-    def get_pub_schedule(self):
-        wdays = [x['published_parsed'].tm_wday for x in self.entries]
-        self.wday_count = {x: 0 for x in range(7)}
-        self.wday_count.update({x: wdays.count(x) for x in set(wdays)})
-        matrix = ["PUB COUNT / 5 WEEKS"]
-        for i in reversed(range(5)):
-            line = ['▮' if self.wday_count[x] > i else ' ' for x in range(7)]
-            matrix.append('  '.join(line))
-        matrix.append('M  T  W  T  F  S  S')
-        self.pub_schedule = '\n'.join(matrix)
+    def print_stats(self):
+        self.set_lhs()
+        self.set_rhs()
+        for index in range(8):
+            print(self.lhs_lst[index] + self.rhs_lst[index])
 
-    def get_average_size(self):
-        self.links = [entry['links'] for entry in self.entries]
-        self.lengths = [enc['length'] for sublist in self.links for enc in
-                        sublist if 'length' in enc]
-        self.get_mean = lambda lst: sum([int(x) for x in lst])/len(lst)
-        if not self.lengths:
-            self.avg_bytes, self_avg_mb = (None, None)
+    def set_lhs(self):
+        lhs = {}
+        lhs['author'] = self.doc.feed.author if 'author' in self.doc.feed \
+                        else 'Unknown'
+        lhs['title'] = self.doc.feed.title if 'title' in self.doc.feed else \
+                       'Unknown'
+        last = self.doc.entries[0]
+        lhs['last_date'] = time.strftime('%d %b %Y', last['published_parsed'])
+        lhs['last_title'] = last['title']
+        lhs['avg_mb'] = self.get_avg_size()
+        lhs['avg_duration'] = self.get_avg_length()
+        headers = {'author': 'Author: ', 'title': 'Title:  ', 
+                   'last_date': 'Published:    ',
+                   'last_title': 'Last episode: ',
+                   'avg_duration': 'Avg. length of episode: ',
+                   'avg_mb': 'Avg. size of episode:   '}
+        order = ['author', 'title', 'last_title', 'last_date', 'avg_mb', 
+                 'avg_duration']
+        head_info = lambda x: (headers[x] + lhs[x])[:58].ljust(60)
+        self.lhs_lst = [head_info(x) for x in order]
+        self.lhs_lst.insert(4, ''.ljust(60))
+        self.lhs_lst.insert(2, ''.ljust(60))
+
+    def get_avg_size(self):
+        links = [entry['links'] for entry in self.entries]
+        lengths = [enc['length'] for sublist in links for enc in sublist 
+                   if 'length' in enc]
+        get_mean = lambda lst: sum([int(x) for x in lst])/len(lst)
+        if not lengths:
+            avg_mb = "n/a"
         else:
-            self.avg_bytes = self.get_mean(self.lengths) 
-            self.avg_mb = round(self.avg_bytes / (1024*1024), 2)
+            avg_bytes = get_mean(lengths)
+            avg_mb = "%s Mb" % int(round(avg_bytes / (1024*1024), 0))
+        return avg_mb
 
     def get_avg_length(self):
         duration_entries = [entry for entry in self.doc.entries if 
                             'itunes_duration' in entry]
         if not duration_entries:
-            self.avg_duration = 'n/a'
+            avg_duration = "n/a"
         durations = [self.itunes2seconds(entry) for entry in duration_entries]
         avg_seconds = int(sum(durations) / len(durations))
         m, s = divmod(avg_seconds, 60)
         h, m = divmod(m, 60)
-        self.avg_duration = "%sh " % h if h > 0 else ""
-        self.avg_duration += "%sm" % m
+        avg_duration = "%sh " % h if h > 0 else ""
+        avg_duration += "%sm" % m
+        return avg_duration
 
     def itunes2seconds(self, entry):
         itunes_hms = entry['itunes_duration'].split(':')
@@ -200,3 +220,13 @@ class Feedstats():
         for index,entry in enumerate(itunes_hms):
             seconds += pow(60, index) * int(entry)
         return int(seconds)
+
+    def set_rhs(self):
+        wdays = [x['published_parsed'].tm_wday for x in self.entries]
+        wday_count = {x: 0 for x in range(7)}
+        wday_count.update({x: wdays.count(x) for x in set(wdays)})
+        self.rhs_lst = ["PUBLISHED / 5 WEEKS", "".ljust(19)]
+        for i in reversed(range(5)):
+            line = ['▮' if wday_count[x] > i else ' ' for x in range(7)]
+            self.rhs_lst.append('  '.join(line))
+        self.rhs_lst.append('M  T  W  T  F  S  S')
