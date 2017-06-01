@@ -150,14 +150,11 @@ class Feedstats():
     def __init__(self, url):
         '''Publishing stats on an RSRSS feed'''
         self.url = url
-
-    def set_entries(self):
-        doc = feedparser.parse(self.url)
-        self.doc = doc
+        self.doc = feedparser.parse(self.url)
         now = time.localtime()
         age = lambda x: (time.mktime(now) - time.mktime(x)) / (24*3600)
-        self.entries = [x for x in doc.entries if age(x['published_parsed']) \
-                        < 35]
+        self.entries = [x for x in self.doc.entries if \
+                        age(x['published_parsed']) < 35]
 
     def print_stats(self):
         self.set_lhs()
