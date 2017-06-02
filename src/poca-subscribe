@@ -31,6 +31,8 @@ def main():
         poco.subscribe.toggle(conf, args)
     elif args.cmd_name == 'stats':
         poco.subscribe.stats(conf, args)
+    elif args.cmd_name == 'tags':
+        poco.subscribe.list_id3_tags()
 
 if __name__ == '__main__':
     try:

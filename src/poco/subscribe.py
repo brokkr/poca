@@ -12,6 +12,7 @@
 
 
 from lxml import etree, objectify
+from mutagen.easyid3 import EasyID3
 
 from poco import files
 from poco.feedstats import Feedstats
@@ -156,3 +157,9 @@ def list_subs(conf):
             url = str(sub.find('url') or '[no url]')
             print(title, state, max_no, url)
         print()
+
+def list_id3_tags():
+    valid_tags = list(EasyID3.valid_keys.keys())
+    valid_tags.sort()
+    for tag in valid_tags:
+        print(tag)
