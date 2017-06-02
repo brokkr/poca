@@ -44,4 +44,7 @@ def get_poca_subscribe_args():
     toggle_parser = subparsers.add_parser('toggle', help='Set state of current subscriptions')
     toggle_parser.add_argument('-t', '--title', help='Match against subscription title')
     toggle_parser.add_argument('-u', '--url', help='Match against subscription url')
+    stats_parser = subparsers.add_parser('stats', help='Get feed stats for current subscriptions')
+    stats_parser.add_argument('-t', '--title', help='Match against subscription title')
+    stats_parser.add_argument('-u', '--url', help='Match against subscription url')
     return parser.parse_args()

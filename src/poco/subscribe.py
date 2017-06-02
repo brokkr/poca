@@ -11,12 +11,10 @@
 """Functions for subscription management for poca"""
 
 
-import time
-import feedparser
 from lxml import etree, objectify
-from math import pow
 
 from poco import files
+from poco.feedstats import Feedstats
 
 
 def search(xml, args):
@@ -59,6 +57,17 @@ def delete(conf, args):
             files.delete_sub(conf, result.title.text, reset=True)
     write(conf)
 
+def stats(conf, args):
+    '''Remove xml subscription and delete audio and log files'''
+    results = search(conf.xml, args)
+    for result in results:
+        result_stats = Feedstats(result.url.text)
+        print(result.title.text.upper())
+        result_stats.print_stats()
+        print()
+        _ = input("Enter to continue ")
+        print()
+
 def toggle(conf, args):
     '''Toggle subscription state between 'active' and 'inactive' '''
     results = search(conf.xml, args)
@@ -81,10 +90,12 @@ def user_input_add_sub():
     sub_lst = ['title', 'url', 'max_number', 'from_the_top']
     sub_dic = dict.fromkeys(sub_lst)
     print("Press enter to skip setting (except * mandatory)")
-    while not sub_dic['title']:
-        sub_dic['title'] = input("* Title of subscription? ")
     while not sub_dic['url']:
         sub_dic['url'] = input("* Url of subscription? ")
+    url_stats = Feedstats(sub_dic['url'])
+    url_stats.print_stats()
+    title = input("Title of subscription? (Enter to use feed title) ")
+    sub_dic['title'] = title if title else url_stats.title
     while True:
         max_number = input("Maximum number of files in subscription? "
                            "(integer/Enter to skip) ")
@@ -145,84 +156,3 @@ def list_subs(conf):
             url = str(sub.find('url') or '[no url]')
             print(title, state, max_no, url)
         print()
-
-class Feedstats():
-    def __init__(self, url):
-        '''Publishing stats on an RSRSS feed'''
-        self.url = url
-        self.doc = feedparser.parse(self.url)
-        now = time.localtime()
-        age = lambda x: (time.mktime(now) - time.mktime(x)) / (24*3600)
-        self.entries = [x for x in self.doc.entries if \
-                        age(x['published_parsed']) < 35]
-
-    def print_stats(self):
-        self.set_lhs()
-        self.set_rhs()
-        for index in range(8):
-            print(self.lhs_lst[index] + self.rhs_lst[index])
-
-    def set_lhs(self):
-        lhs = {}
-        lhs['author'] = self.doc.feed.author if 'author' in self.doc.feed \
-                        else 'Unknown'
-        lhs['title'] = self.doc.feed.title if 'title' in self.doc.feed else \
-                       'Unknown'
-        last = self.doc.entries[0]
-        lhs['last_date'] = time.strftime('%d %b %Y', last['published_parsed'])
-        lhs['last_title'] = last['title']
-        lhs['avg_mb'] = self.get_avg_size()
-        lhs['avg_duration'] = self.get_avg_length()
-        headers = {'author': 'Author: ', 'title': 'Title:  ', 
-                   'last_date': 'Published:    ',
-                   'last_title': 'Last episode: ',
-                   'avg_duration': 'Avg. length of episode: ',
-                   'avg_mb': 'Avg. size of episode:   '}
-        order = ['author', 'title', 'last_title', 'last_date', 'avg_mb', 
-                 'avg_duration']
-        head_info = lambda x: (headers[x] + lhs[x])[:58].ljust(60)
-        self.lhs_lst = [head_info(x) for x in order]
-        self.lhs_lst.insert(4, ''.ljust(60))
-        self.lhs_lst.insert(2, ''.ljust(60))
-
-    def get_avg_size(self):
-        links = [entry['links'] for entry in self.entries]
-        lengths = [enc['length'] for sublist in links for enc in sublist 
-                   if 'length' in enc]
-        get_mean = lambda lst: sum([int(x) for x in lst])/len(lst)
-        if not lengths:
-            return "n/a"
-        avg_bytes = get_mean(lengths)
-        avg_mb = "%s Mb" % int(round(avg_bytes / (1024*1024), 0))
-        return avg_mb
-
-    def get_avg_length(self):
-        duration_entries = [entry for entry in self.doc.entries if 
-                            'itunes_duration' in entry]
-        if not duration_entries:
-            return "n/a"
-        durations = [self.itunes2seconds(entry) for entry in duration_entries]
-        avg_seconds = int(sum(durations) / len(durations))
-        m, s = divmod(avg_seconds, 60)
-        h, m = divmod(m, 60)
-        avg_duration = "%sh " % h if h > 0 else ""
-        avg_duration += "%sm" % m
-        return avg_duration
-
-    def itunes2seconds(self, entry):
-        itunes_hms = entry['itunes_duration'].split(':')
-        itunes_hms.reverse()
-        seconds = 0
-        for index,entry in enumerate(itunes_hms):
-            seconds += pow(60, index) * int(entry)
-        return int(seconds)
-
-    def set_rhs(self):
-        wdays = [x['published_parsed'].tm_wday for x in self.entries]
-        wday_count = {x: 0 for x in range(7)}
-        wday_count.update({x: wdays.count(x) for x in set(wdays)})
-        self.rhs_lst = ["PUBLISHED / 5 WEEKS", "".ljust(19)]
-        for i in reversed(range(5)):
-            line = ['▮' if wday_count[x] > i else ' ' for x in range(7)]
-            self.rhs_lst.append('  '.join(line))
-        self.rhs_lst.append('M  T  W  T  F  S  S')
