@@ -61,13 +61,16 @@ def delete(conf, args):
 def stats(conf, args):
     '''Remove xml subscription and delete audio and log files'''
     results = search(conf.xml, args)
-    for result in results:
+    for index, result in enumerate(results):
         result_stats = Feedstats(result.url.text)
         print(result.title.text.upper())
         result_stats.print_stats()
-        print()
-        _ = input("Enter to continue ")
-        print()
+        if index + 1 == len(results):
+            return
+        else:
+            print()
+            _ = input("Enter to continue ")
+            print()
 
 def toggle(conf, args):
     '''Toggle subscription state between 'active' and 'inactive' '''

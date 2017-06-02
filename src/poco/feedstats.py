@@ -44,7 +44,7 @@ class Feedstats():
         lhs['last_date'] = time.strftime('%d %b %Y', last['published_parsed'])
         lhs['last_title'] = last['title']
         lhs['avg_mb'] = self.get_avg_size()
-        lhs['avg_duration'] = self.get_avg_length()
+        lhs['avg_duration'] = self.get_avg_duration()
         headers = {'author': 'Author: ', 'title': 'Title:  ',
                    'last_date': 'Published:    ',
                    'last_title': 'Last episode: ',
@@ -64,20 +64,21 @@ class Feedstats():
         links = [entry['links'] for entry in self.entries]
         lengths = [enc['length'] for sublist in links for enc in sublist
                    if 'length' in enc]
-        get_mean = lambda lst: sum([int(x) for x in lst])/len(lst)
+        lengths = [int(x) for x in lengths if int(x) > 0]
         if not lengths:
             return "n/a"
-        avg_bytes = get_mean(lengths)
+        avg_bytes = sum(lengths)/len(lengths)
         avg_mb = "%s Mb" % int(round(avg_bytes / (1024*1024), 0))
         return avg_mb
 
-    def get_avg_length(self):
+    def get_avg_duration(self):
         '''Average duration in hours and minutes of an episode in the feed'''
         duration_entries = [entry for entry in self.doc.entries if 
                             'itunes_duration' in entry]
-        if not duration_entries:
+        durations = list(map(self.itunes2seconds, duration_entries))
+        durations = [entry for entry in durations if entry > 0]
+        if not durations:
             return "n/a"
-        durations = [self.itunes2seconds(entry) for entry in duration_entries]
         avg_seconds = int(sum(durations) / len(durations))
         m, s = divmod(avg_seconds, 60)
         h, m = divmod(m, 60)
