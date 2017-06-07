@@ -33,6 +33,10 @@ def main():
         poco.subscribe.stats(conf, args)
     elif args.cmd_name == 'tags':
         poco.subscribe.list_id3_tags()
+    elif args.cmd_name == 'search':
+        sub_dic, sub_category = poco.subscribe.search_show(conf, args)
+        if sub_dic:
+            poco.subscribe.add_sub(conf, sub_category, sub_dic)
 
 if __name__ == '__main__':
     try:

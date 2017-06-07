@@ -14,6 +14,8 @@
 from lxml import etree, objectify
 from mutagen.easyid3 import EasyID3
 
+import audiosearch
+
 from poco import files
 from poco.feedstats import Feedstats
 
@@ -89,15 +91,20 @@ def toggle(conf, args):
             files.delete_sub(conf, result.title.text)
     write(conf)
 
-def user_input_add_sub():
+def user_input_add_sub(url=None):
     '''Get user input for new subscription'''
     sub_lst = ['title', 'url', 'max_number', 'from_the_top']
     sub_dic = dict.fromkeys(sub_lst)
-    print("Press enter to skip setting (except * mandatory)")
-    while not sub_dic['url']:
-        sub_dic['url'] = input("* Url of subscription? ")
+    if url is None:
+        print("Press enter to skip setting (except * mandatory)")
+        while not sub_dic['url']:
+            sub_dic['url'] = input("* Url of subscription? ")
+    else:
+        sub_dic['url'] = url
+    print()
     url_stats = Feedstats(sub_dic['url'])
     url_stats.print_stats()
+    print()
     title = input("Title of subscription? (Enter to use feed title) ")
     sub_dic['title'] = title if title else url_stats.title
     while True:
@@ -162,7 +169,30 @@ def list_subs(conf):
         print()
 
 def list_id3_tags():
+    '''list valid id3 tags to use in metadata overrides'''
     valid_tags = list(EasyID3.valid_keys.keys())
     valid_tags.sort()
     for tag in valid_tags:
         print(tag)
+
+def search_show(conf, args):
+    '''Search for show title on audiosear.ch'''
+    oauth_id = conf.xml.find('./settings/audiosearch/id')
+    oauth_secret = conf.xml.find('./settings/audiosearch/secret')
+    if not oauth_id or not oauth_secret:
+        return(None, None)
+    # what if the client is bad
+    client = audiosearch.client.Client(oauth_id, oauth_secret)
+    search_query = client.search({'q': args.title}, type='shows')
+    results = search_query['results']
+    # what if there are zero reults
+    for index, result in enumerate(results):
+        print(index, result['title'])
+    # input should display correct length of results
+    select = input("Choose 0-9: ")
+    try:
+        choice = results[int(select)]
+    except (ValueError, IndexError):
+        return (None, None)
+    # are we guaranteed there is an rss_url?
+    return user_input_add_sub(url=choice['rss_url'])

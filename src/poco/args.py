@@ -60,4 +60,8 @@ def get_poca_subscribe_args():
                               help='Match against subscription title')
     stats_parser.add_argument('-u', '--url',
                               help='Match against subscription url')
+    search_parser = subparsers.add_parser('search', help='Search for show '
+                                          'on audiosear.ch')
+    search_parser.add_argument('-t', '--title',
+                               help='Match against show title')
     return parser.parse_args()
