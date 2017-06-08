@@ -15,6 +15,17 @@ import logging
 STREAM = logging.getLogger('POCASTREAM')
 SUMMARY = logging.getLogger('POCASUMMARY')
 
+# generic error
+def geninfo(msg):
+    '''Generic info'''
+    SUMMARY.info(msg)
+
+def generror(msg):
+    '''Generic error'''
+    err = "\N{Heavy Exclamation Mark Symbol}"
+    msg = err + 'ERROR' + err + ' ' + msg
+    SUMMARY.error(msg)
+
 # config reporting
 def conffatal(msg):
     '''Fatal errors encountered during config read'''

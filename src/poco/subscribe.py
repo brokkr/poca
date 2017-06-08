@@ -16,7 +16,7 @@ from mutagen.easyid3 import EasyID3
 
 import audiosearch
 
-from poco import files
+from poco import files, output
 from poco.feedstats import Feedstats
 
 
@@ -180,19 +180,27 @@ def search_show(conf, args):
     oauth_id = conf.xml.find('./settings/audiosearch/id')
     oauth_secret = conf.xml.find('./settings/audiosearch/secret')
     if not oauth_id or not oauth_secret:
+        msg = ("Missing audiosear.ch key and/or secret."
+               " Please get yours at https://www.audiosear.ch/users/sign_up")
+        output.generror(msg)
         return(None, None)
-    # what if the client is bad
-    client = audiosearch.client.Client(oauth_id, oauth_secret)
+    try:
+        client = audiosearch.client.Client(oauth_id, oauth_secret)
+    except Exception as e:
+        msg = "Audiosear.ch connection or authentication failed."
+        output.generror(msg)
+        return (None, None)
     search_query = client.search({'q': args.title}, type='shows')
     results = search_query['results']
-    # what if there are zero reults
     for index, result in enumerate(results):
         print(index, result['title'])
-    # input should display correct length of results
-    select = input("Choose 0-9: ")
+    no_search_results = len(results)
+    if no_search_results == 0:
+        output.geninfo('No results from search')
+        return (None, None)
+    select = input("Choose 0-%i: " % (no_search_results-1))
     try:
         choice = results[int(select)]
     except (ValueError, IndexError):
         return (None, None)
-    # are we guaranteed there is an rss_url?
     return user_input_add_sub(url=choice['rss_url'])
