@@ -11,10 +11,14 @@
 """Functions for subscription management for poca"""
 
 
+import os
 from lxml import etree, objectify
 from mutagen.easyid3 import EasyID3
 
-import audiosearch
+try:
+    import audiosearch
+except ImportError:
+    audiosearch = None
 
 from poco import files, output
 from poco.feedstats import Feedstats
@@ -152,10 +156,10 @@ def list_subs(conf):
         max_no = 'MAX NO'
         url = 'URL'
         print(heading.ljust(32), state.ljust(10), max_no.ljust(8), url)
-        heading_line = ''.ljust(len(heading),'-').ljust(32)
-        state_line = ''.ljust(5,'-').ljust(10)
-        maxno_line = ''.ljust(6,'-').ljust(8)
-        url_line = ''.ljust(3,'-')
+        heading_line = ''.ljust(len(heading), '-').ljust(32)
+        state_line = ''.ljust(5, '-').ljust(10)
+        maxno_line = ''.ljust(6, '-').ljust(8)
+        url_line = ''.ljust(3, '-')
         print(heading_line, state_line, maxno_line, url_line)
         for sub in cats_dic[key]:
             title = sub.find('title') or '[no title]'
@@ -179,6 +183,11 @@ def search_show(conf, args):
     '''Search for show title on audiosear.ch'''
     oauth_id = conf.xml.find('./settings/audiosearch/id')
     oauth_secret = conf.xml.find('./settings/audiosearch/secret')
+    if not audiosearch:
+        msg = ("Missing audiosearch module. Please install with \n"
+               "  pip3 install audiosearch")
+        output.generror(msg)
+        return(None, None)
     if not oauth_id or not oauth_secret:
         msg = ("Missing audiosear.ch key and/or secret."
                " Please get yours at https://www.audiosear.ch/users/sign_up")
@@ -190,10 +199,39 @@ def search_show(conf, args):
         msg = "Audiosear.ch connection or authentication failed."
         output.generror(msg)
         return (None, None)
-    search_query = client.search({'q': args.title}, type='shows')
+    if args.list_networks:
+        networks = [network['name'].lower() for network in
+                    client.get('/networks/')]
+        networks.sort()
+        for index, network in enumerate(networks):
+            divisor, modulus = divmod(index, 20)
+            if divisor > 0 and modulus == 0:
+                print()
+                _ = input('Press Enter to continue ')
+                os.system('clear')
+            print(network)
+        return (None, None)
+    search_dic = {'q': '*'}
+    if args.keyword:
+        search_dic['q'] = args.keyword
+    if args.title:
+        search_dic['q'] = "title:%s" % args.title
+    if args.network:
+        networks = [network['name'].lower() for network in
+                    client.get('/networks/')]
+        if args.network.lower() in networks:
+            search_dic["filters[network.name]"] = args.network
+        else:
+            output.geninfo("Network not in audiosear.ch db. Run "
+                           "poca-subscribe search --list-networks for a "
+                           "list of known networks")
+            return (None, None)
+    search_query = client.search(search_dic, type='shows')
     results = search_query['results']
     for index, result in enumerate(results):
-        print(index, result['title'])
+        title = result['title'][:23].ljust(25)
+        desc = result['description'].lstrip().replace('\n', '')[:52]
+        print(index, title, desc)
     no_search_results = len(results)
     if no_search_results == 0:
         output.geninfo('No results from search')

@@ -62,6 +62,12 @@ def get_poca_subscribe_args():
                               help='Match against subscription url')
     search_parser = subparsers.add_parser('search', help='Search for show '
                                           'on audiosear.ch')
+    search_parser.add_argument('-k', '--keyword',
+                               help='Match against show title and description')
     search_parser.add_argument('-t', '--title',
-                               help='Match against show title')
+                               help='Match only against show title')
+    search_parser.add_argument('-n', '--network',
+                               help='Restrict results to one publisher (e.g. BBC, NPR)')
+    search_parser.add_argument('--list-networks', action='store_true', default=False,
+                               help='List valid networks for use in --network')
     return parser.parse_args()
