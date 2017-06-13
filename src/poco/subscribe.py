@@ -230,7 +230,9 @@ def search_show(conf, args):
     results = search_query['results']
     for index, result in enumerate(results):
         title = result['title'][:23].ljust(25)
-        desc = result['description'].lstrip().replace('\n', '')[:52]
+        desc = result['description']
+        desc = desc.lstrip().replace('\n', '')[:52] if desc else \
+               'Description missing'
         print(index, title, desc)
     no_search_results = len(results)
     if no_search_results == 0:
