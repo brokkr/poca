@@ -273,8 +273,9 @@ class Wanted():
                     'title': self.match_title,
                     'hour': self.match_hour,
                     'weekdays': self.match_weekdays}
-        for key in sub.filters.iterchildren():
-            func_dic[key.tag](combo.dic, key.text)
+        valid_filters = set(sub.filters.iterchildren()) & set(func_dic.keys())
+        for key in valid_filters:
+            func_dic[key](combo.dic, sub.filters[key].text)
 
     def limit(self, sub):
         '''Limit the number of episodes to that set in max_number'''
