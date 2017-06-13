@@ -53,8 +53,7 @@ def tag_audio_file(settings, sub, jar, entry):
         track_no += 1
         jar.track_no = track_no
         jar.save()
-        track_str = str(track_no).rjust(3, '0')
-        audio['tracknumber'] = track_str
+        audio['tracknumber'] = str(track_no)
         # note: we save the jar before we know if tagging is succesful
         # could mean skipped track numbers
     if isinstance(audio, mutagen.mp3.EasyMP3):
