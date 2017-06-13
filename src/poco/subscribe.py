@@ -184,13 +184,13 @@ def search_show(conf, args):
     oauth_id = conf.xml.find('./settings/audiosearch/id')
     oauth_secret = conf.xml.find('./settings/audiosearch/secret')
     if not audiosearch:
-        msg = ("Missing audiosearch module. Please install with \n"
-               "  pip3 install audiosearch")
+        msg = ("Missing audiosearch module. Please install with "
+               "'pip3 install audiosearch'")
         output.generror(msg)
         return(None, None)
     if not oauth_id or not oauth_secret:
         msg = ("Missing audiosear.ch key and/or secret."
-               " Please get yours at https://www.audiosear.ch/users/sign_up")
+                " Please get yours at https://www.audiosear.ch/oauth/applications")
         output.generror(msg)
         return(None, None)
     try:

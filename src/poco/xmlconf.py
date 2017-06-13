@@ -16,15 +16,18 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 <poca version="0.8">
 
     <!-- Please see detailed configuration documentation online:
-     https://github.com/brokkr/poca/wiki/Configuration -->
+     https://github.com/brokkr/poca/wiki/Configuration 
+     All tags can be removed for relying on default settings -->
 
     <!-- The meaning of the settings options are briefly as follows:
     * base_dir: Directory containing the individual subscription folders
-    * id3encoding: Encoding to use on metadata (utf8 or latin1)
+    * id3v2version: 3 for id3v2.3, 4 for id3v2.4 (default)
     * id3removev1: Should we remove id3v1, only keeping v2 (yes or no)
     * useragent: _Fallback_ user agent if connection is rejected for
       default python user agent. Leave empty not to use a fallback.
     * email logging setup not included by default, see wiki for details.
+    * audiosearch id/secret: keys required for 'poca-subscribe search'
+                             get yours @ https://www.audiosear.ch/oauth/applications
     -->
 
     <settings>
@@ -32,6 +35,10 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
         <id3v2version>4</id3v2version>
         <id3removev1>yes</id3removev1>
         <useragent></useragent>
+        <audiosearch>
+            <id></id>
+            <secret></secret>
+        </audiosearch>
     </settings>
 
     <!-- Defaults take the same options as any single subscription. A
