@@ -12,6 +12,7 @@
 
 
 import os
+import re
 from lxml import etree, objectify
 from mutagen.easyid3 import EasyID3
 
@@ -229,11 +230,14 @@ def search_show(conf, args):
     search_query = client.search(search_dic, type='shows')
     results = search_query['results']
     for index, result in enumerate(results):
-        title = result['title'][:23].ljust(25)
-        desc = result['description']
-        desc = desc.lstrip().replace('\n', '')[:52] if desc else \
-               'Description missing'
-        print(index, title, desc)
+        title = result['title']
+        desc_full = result['description'] if result['description'] else ''
+        desc_start = re.match('[^\.\?\!]+', desc_full)
+        desc = desc_start.group()[:77] if desc_start else ''
+        network = result['network']['name'] if result['network'] else 'Unknown'
+        print(index, title)
+        print(' ', 'From:', network)
+        print(' ', desc)
     no_search_results = len(results)
     if no_search_results == 0:
         output.geninfo('No results from search')
