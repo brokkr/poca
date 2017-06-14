@@ -25,6 +25,8 @@ With Poca you can set custom options for each individual subscription.
  * **Manage your shows** by editing an easy-to-understand xml file. Or use
    the accompanying tool to add, delete, sort them and get neat (!) ascii
    graphs showing the publishing frequency, average episode length and more.
+ * **... and find new ones** with the accompanying search tool using the
+   Audiosear.ch API.
 
 Poca also: has excellent unicode support for feeds, filenames and tags, gets 
 cover images for feeds, has the ability to spoof user agents, can pause your
