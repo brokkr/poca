@@ -3,7 +3,8 @@ Poca is a command line podcast client, written in Python 3. It is developed for
 stability and ease of use.
 
 ### Features
-With Poca you can set custom options for each individual subscription. 
+With Poca you can set custom options for each individual subscription or use
+global defaults to have them apply to every subscription.
 
  * **Maximum amount**. Specify how many episodes the subscription should get 
    before deleting old episodes to make room for new ones.
@@ -23,7 +24,7 @@ With Poca you can set custom options for each individual subscription.
    easily see what's changed. Or configure it with an SMTP server and get
    notified when a feed stops working.
  * **Manage your shows** by editing an easy-to-understand xml file. Or use
-   the accompanying tool to add, delete, sort them and get neat (!) ascii
+   the accompanying tool to add, delete, sort them and get neat ascii
    graphs showing the publishing frequency, average episode length and more.
  * **... and find new ones** with the accompanying search tool using the
    Audiosear.ch API.
@@ -32,8 +33,8 @@ Poca also: has excellent unicode support for feeds, filenames and tags, gets
 cover images for feeds, has the ability to spoof user agents, can pause your
 subscriptions, remembers which downloads actually completed, and more.
 
-See the [Configuration](https://github.com/brokkr/poca/wiki/Configuration) section of the
-wiki for more details on features.
+See the [Configuration](https://github.com/brokkr/poca/wiki/Configuration) 
+section of the wiki for more details on features.
 
 ### Interface
 [![asciicast](https://asciinema.org/a/cwf8k4e154s6dkw2hiohqxj68.png)](https://asciinema.org/a/cwf8k4e154s6dkw2hiohqxj68)
