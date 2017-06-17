@@ -13,6 +13,8 @@ import os
 import re
 import sys
 import time
+
+from threading import Thread
 from copy import deepcopy
 
 import feedparser
@@ -22,7 +24,7 @@ from poco.outcome import Outcome
 from poco.config import merge
 
 
-class Channel:
+class SubUpdate(Thread):
     '''A class for a single subscription/channel. Creates the containers
     first, then acts on them and updates the db as it goes.'''
     def __init__(self, conf, sub):
@@ -36,7 +38,7 @@ class Channel:
                                     self.sub.title.text)
         self.ctitle = self.sub.title.text.upper()
 
-    def make_plans(self):
+    def run(self):
         '''Calculate what files to get and what files to dump'''
         # see if merge did okay
         if not self.outcome.success:
