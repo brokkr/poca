@@ -7,11 +7,10 @@
 # the Free Software Foundation, either version 3 of the License,
 # or (at your option) any later version.
 
-"""Per-subscription operations"""
+"""Update feed in thread"""
 
 import os
 import re
-import sys
 import time
 
 from threading import Thread
@@ -19,7 +18,7 @@ from copy import deepcopy
 
 import feedparser
 
-from poco import files, history, entryinfo, output, tag
+from poco import files, history, entryinfo, output
 from poco.outcome import Outcome
 from poco.config import merge
 
@@ -27,27 +26,32 @@ from poco.config import merge
 class SubUpdate(Thread):
     '''A class for a single subscription/channel. Creates the containers
     first, then acts on them and updates the db as it goes.'''
-    def __init__(self, conf, sub):
+    def __init__(self, q, conf, sub):
+        self.q = q
         self.conf = conf
-        defaults = deepcopy(conf.xml.defaults)
-        errors = merge(sub, defaults, conf.xml.defaults, errors=[])
-        self.outcome = errors[0] if errors else Outcome(True, '')
-        defaults.tag = "subscription"
-        self.sub = defaults
-        self.sub_dir = os.path.join(conf.xml.settings.base_dir.text,
-                                    self.sub.title.text)
-        self.ctitle = self.sub.title.text.upper()
+        self.sub = sub
+        super(SubUpdate, self).__init__()
 
     def run(self):
         '''Calculate what files to get and what files to dump'''
-        # see if merge did okay
+        defaults = deepcopy(self.conf.xml.defaults)
+        errors = merge(self.sub, defaults, self.conf.xml.defaults, errors=[])
+        self.outcome = errors[0] if errors else Outcome(True, '')
+        defaults.tag = "subscription"
+        self.sub = defaults
         if not self.outcome.success:
-            output.suberror(self.ctitle, self.outcome)
+            #output.suberror(self.ctitle, self.outcome)
+            self.q.put(None)
             return
-        # see that we can write to the designated directory
+
+        # basic sub set up and prerequisites
+        self.ctitle = self.sub.title.text.upper()
+        self.sub_dir = os.path.join(self.conf.xml.settings.base_dir.text,
+                                    self.sub.title.text)
         self.outcome = files.check_path(self.sub_dir)
         if not self.outcome.success:
-            output.suberror(self.ctitle, self.outcome)
+            #output.suberror(self.ctitle, self.outcome)
+            self.q.put(None)
             return
 
         # get jar and check for user deleted files
@@ -55,7 +59,8 @@ class SubUpdate(Thread):
         self.jar, self.outcome = history.get_subjar(self.conf.paths,
                                                     self.sub)
         if not self.outcome.success:
-            output.suberror(self.ctitle, self.outcome)
+            #output.suberror(self.ctitle, self.outcome)
+            self.q.put(None)
             return
         self.check_jar()
 
@@ -63,57 +68,29 @@ class SubUpdate(Thread):
         self.feed = Feed(self.sub, self.jar, self.udeleted)
         self.outcome = self.feed.outcome
         if not self.outcome.success:
-            output.suberror(self.ctitle, self.outcome)
+            #output.suberror(self.ctitle, self.outcome)
+            self.q.put(None)
             return
         self.combo = Combo(self.feed, self.jar, self.sub, self.sub_dir)
-        self.wanted = Wanted(self.sub, self.combo, self.jar.del_lst)
+        self.wanted = Wanted(self.sub, self.feed, self.combo, self.jar.del_lst)
         from_the_top = self.sub.find('from_the_top') or 'no'
         if from_the_top == 'no':
             self.wanted.lst.reverse()
 
         # inform user of intentions
+        # why are we using sets here? why not use list comprehension
+        # self.unwanted = [x for x in self.jar.lst if x not in self.wanted.lst]
+        # self.lacking = [x for x in self.wanted.lst if x not in self.jar.lst]
         self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
         self.lacking = set(self.wanted.lst) - set(self.jar.lst)
-        output.plans(self.ctitle, len(self.udeleted), len(self.unwanted),
-                     len(self.lacking))
-        self.removed, self.downed, self.failed = [], [], []
-
-    def follow_through(self):
-        '''Act on the plans laid out'''
-        # loop through user deleted and indicate recognition
-        for entry in self.udeleted:
-            output.notice_udeleted(entry)
-
-        # loop through unwanted (set) entries to remove
-        for uid in self.unwanted:
-            entry = self.jar.dic[uid]
-            self.remove(uid, entry)
-            if not self.outcome.success:
-                output.suberror(self.ctitle, self.outcome)
-                return
-
-        # loop through wanted (list) entries to acquire
-        for uid in self.wanted.lst:
-            if uid not in self.lacking:
-                continue
-            entry = self.wanted.dic[uid]
-            self.acquire(uid, entry)
-
-        # save etag and subsettings after succesful update
-        if not self.failed:
-            self.jar.sub = self.sub
-            self.jar.etag = self.feed.etag
-        self.jar.save()
-
-        # download cover image
-        if self.downed and self.feed.image:
-            outcome = files.download_img_file(self.feed.image, self.sub_dir,
-                                              self.conf.xml.settings)
-
-        # print summary of operations in file log
-        output.summary(self.ctitle, self.udeleted, self.removed,
-                       self.downed, self.failed)
-
+        #output.plans(self.ctitle, len(self.udeleted), len(self.unwanted),
+        #             len(self.lacking))
+        update_dic = {'jar': self.jar,
+                      'wanted': self.wanted,
+                      'udeleted': self.udeleted,
+                      'unwanted': self.unwanted,
+                      'lacking': self.lacking}
+        self.q.put(update_dic)
 
     def check_jar(self):
         '''Check for user deleted files so we can filter them out'''
@@ -124,54 +101,20 @@ class SubUpdate(Thread):
                 self.udeleted.append(entry)
                 self.jar.del_lst.append(uid)
                 self.jar.del_dic[uid] = self.jar.dic.pop(uid)
+        # we change the list after the loop because we don't want to saw the
+        # branch we're sitting on. but maybe it would be smarter to just loop
+        # a copy and pop the lst entries into del_lst?
         self.jar.lst = [x for x in self.jar.lst if x not in self.jar.del_lst]
         self.jar.save()
         # currently no jar-save checks
-
-    def acquire(self, uid, entry):
-        '''Get new entries, tag them and add to history'''
-        # see https://github.com/brokkr/poca/wiki/Architecture#wantedindex
-        output.downloading(entry)
-        wantedindex = self.wanted.lst.index(uid) - len(self.failed)
-        outcome = files.download_file(entry['poca_url'],
-                                      entry['poca_abspath'],
-                                      self.conf.xml.settings)
-        if outcome.success:
-            outcome = tag.tag_audio_file(self.conf.xml.settings,
-                                         self.sub, self.jar, entry)
-            if not outcome.success:
-                output.tag_fail(outcome)
-                # add to failed?
-            self.add_to_jar(uid, entry, wantedindex)
-            self.downed.append(entry)
-        else:
-            output.dl_fail(outcome)
-            self.failed.append(entry)
-
-    def add_to_jar(self, uid, entry, wantedindex):
-        '''Add new entry to jar'''
-        self.jar.lst.insert(wantedindex, uid)
-        self.jar.dic[uid] = entry
-        self.outcome = self.jar.save()
-        # currently no jar-save checks
-
-    def remove(self, uid, entry):
-        '''Deletes the file and removes the entry from the jar'''
-        output.removing(entry)
-        self.outcome = files.delete_file(entry['poca_abspath'])
-        if not self.outcome.success:
-            return
-        self.jar.lst.remove(uid)
-        del(self.jar.dic[uid])
-        self.outcome = self.jar.save()
-        # currently no jar-save checks
-        self.removed.append(entry)
 
 class Feed:
     '''Constructs a container for feed entries'''
     def __init__(self, sub, jar, udeleted):
         self.outcome = Outcome(True, '')
         self.etag = jar.etag
+        # does comapring sub instances actually work?
+        # does it ever see that sub_a is the same as sub_b?
         if sub != jar.sub or udeleted:
             self.etag = None
         doc = self.update(sub)
@@ -231,7 +174,7 @@ class Combo:
 
 class Wanted():
     '''Filters the combo entries and decides which ones to go for'''
-    def __init__(self, sub, combo, del_lst):
+    def __init__(self, sub, feed, combo, del_lst):
         self.lst = combo.lst
         self.lst = list(filter(lambda x: x not in del_lst, self.lst))
         self.lst = list(filter(lambda x: combo.dic[x]['valid'], self.lst))
@@ -241,6 +184,8 @@ class Wanted():
         if hasattr(sub, 'max_number'):
             self.limit(sub)
         self.dic = {x: combo.dic[x] for x in self.lst}
+        self.feed_etag = feed.etag
+        self.feed_image = feed.image
 
     def match_filename(self, dic, filter_text):
         '''The episode filename must match a regex/string'''
