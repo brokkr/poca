@@ -13,7 +13,8 @@ from . import about
 from . import args
 from . import outcome
 from . import output
-from . import channel
+from . import subupdate
+from . import subupgrade
 from . import config
 from . import entryinfo
 from . import files
