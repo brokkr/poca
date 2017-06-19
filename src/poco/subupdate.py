@@ -23,35 +23,42 @@ from poco.outcome import Outcome
 from poco.config import merge
 
 
-class SubUpdate(Thread):
-    '''A class for a single subscription/channel. Creates the containers
-    first, then acts on them and updates the db as it goes.'''
-    def __init__(self, q, conf, sub):
-        self.q = q
-        self.conf = conf
-        self.sub = sub
-        super(SubUpdate, self).__init__()
+class SubThread(Thread):
+    '''A thread class that creates a SubData instance and puts it in the
+       queue'''
+    def __init__(self, queue, target, *args):
+        self.queue = queue
+        self._target = target
+        self._args = args
+        super(SubThread, self).__init__()
 
     def run(self):
-        '''Calculate what files to get and what files to dump'''
+        subdata = self._target(self._args)
+        self.queue.put(subdata)
+
+
+class SubData():
+    '''Data carrier for subscription: entries to dl, entries to remove,
+       user deleted entries, etc.'''
+    def __init__(self, conf, sub):
+        # basic sub set up and prerequisites
+        self.conf = conf
+        self.sub = sub
+        self.outcome = Outcome(True, '')
+        self.ctitle = self.sub.title.text.upper()
+        self.sub_dir = os.path.join(self.conf.xml.settings.base_dir.text,
+                                    self.sub.title.text)
+        self.outcome = files.check_path(self.sub_dir)
+        if not self.outcome.success:
+            return
+
+        # merge sub settings and defaults
         defaults = deepcopy(self.conf.xml.defaults)
         errors = merge(self.sub, defaults, self.conf.xml.defaults, errors=[])
         self.outcome = errors[0] if errors else Outcome(True, '')
         defaults.tag = "subscription"
         self.sub = defaults
         if not self.outcome.success:
-            #output.suberror(self.ctitle, self.outcome)
-            self.q.put(None)
-            return
-
-        # basic sub set up and prerequisites
-        self.ctitle = self.sub.title.text.upper()
-        self.sub_dir = os.path.join(self.conf.xml.settings.base_dir.text,
-                                    self.sub.title.text)
-        self.outcome = files.check_path(self.sub_dir)
-        if not self.outcome.success:
-            #output.suberror(self.ctitle, self.outcome)
-            self.q.put(None)
             return
 
         # get jar and check for user deleted files
@@ -59,38 +66,27 @@ class SubUpdate(Thread):
         self.jar, self.outcome = history.get_subjar(self.conf.paths,
                                                     self.sub)
         if not self.outcome.success:
-            #output.suberror(self.ctitle, self.outcome)
-            self.q.put(None)
             return
         self.check_jar()
 
         # get feed, combine with jar and filter the lot
-        self.feed = Feed(self.sub, self.jar, self.udeleted)
-        self.outcome = self.feed.outcome
+        feed = Feed(self.sub, self.jar, self.udeleted)
+        self.outcome = feed.outcome
         if not self.outcome.success:
-            #output.suberror(self.ctitle, self.outcome)
-            self.q.put(None)
             return
-        self.combo = Combo(self.feed, self.jar, self.sub, self.sub_dir)
-        self.wanted = Wanted(self.sub, self.feed, self.combo, self.jar.del_lst)
+        combo = Combo(feed, self.jar, self.sub, self.sub_dir)
+        self.wanted = Wanted(self.sub, feed, combo, self.jar.del_lst)
         from_the_top = self.sub.find('from_the_top') or 'no'
         if from_the_top == 'no':
             self.wanted.lst.reverse()
 
         # inform user of intentions
-        # why are we using sets here? why not use list comprehension
-        # self.unwanted = [x for x in self.jar.lst if x not in self.wanted.lst]
-        # self.lacking = [x for x in self.wanted.lst if x not in self.jar.lst]
-        self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
-        self.lacking = set(self.wanted.lst) - set(self.jar.lst)
+        self.unwanted = [x for x in self.jar.lst if x not in self.wanted.lst]
+        self.lacking = [x for x in self.wanted.lst if x not in self.jar.lst]
+        #self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
+        #self.lacking = set(self.wanted.lst) - set(self.jar.lst)
         #output.plans(self.ctitle, len(self.udeleted), len(self.unwanted),
         #             len(self.lacking))
-        update_dic = {'jar': self.jar,
-                      'wanted': self.wanted,
-                      'udeleted': self.udeleted,
-                      'unwanted': self.unwanted,
-                      'lacking': self.lacking}
-        self.q.put(update_dic)
 
     def check_jar(self):
         '''Check for user deleted files so we can filter them out'''

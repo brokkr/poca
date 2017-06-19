@@ -29,7 +29,7 @@ def main():
     xp_str = './subscription[not(@state="inactive")][title][url]'
     valid_subs = conf.xml.subscriptions.xpath(xp_str)
     for sub in valid_subs:
-        t = poco.subupdate.SubUpdate(q, conf, sub)
+        t = poco.subupdate.SubThread(q, poco.subupdate.SubData, conf, sub)
         threads.append(t)
         t.start()
         #if not channel.outcome.success:
