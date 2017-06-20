@@ -18,7 +18,7 @@ from copy import deepcopy
 
 import feedparser
 
-from poco import files, history, entryinfo, output
+from poco import files, history, entryinfo
 from poco.outcome import Outcome
 from poco.config import merge
 
@@ -28,12 +28,12 @@ class SubThread(Thread):
        queue'''
     def __init__(self, queue, target, *args):
         self.queue = queue
-        self._target = target
-        self._args = args
+        self.target = target
+        self.args = args
         super(SubThread, self).__init__()
 
     def run(self):
-        subdata = self._target(self._args)
+        subdata = self.target(*self.args)
         self.queue.put(subdata)
 
 
@@ -45,7 +45,6 @@ class SubData():
         self.conf = conf
         self.sub = sub
         self.outcome = Outcome(True, '')
-        self.ctitle = self.sub.title.text.upper()
         self.sub_dir = os.path.join(self.conf.xml.settings.base_dir.text,
                                     self.sub.title.text)
         self.outcome = files.check_path(self.sub_dir)
@@ -90,16 +89,16 @@ class SubData():
 
     def check_jar(self):
         '''Check for user deleted files so we can filter them out'''
+        #for index, uid in enumerate(deepcopy(self.jar.lst)):
         for uid in self.jar.lst:
             entry = self.jar.dic[uid]
             outcome = files.verify_file(entry)
             if not outcome.success:
                 self.udeleted.append(entry)
+                #self.jar.del_lst.append(self.jar.lst.pop(index))
                 self.jar.del_lst.append(uid)
+                # do we actually use/need del_dic?
                 self.jar.del_dic[uid] = self.jar.dic.pop(uid)
-        # we change the list after the loop because we don't want to saw the
-        # branch we're sitting on. but maybe it would be smarter to just loop
-        # a copy and pop the lst entries into del_lst?
         self.jar.lst = [x for x in self.jar.lst if x not in self.jar.del_lst]
         self.jar.save()
         # currently no jar-save checks
