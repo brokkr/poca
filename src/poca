@@ -24,31 +24,31 @@ def main():
                                                       conf.xml.settings)
 
     # update loop
-    threads = []
-    q = Queue()
+    update_threads = []
+    update_q = Queue()
     xp_str = './subscription[not(@state="inactive")][title][url]'
     valid_subs = conf.xml.subscriptions.xpath(xp_str)
     for sub in valid_subs:
-        t = poco.subupdate.SubThread(q, poco.subupdate.SubData, conf, sub)
-        threads.append(t)
-        t.start()
-        #if not channel.outcome.success:
-        #    continue
-        #channel.follow_through()
-        #if not channel.outcome.success:
-        #    continue
-    #if summary_logger.poca_email_handler:
-    #    summary_logger.poca_email_handler.close()
-    #    outcome = summary_logger.poca_email_handler.outcome
-    #    if outcome.success is False:
-    #        poco.output.conffatal('Email log failed with: ')
-    #        poco.output.conffatal('  ' + outcome.msg)
-    for t in threads:
-        t.join()
-    return q
+        thread = poco.subupdate.SubThread(update_q, poco.subupdate.SubData, conf, sub)
+        update_threads.append(thread)
+        thread.start()
+    for thread in update_threads:
+        thread.join()
+    update_lst = []
+    while not update_q.empty():
+        update_lst.append(update_q.get())
+    print(update_lst)
 
 if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
         pass
+
+
+    #if summary_logger.poca_email_handler:
+    #    summary_logger.poca_email_handler.close()
+    #    outcome = summary_logger.poca_email_handler.outcome
+    #    if outcome.success is False:
+    #        poco.output.conffatal('Email log failed with: ')
+    #        poco.output.conffatal('  ' + outcome.msg)
