@@ -25,6 +25,10 @@ class TestThread(Thread):
 
     def run(self):
         subdata = self.q.get()
+        if not subdata.outcome.success:
+            print(self.name, subdata.sub.title, subdata.outcome.msg)
+            self.q.task_done()
+            return
         sleep(randint(1, 20))
         print(self.name, subdata.sub.title)
         self.q.task_done()
@@ -49,21 +53,18 @@ def main():
         update_threads.append(thread)
         thread.start()
     upgrade_threads = []
+    #counter = 0
     while len(upgrade_threads) < len(valid_subs):
-        live_threads = [t for t in upgrade_threads if t.is_alive()]
-        print(len(live_threads))
+        #live_threads = len([t.name for t in upgrade_threads if t.is_alive()])
+        #counter += 1
+        #print(str(counter).ljust(6), update_q.unfinished_tasks, live_threads)
         while len([t for t in upgrade_threads if t.is_alive()]) < 4 and not update_q.empty():
             t = TestThread(update_q)
             upgrade_threads.append(t)
             t.start()
-            print('starting new thread')
-        sleep(1)
+            #print('starting new thread')
+        sleep(0.1)
     print(update_q.empty())
-
-    #update_lst = []
-    #while not update_q.empty():
-    #    update_lst.append(update_q.get())
-    #print(update_lst)
 
 
 if __name__ == '__main__':
