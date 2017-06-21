@@ -48,19 +48,17 @@ def main():
         thread = poco.subupdate.SubThread(update_q, poco.subupdate.SubData, conf, sub)
         update_threads.append(thread)
         thread.start()
-    for thread in update_threads:
-        thread.join()
     upgrade_threads = []
     while len(upgrade_threads) < len(valid_subs):
         live_threads = [t for t in upgrade_threads if t.is_alive()]
         print(len(live_threads))
-        print(update_q.empty())
         while len([t for t in upgrade_threads if t.is_alive()]) < 4 and not update_q.empty():
             t = TestThread(update_q)
             upgrade_threads.append(t)
             t.start()
             print('starting new thread')
         sleep(1)
+    print(update_q.empty())
 
     #update_lst = []
     #while not update_q.empty():
