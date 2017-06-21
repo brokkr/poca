@@ -18,6 +18,18 @@ from random import randint
 from time import sleep
 
 
+class TestThread(Thread):
+    def __init__(self, q):
+        self.q = q
+        super(TestThread, self).__init__()
+
+    def run(self):
+        subdata = self.q.get()
+        sleep(randint(1, 20))
+        print(self.name, subdata.sub.title)
+        self.q.task_done()
+
+
 def main():
     '''Main script'''
     # setup
@@ -39,17 +51,22 @@ def main():
     for thread in update_threads:
         thread.join()
     upgrade_threads = []
-    upgrade_q = Queue()
-    while upgrade_q.qsize() < len(valid_subs):
-        while upgrade_q.unfinished_tasks < 4 and not update_q.empty():
-            t = None
+    while len(upgrade_threads) < len(valid_subs):
+        live_threads = [t for t in upgrade_threads if t.is_alive()]
+        print(len(live_threads))
+        print(update_q.empty())
+        while len([t for t in upgrade_threads if t.is_alive()]) < 4 and not update_q.empty():
+            t = TestThread(update_q)
             upgrade_threads.append(t)
             t.start()
+            print('starting new thread')
+        sleep(1)
 
     #update_lst = []
     #while not update_q.empty():
     #    update_lst.append(update_q.get())
     #print(update_lst)
+
 
 if __name__ == '__main__':
     try:
@@ -64,13 +81,3 @@ if __name__ == '__main__':
     #    if outcome.success is False:
     #        poco.output.conffatal('Email log failed with: ')
     #        poco.output.conffatal('  ' + outcome.msg)
-class TestThread(Thread):
-    def __init__(self, q, subdata):
-        self.subdata = subdata
-        self.q = q
-        super(TestThread, self).__init__()
-
-    def run(self):
-        sleep(randint(1, 10))
-        print(self.name, self.subdata.sub.title)
-        self.q.task_done()
