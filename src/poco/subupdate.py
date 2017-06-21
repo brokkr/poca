@@ -23,21 +23,21 @@ from poco.outcome import Outcome
 from poco.config import merge
 
 
-class SubThread(Thread):
+class SubUpdateThread(Thread):
     '''A thread class that creates a SubData instance and puts it in the
        queue'''
     def __init__(self, queue, target, *args):
         self.queue = queue
         self.target = target
         self.args = args
-        super(SubThread, self).__init__()
+        super(SubUpdateThread, self).__init__()
 
     def run(self):
         subdata = self.target(*self.args)
         self.queue.put(subdata)
 
 
-class SubData():
+class SubUpdate():
     '''Data carrier for subscription: entries to dl, entries to remove,
        user deleted entries, etc.'''
     def __init__(self, conf, sub):

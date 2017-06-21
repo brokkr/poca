@@ -10,88 +10,104 @@
 """Operations on feeds with updates"""
 
 
+from threading import Thread
 from poco import files, output, tag
 
 
-class SubUpgrade():
-    def __init__(self):
-        '''Act on the plans laid out'''
-        # loop through user deleted and indicate recognition
-        for entry in self.udeleted:
-            output.notice_udeleted(entry)
+class SubUpgradeThread(Thread):
+    '''A thread class that creates handles a SubData instance'''
+    def __init__(self, queue, target):
+        self.queue = queue
+        self.target = target
+        super(SubUpgradeThread, self).__init__()
 
+    def run(self):
+        subdata = self.queue.get()
+        if subdata.outcome.success:
+            output.subplans(subdata)
+            sub_upgrade = self.target(subdata)
+        else:
+            output.suberror(subdata)
+        self.queue.task_done()
+
+class SubUpgrade():
+    '''Use the SubData packet to implement file operations'''
+    def __init__(self, subdata):
         # prepare list for summary
         self.removed, self.downed, self.failed = [], [], []
 
+        # loop through user deleted and indicate recognition
+        for entry in subdata.udeleted:
+            output.notice_udeleted(entry)
+
         # loop through unwanted (set) entries to remove
-        for uid in self.unwanted:
-            entry = self.jar.dic[uid]
-            self.remove(uid, entry)
+        for uid in subdata.unwanted:
+            entry = subdata.jar.dic[uid]
+            self.remove(uid, entry, subdata)
             if not self.outcome.success:
-                output.suberror(self.ctitle, self.outcome)
+                output.suberror(subdata)
                 return
 
         # loop through wanted (list) entries to acquire
-        # WHY OH WHY aren't we just looping through lacking? we still have 
+        # WHY OH WHY aren't we just looping through lacking? we still have
         # access to wanted's dictionary?
-        for uid in self.wanted.lst:
-            if uid not in self.lacking:
+        for uid in subdata.wanted.lst:
+            if uid not in subdata.lacking:
                 continue
-            entry = self.wanted.dic[uid]
-            self.acquire(uid, entry)
+            entry = subdata.wanted.dic[uid]
+            self.acquire(uid, entry, subdata)
 
         # save etag and subsettings after succesful update
         if not self.failed:
-            self.jar.sub = self.sub
-            self.jar.etag = self.feed.etag
-        self.jar.save()
+            subdata.jar.sub = subdata.sub
+            subdata.jar.etag = subdata.wanted.etag
+        subdata.jar.save()
 
         # download cover image
-        if self.downed and self.feed.image:
-            outcome = files.download_img_file(self.feed.image, self.sub_dir,
-                                              self.conf.xml.settings)
+        if self.downed and subdata.wanted.image:
+            outcome = files.download_img_file(subdata.wanted.image,
+                                              subdata.sub_dir,
+                                              subdata.conf.xml.settings)
 
         # print summary of operations in file log
-        output.summary(self.ctitle, self.udeleted, self.removed,
-                       self.downed, self.failed)
+        output.summary(subdata, self.removed, self.downed, self.failed)
 
 
-    def acquire(self, uid, entry):
+    def acquire(self, uid, entry, subdata):
         '''Get new entries, tag them and add to history'''
         # see https://github.com/brokkr/poca/wiki/Architecture#wantedindex
         output.downloading(entry)
-        wantedindex = self.wanted.lst.index(uid) - len(self.failed)
+        wantedindex = subdata.wanted.lst.index(uid) - len(self.failed)
         outcome = files.download_file(entry['poca_url'],
                                       entry['poca_abspath'],
-                                      self.conf.xml.settings)
+                                      subdata.conf.xml.settings)
         if outcome.success:
-            outcome = tag.tag_audio_file(self.conf.xml.settings,
-                                         self.sub, self.jar, entry)
+            outcome = tag.tag_audio_file(subdata.conf.xml.settings,
+                                         subdata.sub, subdata.jar, entry)
             if not outcome.success:
                 output.tag_fail(outcome)
                 # add to failed?
-            self.add_to_jar(uid, entry, wantedindex)
+            self.add_to_jar(uid, entry, wantedindex, subdata)
             self.downed.append(entry)
         else:
             output.dl_fail(outcome)
             self.failed.append(entry)
 
-    def add_to_jar(self, uid, entry, wantedindex):
+    def add_to_jar(self, uid, entry, wantedindex, subdata):
         '''Add new entry to jar'''
-        self.jar.lst.insert(wantedindex, uid)
-        self.jar.dic[uid] = entry
-        self.outcome = self.jar.save()
+        subdata.jar.lst.insert(wantedindex, uid)
+        subdata.jar.dic[uid] = entry
+        self.outcome = subdata.jar.save()
         # currently no jar-save checks
 
-    def remove(self, uid, entry):
+    def remove(self, uid, entry, subdata):
         '''Deletes the file and removes the entry from the jar'''
         output.removing(entry)
         self.outcome = files.delete_file(entry['poca_abspath'])
         if not self.outcome.success:
             return
-        self.jar.lst.remove(uid)
-        del(self.jar.dic[uid])
-        self.outcome = self.jar.save()
+        subdata.jar.lst.remove(uid)
+        del(subdata.jar.dic[uid])
+        self.outcome = subdata.jar.save()
         # currently no jar-save checks
         self.removed.append(entry)
-

@@ -16,6 +16,7 @@ import poco
 from threading import Thread
 from random import randint
 from time import sleep
+from poco import output
 
 
 class TestThread(Thread):
@@ -25,12 +26,11 @@ class TestThread(Thread):
 
     def run(self):
         subdata = self.q.get()
-        if not subdata.outcome.success:
-            print(self.name, subdata.sub.title, subdata.outcome.msg)
-            self.q.task_done()
-            return
-        sleep(randint(1, 20))
-        print(self.name, subdata.sub.title)
+        if subdata.outcome.success:
+            output.subplans(subdata)
+            sleep(randint(1, 20))
+        else:
+            output.suberror(subdata)
         self.q.task_done()
 
 
@@ -49,7 +49,9 @@ def main():
     xp_str = './subscription[not(@state="inactive")][title][url]'
     valid_subs = conf.xml.subscriptions.xpath(xp_str)
     for sub in valid_subs:
-        thread = poco.subupdate.SubThread(update_q, poco.subupdate.SubData, conf, sub)
+        thread = poco.subupdate.SubUpdateThread(update_q,
+                                                poco.subupdate.SubUpdate,
+                                                conf, sub)
         update_threads.append(thread)
         thread.start()
     upgrade_threads = []
@@ -58,12 +60,14 @@ def main():
         #live_threads = len([t.name for t in upgrade_threads if t.is_alive()])
         #counter += 1
         #print(str(counter).ljust(6), update_q.unfinished_tasks, live_threads)
-        while len([t for t in upgrade_threads if t.is_alive()]) < 4 and not update_q.empty():
-            t = TestThread(update_q)
+        while len([t for t in upgrade_threads if t.is_alive()]) < 4 \
+            and not update_q.empty():
+            t = poco.subupgrade.SubUpgradeThread(update_q,
+                                                 poco.subupgrade.SubUpgrade)
             upgrade_threads.append(t)
             t.start()
             #print('starting new thread')
-        sleep(0.1)
+        sleep(1)
     print(update_q.empty())
 
 

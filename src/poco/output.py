@@ -15,7 +15,7 @@ import logging
 STREAM = logging.getLogger('POCASTREAM')
 SUMMARY = logging.getLogger('POCASUMMARY')
 
-# generic error
+# generic output
 def geninfo(msg):
     '''Generic info'''
     STREAM.info(msg)
@@ -31,18 +31,21 @@ def conffatal(msg):
     '''Fatal errors encountered during config read'''
     STREAM.fatal(msg)
 
-# subscription error reporting
-def suberror(title, outcome):
+# subscription plans and error reporting
+def suberror(subdata):
     '''Non-fatal errors encountered processing a specific subscription'''
-    err = "\N{Heavy Exclamation Mark Symbol}"
-    msg = title + '. ' + err + 'ERROR' + err + ' ' + outcome.msg
+    err = ' // e r r o r // '
+    msg = "%s. %s %s" % (subdata.sub.title.text.upper(), err,
+                         subdata.outcome.msg)
     STREAM.error(msg)
     SUMMARY.error(msg)
 
-# report on intentions based on analysis
-def plans(title, no_udeleted, no_unwanted, no_lacking):
+def subplans(subdata):
     '''Summary of files to be downloaded and deleted'''
-    msg = title
+    msg = subdata.sub.title.text.upper()
+    no_udeleted = len(subdata.udeleted)
+    no_unwanted = len(subdata.unwanted)
+    no_lacking = len(subdata.lacking)
     if no_udeleted > 0 or no_unwanted > 0 or no_lacking > 0:
         msg = msg + '. '
     if no_udeleted > 0:
@@ -89,10 +92,11 @@ def tag_fail(outcome):
     STREAM.error('   Tagging failed. ' + outcome.msg)
 
 # file operations summary (for file log)
-def summary(title, udeleted, removed, downed, failed):
+def summary(subdata, removed, downed, failed):
     '''Print summary to log'''
-    if udeleted:
-        udeleted_files = [x['poca_filename'] for x in udeleted]
+    title = subdata.sub.title.text.upper()
+    if subdata.udeleted:
+        udeleted_files = [x['poca_filename'] for x in subdata.udeleted]
         SUMMARY.info(title + '. User deleted: ' + ', '.join(udeleted_files))
     if removed:
         removed_files = [x['poca_filename'] for x in removed]
