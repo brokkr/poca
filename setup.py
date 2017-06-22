@@ -28,7 +28,7 @@ setup(
     package_dir={'poco': 'src/poco'},
     data_files=[('share/man/man1', ["man/poca.1"]),
                 ('share/man/man1', ["man/poca-subscribe.1"])],
-    requires=['feedparser', 'lxml', 'mutagen'],
+    requires=['feedparser', 'lxml', 'mutagen', 'requests'],
     provides=['poco'],
     platforms=['POSIX'],
     classifiers=['Development Status :: 4 - Beta',
