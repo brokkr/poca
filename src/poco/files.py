@@ -12,7 +12,6 @@
 import os
 import sys
 import shutil
-import signal
 import socket
 import urllib.request
 import urllib.error
@@ -56,12 +55,10 @@ def download_file(url, file_path, settings):
     except socket.error as e:
         return Outcome(False, str(e))
 
-    signal.signal(signal.SIGALRM, handler)
     f = open(file_path, "wb")
 
     block_size = 8192
     while True:
-        signal.alarm(90)
         try:
             download_block(u, f, block_size)
         except NoMoreBufferException as e:
@@ -77,9 +74,6 @@ def download_file(url, file_path, settings):
             f.close()
             del_outcome = delete_file(file_path)
             sys.exit()
-
-    signal.alarm(0)
-    signal.signal(signal.SIGALRM, signal.SIG_DFL)
 
     return outcome
 
