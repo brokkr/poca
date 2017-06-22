@@ -24,7 +24,6 @@ from poco.outcome import Outcome
 def get_logger(logger_name):
     '''Initialises and returns a basic, generic logger'''
     logger = logging.getLogger(logger_name)
-    logger.setLevel(logging.INFO)
     null_handler = logging.NullHandler()
     logger.addHandler(null_handler)
     return logger
@@ -32,17 +31,24 @@ def get_logger(logger_name):
 def start_streamlogger(args):
     '''Starts up a stream logger'''
     logger = get_logger('POCASTREAM')
-    if not args.quiet:
-        stream_handler = logging.StreamHandler()
+    stream_handler = logging.StreamHandler()
+    stream_formatter = logging.Formatter("%(message)s")
+    stream_handler.setFormatter(stream_formatter)
+    if args.quiet:
+        return logger
+    elif args.verbose:
+        logger.setLevel(logging.DEBUG)
+        stream_handler.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
         stream_handler.setLevel(logging.INFO)
-        stream_formatter = logging.Formatter("%(message)s")
-        stream_handler.setFormatter(stream_formatter)
-        logger.addHandler(stream_handler)
+    logger.addHandler(stream_handler)
     return logger
 
 def start_summarylogger(args, paths, settings):
     '''Starts up the summary logger (for use in file and email logging)'''
     logger = get_logger('POCASUMMARY')
+    logger.setLevel(logging.INFO)
     logger.poca_file_handler = None
     logger.poca_email_handler = None
     if args.logfile:

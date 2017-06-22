@@ -17,14 +17,22 @@ def get_poca_args():
     '''Returns arguments from a command line argument parser'''
     blurb = "Poca " + about.VERSION + " : " + about.DESCRIPTION
     parser = argparse.ArgumentParser(description=blurb)
-    parser.add_argument('-q', '--quiet', action='store_true', default=False,
-                        help='No output to stdout (useful for cron jobs)')
+    noise_level = parser.add_mutually_exclusive_group()
+    noise_level.add_argument('-q', '--quiet', action='store_true',
+                             default=False,
+                             help='No output to stdout (useful for cron jobs)')
+    noise_level.add_argument('-v', '--verbose', action='store_true',
+                             default=False, help='Output details on files '
+                             'being added and removed. Do not use with '
+                             'multiple concurrent downloads (\'-t [threads]\')')
     parser.add_argument('-l', '--logfile', action='store_true', default=False,
                         help='Output to file in poca config directory')
     parser.add_argument('-e', '--email', action='store_true', default=False,
                         help='Output to email (set in config)')
     parser.add_argument('-c', '--config',
                         help='Use alternate config directory')
+    parser.add_argument('-t', '--threads', default=1, type=int,
+                        help='Number of concurrent downloads to allow')
     return parser.parse_args()
 
 def get_poca_subscribe_args():

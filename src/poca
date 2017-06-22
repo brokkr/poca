@@ -12,26 +12,9 @@
 
 
 from queue import Queue
-import poco
-from threading import Thread
-from random import randint
 from time import sleep
-from poco import output
 
-
-class TestThread(Thread):
-    def __init__(self, q):
-        self.q = q
-        super(TestThread, self).__init__()
-
-    def run(self):
-        subdata = self.q.get()
-        if subdata.outcome.success:
-            output.subplans(subdata)
-            sleep(randint(1, 20))
-        else:
-            output.suberror(subdata)
-        self.q.task_done()
+import poco
 
 
 def main():
@@ -60,14 +43,14 @@ def main():
         #live_threads = len([t.name for t in upgrade_threads if t.is_alive()])
         #counter += 1
         #print(str(counter).ljust(6), update_q.unfinished_tasks, live_threads)
-        while len([t for t in upgrade_threads if t.is_alive()]) < 4 \
-            and not update_q.empty():
+        while len([t for t in upgrade_threads if t.is_alive()]) < \
+                args.threads and not update_q.empty():
             t = poco.subupgrade.SubUpgradeThread(update_q,
                                                  poco.subupgrade.SubUpgrade)
             upgrade_threads.append(t)
             t.start()
             #print('starting new thread')
-        sleep(1)
+        sleep(0.1)
     print(update_q.empty())
 
 

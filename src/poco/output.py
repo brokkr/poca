@@ -65,14 +65,14 @@ def notice_udeleted(entry):
     '''One line per entry telling user of episodes deleted by user'''
     msg = ' ' + "\N{WARNING SIGN}" + ' ' + entry['poca_filename'] + \
         ' deleted by user'
-    STREAM.info(msg)
+    STREAM.debug(msg)
 
 def removing(entry):
     '''One line per entry telling user of episodes being deleted by poca'''
     size = entry['poca_mb']
     size_str = ' [' + str(round(size)) + ' Mb]' if size else ' [Unknown]'
     msg = ' ' + "\N{CANCELLATION X}" + ' ' + entry['poca_filename'] + size_str
-    STREAM.info(msg)
+    STREAM.debug(msg)
 
 def downloading(entry):
     '''One line per entry telling user of episodes being downloaded by poca'''
@@ -80,7 +80,7 @@ def downloading(entry):
     size_str = ' [' + str(round(size)) + ' Mb]' if size else ' [Unknown]'
     msg = ' ' + "\N{DOWNWARDS ARROW LEFTWARDS OF UPWARDS ARROW}" + ' ' + \
         entry['poca_filename'] + size_str
-    STREAM.info(msg)
+    STREAM.debug(msg)
 
 # single entry failures
 def dl_fail(outcome):
