@@ -60,12 +60,12 @@ class SubUpgrade():
         # save etag and subsettings after succesful update
         if not self.failed:
             subdata.jar.sub = subdata.sub
-            subdata.jar.etag = subdata.wanted.etag
+            subdata.jar.etag = subdata.wanted.feed_etag
         subdata.jar.save()
 
         # download cover image
-        if self.downed and subdata.wanted.image:
-            outcome = files.download_img_file(subdata.wanted.image,
+        if self.downed and subdata.wanted.feed_image:
+            outcome = files.download_img_file(subdata.wanted.feed_image,
                                               subdata.sub_dir,
                                               subdata.conf.xml.settings)
 

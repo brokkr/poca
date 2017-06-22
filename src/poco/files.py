@@ -15,11 +15,12 @@ import shutil
 import socket
 import urllib.request
 import urllib.error
+import requests
 
 from poco.outcome import Outcome
 
 
-# download
+# old download
 class NoMoreBufferException(Exception):
     '''Custom sub-classed exception used to trigger except in dl function'''
     pass
@@ -38,7 +39,7 @@ def download_block(u, f, block_size):
 def handler(signum, frame):
     raise TimesUpException("Download timed out")
 
-def download_file(url, file_path, settings):
+def old_download_file(url, file_path, settings):
     '''Download function with block time outs'''
     try:
         request = urllib.request.Request(url)
@@ -77,7 +78,7 @@ def download_file(url, file_path, settings):
 
     return outcome
 
-def download_img_file(url, sub_dir, settings):
+def old_download_img_file(url, sub_dir, settings):
     '''Download an image file'''
     try:
         u = urllib.request.urlopen(url)
@@ -93,6 +94,36 @@ def download_img_file(url, sub_dir, settings):
     else:
         file_path = os.path.join(sub_dir, 'cover' + extension)
         return download_file(url, file_path, settings)
+
+
+
+# new download
+def download_file(url, file_path, settings):
+    '''Download function with block time outs'''
+    r = requests.get(url, stream=True, timeout=60)
+    with open(file_path, 'wb') as f:
+        for chunk in r.iter_content(chunk_size=8192):
+            if chunk:
+                f.write(chunk)
+    r.close()
+    return Outcome(True, '')
+
+def download_img_file(url, sub_dir, settings):
+    '''Download an image file'''
+    r = requests.get(url, timeout=60)
+    content_type = r.headers['content-type']
+    mime_dic = {'image/bmp': '.bmp',
+                'image/gif': '.gif',
+                'image/jpeg': '.jpg',
+                'image/png': '.png',
+                'image/webp': '.webp'}
+    extension = mime_dic.get(content_type, None)
+    if extension is None:
+        return Outcome(False, 'Unknown image MIME type')
+    else:
+        file_path = os.path.join(sub_dir, 'cover' + extension)
+        with open(file_path, 'wb') as f:
+            f.write(r.content)
 
 def delete_file(file_path):
     '''Deletes a file'''
