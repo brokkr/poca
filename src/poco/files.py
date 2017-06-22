@@ -20,24 +20,6 @@ import requests
 from poco.outcome import Outcome
 
 
-# old download
-class NoMoreBufferException(Exception):
-    '''Custom sub-classed exception used to trigger except in dl function'''
-    pass
-
-class TimesUpException(Exception):
-    '''Custom sub-classed exception used to trigger except in dl function'''
-    pass
-
-def download_block(u, f, block_size):
-    '''Download until there's no more to download'''
-    buffer = u.read(block_size)
-    if not buffer:
-        raise NoMoreBufferException("No more to download")
-    f.write(buffer)
-
-def handler(signum, frame):
-    raise TimesUpException("Download timed out")
 
 def old_download_file(url, file_path, settings):
     '''Download function with block time outs'''
@@ -100,7 +82,13 @@ def old_download_img_file(url, sub_dir, settings):
 # new download
 def download_file(url, file_path, settings):
     '''Download function with block time outs'''
-    r = requests.get(url, stream=True, timeout=60)
+    try:
+        r = requests.get(url, stream=True, timeout=60)
+    except (requests.exceptions.ConnectionError,
+            requests.exceptions.HTTPError):
+        return Outcome(False, 'Download failed')
+    except requests.exceptions.Timeout:
+        return Outcome(False, 'Download timed out')
     with open(file_path, 'wb') as f:
         for chunk in r.iter_content(chunk_size=8192):
             if chunk:
@@ -110,7 +98,10 @@ def download_file(url, file_path, settings):
 
 def download_img_file(url, sub_dir, settings):
     '''Download an image file'''
-    r = requests.get(url, timeout=60)
+    try:
+        r = requests.get(url, timeout=60)
+    except requests.exceptions.RequestException:
+        return Outcome(False, 'Download failed')
     content_type = r.headers['content-type']
     mime_dic = {'image/bmp': '.bmp',
                 'image/gif': '.gif',
@@ -124,6 +115,7 @@ def download_img_file(url, sub_dir, settings):
         file_path = os.path.join(sub_dir, 'cover' + extension)
         with open(file_path, 'wb') as f:
             f.write(r.content)
+    return Outcome(True, '')
 
 def delete_file(file_path):
     '''Deletes a file'''
