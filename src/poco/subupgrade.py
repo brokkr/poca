@@ -71,6 +71,15 @@ class SubUpgrade():
 
         # print summary of operations in file log
         output.summary(subdata, self.removed, self.downed, self.failed)
+        # we need to gather up failed errors for a presentation after all
+        # threads have ended. There are two ways to do this:
+        # 1) Throw in another queue to stuff them down
+        # 2) Throw in another filelogger to write them to, then print it 
+        # out after all threads have ended.
+        # Advantage of 1 is that it can be used to all kinds of communication
+        # Advantage of 2 is that it seems more 'logical' to use loggers 
+        # seeing as it is a logging issue
+        # Actually we don't need a file logger, we need a buffering logger
 
 
     def acquire(self, uid, entry, subdata):
@@ -86,7 +95,7 @@ class SubUpgrade():
                                          subdata.sub, subdata.jar, entry)
             if not outcome.success:
                 output.tag_fail(outcome)
-                # add to failed?
+                # add to failed? no, it would mess with wanted_index
             self.add_to_jar(uid, entry, wantedindex, subdata)
             self.downed.append(entry)
         else:

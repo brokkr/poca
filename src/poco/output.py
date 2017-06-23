@@ -34,9 +34,8 @@ def conffatal(msg):
 # subscription plans and error reporting
 def suberror(subdata):
     '''Non-fatal errors encountered processing a specific subscription'''
-    err = ' // e r r o r // '
-    msg = "%s. %s %s" % (subdata.sub.title.text.upper(), err,
-                         subdata.outcome.msg)
+    err = ' { error } '
+    msg = "%s. %s" % (subdata.sub.title.text.upper(), subdata.outcome.msg)
     STREAM.error(msg)
     SUMMARY.error(msg)
 
@@ -85,11 +84,11 @@ def downloading(entry):
 # single entry failures
 def dl_fail(outcome):
     '''Subline telling user of single entry download failure'''
-    STREAM.error('   Download failed. ' + outcome.msg)
+    STREAM.debug('   ' + outcome.msg)
 
 def tag_fail(outcome):
     '''Subline telling user of single entry tagging failure'''
-    STREAM.error('   Tagging failed. ' + outcome.msg)
+    STREAM.debug('   Tagging failed. ' + outcome.msg)
 
 # file operations summary (for file log)
 def summary(subdata, removed, downed, failed):

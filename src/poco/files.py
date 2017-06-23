@@ -21,8 +21,8 @@ def download_file(url, file_path, settings):
     try:
         r = requests.get(url, stream=True, timeout=60)
     except (requests.exceptions.ConnectionError,
-            requests.exceptions.HTTPError):
-        return Outcome(False, 'Download failed')
+            requests.exceptions.HTTPError) as e:
+        return Outcome(False, 'Download failed: %s' % str(e))
     except requests.exceptions.Timeout:
         return Outcome(False, 'Download timed out')
     with open(file_path, 'wb') as f:
@@ -30,10 +30,10 @@ def download_file(url, file_path, settings):
             for chunk in r.iter_content(chunk_size=8192):
                 if chunk:
                     f.write(chunk)
-        except requests.exceptions.ConnectionError:
+        except requests.exceptions.ConnectionError as e:
             r.close()
             os.remove(f.name)
-            return Outcome(False, 'Download failed')
+            return Outcome(False, 'Download broke off: %s' % str(e))
     r.close()
     return Outcome(True, '')
 
