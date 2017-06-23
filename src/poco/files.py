@@ -31,6 +31,8 @@ def download_file(url, file_path, settings):
                 if chunk:
                     f.write(chunk)
         except requests.exceptions.ConnectionError:
+            r.close()
+            os.remove(f.name)
             return Outcome(False, 'Download failed')
     r.close()
     return Outcome(True, '')
