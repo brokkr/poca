@@ -13,6 +13,7 @@ import logging
 
 
 STREAM = logging.getLogger('POCASTREAM')
+STREAMFAIL = logging.getLogger('POCASTREAMFAIL')
 SUMMARY = logging.getLogger('POCASUMMARY')
 
 # generic output
@@ -106,3 +107,10 @@ def summary(subdata, removed, downed, failed):
     if failed:
         failed_files = [x['poca_filename'] for x in failed]
         SUMMARY.error(title + '. Failed: ' + ', '.join(failed_files))
+
+# failures
+def fail_log(failed):
+    pass
+
+def streamfail():
+    STREAMFAIL.flush()

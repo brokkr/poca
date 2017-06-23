@@ -22,6 +22,7 @@ def main():
     # setup
     args = poco.args.get_poca_args()
     stream_logger = poco.loggers.start_streamlogger(args)
+    streamfail_logger = poco.loggers.start_streamfaillogger(args)
     conf = poco.config.Config(args, merge_default=True)
     summary_logger = poco.loggers.start_summarylogger(args, conf.paths,
                                                       conf.xml.settings)
@@ -52,6 +53,7 @@ def main():
             #print('starting new thread')
         sleep(0.1)
     print(update_q.empty())
+    # insert some flushing for streamfail (and emails)
 
 
 if __name__ == '__main__':

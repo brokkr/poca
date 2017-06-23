@@ -45,6 +45,21 @@ def start_streamlogger(args):
     logger.addHandler(stream_handler)
     return logger
 
+def start_streamfaillogger(args):
+    logger = get_logger('POCASTREAMFAIL')
+    logger.setLevel(logging.INFO)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.INFO)
+    stream_formatter = logging.Formatter("%(message)s")
+    stream_handler.setFormatter(stream_formatter)
+    memory_handler = logging.handlers.MemoryHandler(100, flushLevel=50,
+                                                    target=stream_handler)
+    if args.quiet:
+        pass
+    else:
+        logger.addHandler(memory_handler)
+    return logger
+
 def start_summarylogger(args, paths, settings):
     '''Starts up the summary logger (for use in file and email logging)'''
     logger = get_logger('POCASUMMARY')
