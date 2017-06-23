@@ -26,9 +26,12 @@ def download_file(url, file_path, settings):
     except requests.exceptions.Timeout:
         return Outcome(False, 'Download timed out')
     with open(file_path, 'wb') as f:
-        for chunk in r.iter_content(chunk_size=8192):
-            if chunk:
-                f.write(chunk)
+        try:
+            for chunk in r.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+        except requests.exceptions.ConnectionError:
+            return Outcome(False, 'Download failed')
     r.close()
     return Outcome(True, '')
 
