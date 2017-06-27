@@ -72,7 +72,6 @@ def removing(entry):
     size_str = ' [' + str(round(size)) + ' Mb]' if size else ' [Unknown]'
     msg = ' ' + "\N{CANCELLATION X}" + ' ' + entry['poca_filename'] + size_str
     STREAM.debug(msg)
-    STREAMFAIL.info(msg)
 
 def downloading(entry):
     '''One line per entry telling user of episodes being downloaded by poca'''
@@ -85,18 +84,35 @@ def downloading(entry):
 # file operations failures
 def dl_fail(outcome):
     '''Subline telling user of single entry download failure'''
-    STREAM.debug('   ' + outcome.msg)
+    msg = '   ' + outcome.msg
+    STREAM.debug(msg)
+    STREAMFAIL.info(msg)
 
 def tag_fail(outcome):
     '''Subline telling user of single entry tagging failure'''
-    STREAM.debug('   Tagging failed. ' + outcome.msg)
+    msg = '   Tagging failed. ' + outcome.msg
+    STREAM.debug(msg)
+    STREAMFAIL.info(msg)
 
 def del_fail(outcome):
     '''Subline telling user of single entry deletion failure'''
-    STREAM.debug('   Deletion failed. ' + outcome.msg)
+    msg = '   Deletion failed. ' + outcome.msg
+    STREAM.debug(msg)
+    STREAMFAIL.info(msg)
+
+def all_fails(args):
+    '''Outputs all buffered failures in one go if not running verbose 
+       (in which case they already have been output)'''
+    if args.verbose:
+        return
+    if STREAMFAIL.poca_memory_handler:
+        if STREAMFAIL.poca_memory_handler.buffer:
+            STREAM.info('The following errors were encountered: ')
+            STREAMFAIL.poca_memory_handler.flush()
+            STREAMFAIL.poca_memory_handler.close()
 
 # file operations summary (for file log)
-def summary(subdata, removed, downed, failed):
+def file_summary(subdata, removed, downed, failed):
     '''Print summary to log'''
     title = subdata.sub.title.text.upper()
     if subdata.udeleted:
@@ -111,3 +127,12 @@ def summary(subdata, removed, downed, failed):
     if failed:
         failed_files = [x['poca_filename'] for x in failed]
         SUMMARY.error(title + '. Failed: ' + ', '.join(failed_files))
+
+def email_summary():
+    '''Empty out buffered email logs (if needed)'''
+    if SUMMARY.poca_email_handler:
+        SUMMARY.poca_email_handler.close()
+        outcome = SUMMARY.poca_email_handler.outcome
+        if outcome.success is False:
+            conffatal('Email log failed with: ')
+            conffatal('  ' + outcome.msg)

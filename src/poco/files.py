@@ -23,8 +23,10 @@ def download_file(url, file_path, settings):
         r = requests.get(url, stream=True, timeout=60)
     except (requests.exceptions.ConnectionError,
             requests.exceptions.HTTPError) as e:
+        r.close()
         return Outcome(False, 'Download failed: %s' % str(e))
     except requests.exceptions.Timeout:
+        r.close()
         return Outcome(False, 'Download timed out')
     with open(file_path, 'wb') as f:
         try:
@@ -35,6 +37,10 @@ def download_file(url, file_path, settings):
             r.close()
             os.remove(f.name)
             return Outcome(False, 'Download broke off: %s' % str(e))
+        except requests.exceptions.Timeout:
+            r.close()
+            os.remove(f.name)
+            return Outcome(False, 'Download timed out')
     r.close()
     return Outcome(True, '')
 

@@ -72,7 +72,7 @@ class SubUpgrade():
                                               subdata.conf.xml.settings)
 
         # print summary of operations in file log
-        output.summary(subdata, self.removed, self.downed, self.failed)
+        output.file_summary(subdata, self.removed, self.downed, self.failed)
         #output.fail_log(self.failed)
 
     def acquire(self, uid, entry, subdata):

@@ -39,39 +39,23 @@ def main():
         update_threads.append(thread)
         thread.start()
     upgrade_threads = []
-    #counter = 0
     while len(upgrade_threads) < len(valid_subs):
-        #live_threads = len([t.name for t in upgrade_threads if t.is_alive()])
-        #counter += 1
-        #print(str(counter).ljust(6), update_q.unfinished_tasks, live_threads)
         while len([t for t in upgrade_threads if t.is_alive()]) < \
                 args.threads and not update_q.empty():
             t = poco.subupgrade.SubUpgradeThread(update_q,
                                                  poco.subupgrade.SubUpgrade)
             upgrade_threads.append(t)
             t.start()
-            #print('starting new thread')
         sleep(0.1)
-    print(update_q.empty())
     for t in upgrade_threads:
         t.join()
-    if streamfail_logger.poca_memory_handler:
-        if streamfail_logger.poca_memory_handler.buffer:
-            print('Here are your deleted files: ')
-            streamfail_logger.poca_memory_handler.flush()
-    # insert some flushing for streamfail (and emails)
 
+    # wrap up 
+    poco.output.all_fails(args)
+    poco.output.email_summary()
 
 if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
         pass
-
-
-    #if summary_logger.poca_email_handler:
-    #    summary_logger.poca_email_handler.close()
-    #    outcome = summary_logger.poca_email_handler.outcome
-    #    if outcome.success is False:
-    #        poco.output.conffatal('Email log failed with: ')
-    #        poco.output.conffatal('  ' + outcome.msg)
