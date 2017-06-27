@@ -34,6 +34,8 @@ def start_streamlogger(args):
     stream_handler = logging.StreamHandler()
     stream_formatter = logging.Formatter("%(message)s")
     stream_handler.setFormatter(stream_formatter)
+    if not hasattr(args, 'verbose'):
+        args.verbose = False
     if args.quiet:
         return logger
     elif args.verbose:
@@ -55,9 +57,11 @@ def start_streamfaillogger(args):
     memory_handler = logging.handlers.MemoryHandler(100000, flushLevel=50,
                                                     target=stream_handler)
     if args.quiet:
+        logger.poca_memory_handler = None
         pass
     else:
         logger.addHandler(memory_handler)
+        logger.poca_memory_handler = memory_handler
     return logger
 
 def start_summarylogger(args, paths, settings):

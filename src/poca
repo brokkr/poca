@@ -53,9 +53,12 @@ def main():
             #print('starting new thread')
         sleep(0.1)
     print(update_q.empty())
-    for handler in streamfail_logger.handlers:
-        handler.flush()
-        handler.close()
+    for t in upgrade_threads:
+        t.join()
+    if streamfail_logger.poca_memory_handler:
+        if streamfail_logger.poca_memory_handler.buffer:
+            print('Here are your deleted files: ')
+            streamfail_logger.poca_memory_handler.flush()
     # insert some flushing for streamfail (and emails)
 
 
