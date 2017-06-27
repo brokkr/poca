@@ -52,7 +52,7 @@ def start_streamfaillogger(args):
     stream_handler.setLevel(logging.INFO)
     stream_formatter = logging.Formatter("%(message)s")
     stream_handler.setFormatter(stream_formatter)
-    memory_handler = logging.handlers.MemoryHandler(100, flushLevel=50,
+    memory_handler = logging.handlers.MemoryHandler(100000, flushLevel=50,
                                                     target=stream_handler)
     if args.quiet:
         pass

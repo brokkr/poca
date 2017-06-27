@@ -45,8 +45,10 @@ class SubUpgrade():
             entry = subdata.jar.dic[uid]
             self.remove(uid, entry, subdata)
             if not self.outcome.success:
-                output.suberror(subdata)
+                output.del_fail(self.outcome)
                 return
+            else:
+                output.removing(entry)
 
         # loop through wanted (list) entries to acquire
         # WHY OH WHY aren't we just looping through lacking? we still have
@@ -71,7 +73,7 @@ class SubUpgrade():
 
         # print summary of operations in file log
         output.summary(subdata, self.removed, self.downed, self.failed)
-        output.fail_log(self.failed)
+        #output.fail_log(self.failed)
 
     def acquire(self, uid, entry, subdata):
         '''Get new entries, tag them and add to history'''
@@ -102,7 +104,6 @@ class SubUpgrade():
 
     def remove(self, uid, entry, subdata):
         '''Deletes the file and removes the entry from the jar'''
-        output.removing(entry)
         self.outcome = files.delete_file(entry['poca_abspath'])
         if not self.outcome.success:
             return

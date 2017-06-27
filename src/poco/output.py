@@ -35,7 +35,6 @@ def conffatal(msg):
 # subscription plans and error reporting
 def suberror(subdata):
     '''Non-fatal errors encountered processing a specific subscription'''
-    err = ' { error } '
     msg = "%s. %s" % (subdata.sub.title.text.upper(), subdata.outcome.msg)
     STREAM.error(msg)
     SUMMARY.error(msg)
@@ -73,6 +72,7 @@ def removing(entry):
     size_str = ' [' + str(round(size)) + ' Mb]' if size else ' [Unknown]'
     msg = ' ' + "\N{CANCELLATION X}" + ' ' + entry['poca_filename'] + size_str
     STREAM.debug(msg)
+    STREAMFAIL.info(msg)
 
 def downloading(entry):
     '''One line per entry telling user of episodes being downloaded by poca'''
@@ -82,7 +82,7 @@ def downloading(entry):
         entry['poca_filename'] + size_str
     STREAM.debug(msg)
 
-# single entry failures
+# file operations failures
 def dl_fail(outcome):
     '''Subline telling user of single entry download failure'''
     STREAM.debug('   ' + outcome.msg)
@@ -90,6 +90,10 @@ def dl_fail(outcome):
 def tag_fail(outcome):
     '''Subline telling user of single entry tagging failure'''
     STREAM.debug('   Tagging failed. ' + outcome.msg)
+
+def del_fail(outcome):
+    '''Subline telling user of single entry deletion failure'''
+    STREAM.debug('   Deletion failed. ' + outcome.msg)
 
 # file operations summary (for file log)
 def summary(subdata, removed, downed, failed):
@@ -107,10 +111,3 @@ def summary(subdata, removed, downed, failed):
     if failed:
         failed_files = [x['poca_filename'] for x in failed]
         SUMMARY.error(title + '. Failed: ' + ', '.join(failed_files))
-
-# failures
-def fail_log(failed):
-    pass
-
-def streamfail():
-    STREAMFAIL.flush()

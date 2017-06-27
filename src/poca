@@ -53,6 +53,9 @@ def main():
             #print('starting new thread')
         sleep(0.1)
     print(update_q.empty())
+    for handler in streamfail_logger.handlers:
+        handler.flush()
+        handler.close()
     # insert some flushing for streamfail (and emails)
 
 
