@@ -59,6 +59,8 @@ class SubUpgrade():
                 continue
             entry = subdata.wanted.dic[uid]
             self.acquire(uid, entry, subdata, run_event)
+            if not run_event.set():
+                return
 
         # save etag and subsettings after succesful update
         if not self.failed:
@@ -74,7 +76,6 @@ class SubUpgrade():
 
         # print summary of operations in file log
         output.file_summary(subdata, self.removed, self.downed, self.failed)
-        #output.fail_log(self.failed)
 
     def acquire(self, uid, entry, subdata, run_event):
         '''Get new entries, tag them and add to history'''
@@ -91,9 +92,11 @@ class SubUpgrade():
                 # add to failed? no, it would mess with wanted_index
             self.add_to_jar(uid, entry, wantedindex, subdata)
             self.downed.append(entry)
-        else:
+        elif outcome.success is False:
             output.dl_fail(outcome)
             self.failed.append(entry)
+        elif outcome.success is None:
+            return
 
     def add_to_jar(self, uid, entry, wantedindex, subdata):
         '''Add new entry to jar'''

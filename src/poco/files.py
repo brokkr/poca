@@ -36,8 +36,7 @@ def download_file(url, file_path, settings, run_event):
                 if not run_event.is_set():
                     r.close()
                     os.remove(f.name)
-                    print(file_path, "download stopped")
-                    return Outcome(False, 'Download stopped')
+                    return Outcome(None, 'Download stopped')
         except requests.exceptions.ConnectionError as e:
             r.close()
             os.remove(f.name)

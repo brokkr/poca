@@ -11,6 +11,7 @@
 """A cron-friendly command line podcast aggregator"""
 
 
+import sys
 from queue import Queue
 from threading import Event
 from time import sleep
@@ -64,3 +65,4 @@ if __name__ == '__main__':
         main(run_event)
     except KeyboardInterrupt:
         run_event.clear()
+        sys.exit()
