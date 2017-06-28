@@ -60,6 +60,7 @@ class SubUpgrade():
             entry = subdata.wanted.dic[uid]
             self.acquire(uid, entry, subdata, run_event)
             if not run_event.set():
+                print('Well that sure didnt work')
                 return
 
         # save etag and subsettings after succesful update

@@ -43,26 +43,28 @@ def main(run_event):
 
     # upgrade loop
     upgrade_threads = []
-    while len(upgrade_threads) < len(valid_subs):
-        while len([t for t in upgrade_threads if t.is_alive()]) < \
-                args.threads and not update_q.empty():
+    while len(upgrade_threads) < len(valid_subs) and run_event.is_set():
+        while (len([t for t in upgrade_threads if t.is_alive()]) < args.threads
+               and run_event.is_set()
+               and not update_q.empty()):
             t = poco.subupgrade.SubUpgradeThread(update_q, run_event,
                                                  poco.subupgrade.SubUpgrade)
             upgrade_threads.append(t)
             t.start()
-        sleep(0.1)
+            sleep(0.1)
     for t in upgrade_threads:
         t.join()
 
-    # wrap up 
+    # wrap up
     poco.output.all_fails(args)
     poco.output.email_summary()
 
 if __name__ == '__main__':
-    run_event = Event()
-    run_event.set()
+    RUN_EVENT = Event()
+    RUN_EVENT.set()
     try:
-        main(run_event)
+        main(RUN_EVENT)
     except KeyboardInterrupt:
-        run_event.clear()
+        RUN_EVENT.clear()
+        print('cleared')
         sys.exit()
