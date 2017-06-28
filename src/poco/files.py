@@ -17,7 +17,7 @@ import requests
 from poco.outcome import Outcome
 
 # download functions
-def download_file(url, file_path, settings):
+def download_file(url, file_path, settings, run_event):
     '''Download function with block time outs'''
     try:
         r = requests.get(url, stream=True, timeout=60)
@@ -30,9 +30,14 @@ def download_file(url, file_path, settings):
         return Outcome(False, 'Download timed out')
     with open(file_path, 'wb') as f:
         try:
-            for chunk in r.iter_content(chunk_size=8192):
+            for chunk in r.iter_content(chunk_size=1024):
                 if chunk:
                     f.write(chunk)
+                if not run_event.is_set():
+                    r.close()
+                    os.remove(f.name)
+                    print(file_path, "download stopped")
+                    return Outcome(False, 'Download stopped')
         except requests.exceptions.ConnectionError as e:
             r.close()
             os.remove(f.name)

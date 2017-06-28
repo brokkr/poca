@@ -16,8 +16,9 @@ from poco import files, output, tag
 
 class SubUpgradeThread(Thread):
     '''A thread class that creates handles a SubData instance'''
-    def __init__(self, queue, target):
+    def __init__(self, queue, run_event, target):
         self.queue = queue
+        self.run_event = run_event
         self.target = target
         super(SubUpgradeThread, self).__init__()
 
@@ -25,14 +26,14 @@ class SubUpgradeThread(Thread):
         subdata = self.queue.get()
         if subdata.outcome.success:
             output.subplans(subdata)
-            sub_upgrade = self.target(subdata)
+            sub_upgrade = self.target(self.run_event, subdata)
         else:
             output.suberror(subdata)
         self.queue.task_done()
 
 class SubUpgrade():
     '''Use the SubData packet to implement file operations'''
-    def __init__(self, subdata):
+    def __init__(self, run_event, subdata):
         # prepare list for summary
         self.removed, self.downed, self.failed = [], [], []
 
@@ -57,7 +58,7 @@ class SubUpgrade():
             if uid not in subdata.lacking:
                 continue
             entry = subdata.wanted.dic[uid]
-            self.acquire(uid, entry, subdata)
+            self.acquire(uid, entry, subdata, run_event)
 
         # save etag and subsettings after succesful update
         if not self.failed:
@@ -75,14 +76,13 @@ class SubUpgrade():
         output.file_summary(subdata, self.removed, self.downed, self.failed)
         #output.fail_log(self.failed)
 
-    def acquire(self, uid, entry, subdata):
+    def acquire(self, uid, entry, subdata, run_event):
         '''Get new entries, tag them and add to history'''
         # see https://github.com/brokkr/poca/wiki/Architecture#wantedindex
         output.downloading(entry)
         wantedindex = subdata.wanted.lst.index(uid) - len(self.failed)
-        outcome = files.download_file(entry['poca_url'],
-                                      entry['poca_abspath'],
-                                      subdata.conf.xml.settings)
+        outcome = files.download_file(entry['poca_url'], entry['poca_abspath'],
+                                      subdata.conf.xml.settings, run_event)
         if outcome.success:
             outcome = tag.tag_audio_file(subdata.conf.xml.settings,
                                          subdata.sub, subdata.jar, entry)
