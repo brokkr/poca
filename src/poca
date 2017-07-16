@@ -13,13 +13,13 @@
 
 import sys
 from queue import Queue
-from threading import Event
+#from threading import Event
 from time import sleep
 
 import poco
 
 
-def main(run_event):
+def main():
     '''Main script'''
     try:
         # setup
@@ -36,25 +36,25 @@ def main(run_event):
         xp_str = './subscription[not(@state="inactive")][title][url]'
         valid_subs = conf.xml.subscriptions.xpath(xp_str)
         for sub in valid_subs:
-            thread = poco.subupdate.SubUpdateThread(update_q,
-                                                    poco.subupdate.SubUpdate,
-                                                    conf, sub)
-            update_threads.append(thread)
-            thread.start()
+            update_thread = poco.subupdate.SubUpdateThread(
+                update_q, poco.subupdate.SubUpdate, conf, sub)
+            update_threads.append(update_thread)
+            update_thread.start()
 
         # upgrade loop
         upgrade_threads = []
-        while len(upgrade_threads) < len(valid_subs) and run_event.is_set():
+        while len(upgrade_threads) < len(valid_subs):
+        #and run_event.is_set():
             while (len([t for t in upgrade_threads if t.is_alive()]) \
                    < args.threads and
-                   run_event.is_set() and
+                   #run_event.is_set() and
                    not update_q.empty()):
-                t = poco.subupgrade.SubUpgradeThread(update_q, run_event,
-                                                     poco.subupgrade.SubUpgrade)
-                upgrade_threads.append(t)
-                t.start()
+                upgrade_thread = poco.subupgrade.SubUpgradeThread(
+                    update_q, poco.subupgrade.SubUpgrade)
+                upgrade_threads.append(upgrade_thread)
+                upgrade_thread.start()
                 sleep(1)
-                print(update_q.qsize())
+                #print(update_q.qsize())
         for t in upgrade_threads:
             t.join()
 
@@ -71,6 +71,6 @@ def main(run_event):
         sys.exit()
 
 if __name__ == '__main__':
-    RUN_EVENT = Event()
-    RUN_EVENT.set()
-    main(RUN_EVENT)
+    #RUN_EVENT = Event()
+    #RUN_EVENT.set()
+    main()

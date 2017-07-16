@@ -16,9 +16,9 @@ from poco import files, output, tag
 
 class SubUpgradeThread(Thread):
     '''A thread class that creates handles a SubData instance'''
-    def __init__(self, queue, run_event, target):
+    def __init__(self, queue, target):
         self.queue = queue
-        self.run_event = run_event
+        #self.run_event = run_event
         self.target = target
         super(SubUpgradeThread, self).__init__()
 
@@ -26,14 +26,14 @@ class SubUpgradeThread(Thread):
         subdata = self.queue.get()
         if subdata.outcome.success:
             output.subplans(subdata)
-            sub_upgrade = self.target(self.run_event, subdata)
+            sub_upgrade = self.target(subdata)
         else:
             output.suberror(subdata)
         self.queue.task_done()
 
 class SubUpgrade():
     '''Use the SubData packet to implement file operations'''
-    def __init__(self, run_event, subdata):
+    def __init__(self, subdata):
         # prepare list for summary
         self.removed, self.downed, self.failed = [], [], []
 
