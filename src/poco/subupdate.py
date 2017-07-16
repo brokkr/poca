@@ -31,10 +31,13 @@ class SubUpdateThread(Thread):
         self.target = target
         self.args = args
         super(SubUpdateThread, self).__init__()
+        self.daemon = True
 
     def run(self):
         subdata = self.target(*self.args)
+        #time.sleep(360)
         self.queue.put(subdata)
+        print('update thread done')
 
 
 class SubUpdate():

@@ -10,7 +10,7 @@
 """Operations on feeds with updates"""
 
 
-from threading import Thread
+from threading import Thread, current_thread
 from poco import files, output, tag
 
 
@@ -58,9 +58,10 @@ class SubUpgrade():
             if uid not in subdata.lacking:
                 continue
             entry = subdata.wanted.dic[uid]
-            self.acquire(uid, entry, subdata, run_event)
-            if not run_event.set():
-                print('Well that sure didnt work')
+            outcome = self.acquire(uid, entry, subdata)
+            my_thread = current_thread()
+            if getattr(my_thread, "kill", False):
+                print(outcome)
                 return
 
         # save etag and subsettings after succesful update
@@ -78,13 +79,13 @@ class SubUpgrade():
         # print summary of operations in file log
         output.file_summary(subdata, self.removed, self.downed, self.failed)
 
-    def acquire(self, uid, entry, subdata, run_event):
+    def acquire(self, uid, entry, subdata):
         '''Get new entries, tag them and add to history'''
         # see https://github.com/brokkr/poca/wiki/Architecture#wantedindex
         output.downloading(entry)
         wantedindex = subdata.wanted.lst.index(uid) - len(self.failed)
         outcome = files.download_file(entry['poca_url'], entry['poca_abspath'],
-                                      subdata.conf.xml.settings, run_event)
+                                      subdata.conf.xml.settings)
         if outcome.success:
             outcome = tag.tag_audio_file(subdata.conf.xml.settings,
                                          subdata.sub, subdata.jar, entry)
@@ -96,8 +97,7 @@ class SubUpgrade():
         elif outcome.success is False:
             output.dl_fail(outcome)
             self.failed.append(entry)
-        elif outcome.success is None:
-            return
+        return outcome
 
     def add_to_jar(self, uid, entry, wantedindex, subdata):
         '''Add new entry to jar'''

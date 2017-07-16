@@ -14,10 +14,12 @@ import os
 import shutil
 import requests
 
+from threading import current_thread
+
 from poco.outcome import Outcome
 
 # download functions
-def download_file(url, file_path, settings, run_event):
+def download_file(url, file_path, settings):
     '''Download function with block time outs'''
     try:
         r = requests.get(url, stream=True, timeout=60)
@@ -28,10 +30,12 @@ def download_file(url, file_path, settings, run_event):
     except requests.exceptions.Timeout:
         r.close()
         return Outcome(False, 'Download timed out')
+    my_thread = current_thread()
     with open(file_path, 'wb') as f:
         try:
             for chunk in r.iter_content(chunk_size=1024):
-                if not run_event.is_set():
+                if getattr(my_thread, "kill", False):
+                    print('ok shutting down')
                     r.close()
                     os.remove(f.name)
                     return Outcome(None, 'Download stopped')

@@ -21,50 +21,56 @@ import poco
 
 def main(run_event):
     '''Main script'''
-    # setup
-    args = poco.args.get_poca_args()
-    stream_logger = poco.loggers.start_streamlogger(args)
-    streamfail_logger = poco.loggers.start_streamfaillogger(args)
-    conf = poco.config.Config(args, merge_default=True)
-    summary_logger = poco.loggers.start_summarylogger(args, conf.paths,
-                                                      conf.xml.settings)
+    try:
+        # setup
+        args = poco.args.get_poca_args()
+        stream_logger = poco.loggers.start_streamlogger(args)
+        streamfail_logger = poco.loggers.start_streamfaillogger(args)
+        conf = poco.config.Config(args, merge_default=True)
+        summary_logger = poco.loggers.start_summarylogger(args, conf.paths,
+                                                          conf.xml.settings)
 
-    # update loop
-    update_threads = []
-    update_q = Queue()
-    xp_str = './subscription[not(@state="inactive")][title][url]'
-    valid_subs = conf.xml.subscriptions.xpath(xp_str)
-    for sub in valid_subs:
-        thread = poco.subupdate.SubUpdateThread(update_q,
-                                                poco.subupdate.SubUpdate,
-                                                conf, sub)
-        update_threads.append(thread)
-        thread.start()
+        # update loop
+        update_threads = []
+        update_q = Queue()
+        xp_str = './subscription[not(@state="inactive")][title][url]'
+        valid_subs = conf.xml.subscriptions.xpath(xp_str)
+        for sub in valid_subs:
+            thread = poco.subupdate.SubUpdateThread(update_q,
+                                                    poco.subupdate.SubUpdate,
+                                                    conf, sub)
+            update_threads.append(thread)
+            thread.start()
 
-    # upgrade loop
-    upgrade_threads = []
-    while len(upgrade_threads) < len(valid_subs) and run_event.is_set():
-        while (len([t for t in upgrade_threads if t.is_alive()]) < args.threads
-               and run_event.is_set()
-               and not update_q.empty()):
-            t = poco.subupgrade.SubUpgradeThread(update_q, run_event,
-                                                 poco.subupgrade.SubUpgrade)
-            upgrade_threads.append(t)
-            t.start()
-            sleep(0.1)
-    for t in upgrade_threads:
-        t.join()
+        # upgrade loop
+        upgrade_threads = []
+        while len(upgrade_threads) < len(valid_subs) and run_event.is_set():
+            while (len([t for t in upgrade_threads if t.is_alive()]) \
+                   < args.threads and
+                   run_event.is_set() and
+                   not update_q.empty()):
+                t = poco.subupgrade.SubUpgradeThread(update_q, run_event,
+                                                     poco.subupgrade.SubUpgrade)
+                upgrade_threads.append(t)
+                t.start()
+                sleep(1)
+                print(update_q.qsize())
+        for t in upgrade_threads:
+            t.join()
 
-    # wrap up
-    poco.output.all_fails(args)
-    poco.output.email_summary()
+        # wrap up
+        poco.output.all_fails(args)
+        poco.output.email_summary()
+
+    except KeyboardInterrupt:
+        print('clearing')
+        #RUN_EVENT.clear()
+        for thread in upgrade_threads:
+            setattr(thread, "kill", True)
+        print('cleared')
+        sys.exit()
 
 if __name__ == '__main__':
     RUN_EVENT = Event()
     RUN_EVENT.set()
-    try:
-        main(RUN_EVENT)
-    except KeyboardInterrupt:
-        RUN_EVENT.clear()
-        print('cleared')
-        sys.exit()
+    main(RUN_EVENT)
