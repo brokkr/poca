@@ -15,6 +15,7 @@ import time
 
 from threading import Thread
 from copy import deepcopy
+from lxml import etree
 
 import feedparser
 
@@ -110,10 +111,9 @@ class Feed:
     def __init__(self, sub, jar, udeleted):
         self.outcome = Outcome(True, '')
         self.etag = jar.etag
-        # does comapring sub instances actually work?
-        # does it ever see that sub_a is the same as sub_b?
-        if sub != jar.sub or udeleted:
-            #print('resetting etag')
+        sub_str = etree.tostring(sub, encoding='unicode')
+        jarsub_str = etree.tostring(jar.sub, encoding='unicode')
+        if sub_str != jarsub_str or udeleted:
             self.etag = None
         doc = self.update(sub)
         self.set_entries(doc, sub)
