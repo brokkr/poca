@@ -16,19 +16,14 @@ from poco import files, output, tag
 
 class SubUpgradeThread(Thread):
     '''A thread class that creates handles a SubData instance'''
-    def __init__(self, queue, target):
+    def __init__(self, subdata, queue, target):
+        self.subdata = subdata
         self.queue = queue
-        #self.run_event = run_event
         self.target = target
         super(SubUpgradeThread, self).__init__()
 
     def run(self):
-        subdata = self.queue.get()
-        if subdata.outcome.success:
-            output.subplans(subdata)
-            sub_upgrade = self.target(subdata)
-        else:
-            output.suberror(subdata)
+        sub_upgrade = self.target(self.subdata)
         self.queue.task_done()
 
 class SubUpgrade():

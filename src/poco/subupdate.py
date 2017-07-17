@@ -35,6 +35,7 @@ class SubUpdateThread(Thread):
 
     def run(self):
         subdata = self.target(*self.args)
+        #print(subdata.skip)
         self.queue.put(subdata)
         #print('update thread done')
 
@@ -46,6 +47,7 @@ class SubUpdate():
         # basic sub set up and prerequisites
         self.conf = conf
         self.sub = sub
+        self.skip = True
         self.outcome = Outcome(True, '')
         self.sub_dir = os.path.join(self.conf.xml.settings.base_dir.text,
                                     self.sub.title.text)
@@ -81,13 +83,11 @@ class SubUpdate():
         if from_the_top == 'no':
             self.wanted.lst.reverse()
 
-        # inform user of intentions
+        # subupgrade will delete unwanted and download lacking
         self.unwanted = [x for x in self.jar.lst if x not in self.wanted.lst]
         self.lacking = [x for x in self.wanted.lst if x not in self.jar.lst]
-        #self.unwanted = set(self.jar.lst) - set(self.wanted.lst)
-        #self.lacking = set(self.wanted.lst) - set(self.jar.lst)
-        #output.plans(self.ctitle, len(self.udeleted), len(self.unwanted),
-        #             len(self.lacking))
+        self.skip = False if self.unwanted or self.lacking or self.udeleted \
+                    else True
 
     def check_jar(self):
         '''Check for user deleted files so we can filter them out'''
@@ -113,6 +113,7 @@ class Feed:
         # does comapring sub instances actually work?
         # does it ever see that sub_a is the same as sub_b?
         if sub != jar.sub or udeleted:
+            #print('resetting etag')
             self.etag = None
         doc = self.update(sub)
         self.set_entries(doc, sub)

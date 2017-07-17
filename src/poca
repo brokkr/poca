@@ -42,14 +42,25 @@ def main():
 
         # upgrade loop
         upgrade_threads = []
-        while len(upgrade_threads) < len(valid_subs):
+        skip_subs = []
+        while len(upgrade_threads) + len(skip_subs) < len(valid_subs):
             while (len([t for t in upgrade_threads if t.is_alive()])
                    < args.threads and not update_q.empty()):
+                subdata = update_q.get()
+                if subdata.outcome.success:
+                    poco.output.subplans(subdata)
+                else:
+                    poco.output.suberror(subdata)
+                if subdata.skip is True:
+                    skip_subs.append(subdata)
+                    update_q.task_done()
+                    continue
                 upgrade_thread = poco.subupgrade.SubUpgradeThread(
-                    update_q, poco.subupgrade.SubUpgrade)
+                    subdata, update_q, poco.subupgrade.SubUpgrade)
                 upgrade_threads.append(upgrade_thread)
                 upgrade_thread.start()
             sleep(0.5)
+            #print(len(upgrade_threads), len(skip_subs))
         for upgrade_thread in upgrade_threads:
             upgrade_thread.join()
 
