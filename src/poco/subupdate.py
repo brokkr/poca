@@ -88,7 +88,7 @@ class SubUpdate():
         self.unwanted = [x for x in self.jar.lst if x not in self.wanted.lst]
         self.lacking = [x for x in self.wanted.lst if x not in self.jar.lst]
         self.skip = False if self.unwanted or self.lacking or self.udeleted \
-                    else True
+                    or feed.fresh else True
 
     def check_jar(self):
         '''Check for user deleted files so we can filter them out'''
@@ -110,28 +110,38 @@ class Feed:
     '''Constructs a container for feed entries'''
     def __init__(self, sub, jar, udeleted):
         self.outcome = Outcome(True, '')
-        self.etag = jar.etag
+        self.etag = getattr(jar, 'etag', None)
+        self.modified = getattr(jar, 'modified', None)
+        #print(sub.title, self.etag, self.modified)
         sub_str = etree.tostring(sub, encoding='unicode')
         jarsub_str = etree.tostring(jar.sub, encoding='unicode')
         if sub_str != jarsub_str or udeleted:
             self.etag = None
+            self.modified = None
+            print(sub.title, 'reset etag')
         doc = self.update(sub)
         self.set_entries(doc, sub)
 
     def update(self, sub):
         '''Check feed, return the xml'''
-        doc = feedparser.parse(sub.url.text, etag=self.etag)
+        doc = feedparser.parse(sub.url.text, etag=self.etag,
+                               modified=self.modified)
+        #print(sub.title, getattr(doc, 'status', None))
         # save new etag if there is one in doc
-        if doc.has_key('etag'):
-            self.etag = doc.etag
+        new_etag = getattr(doc, 'etag', None)
+        new_modified = getattr(doc, 'modified', None)
+        self.fresh = False if self.etag == new_etag and self.modified == \
+                     new_modified else True
+        self.etag, self.modified = (new_etag, new_modified)
+        #print(sub.title, self.etag, self.modified, self.fresh)
         # only bozo for actual errors
-        if doc.bozo and not doc.entries:
-            if 'status' in doc:
-                # if etag is 304 doc.entries is empty and we proceed as normal
-                if doc.status != 304:
-                    self.outcome = Outcome(False, str(doc.bozo_exception))
-            else:
-                self.outcome = Outcome(False, str(doc.bozo_exception))
+        #if doc.bozo and not doc.entries:
+        #    if 'status' in doc:
+        #        # if etag is 304 doc.entries is empty and we proceed as normal
+        #        if doc.status != 304:
+        #            self.outcome = Outcome(False, str(doc.bozo_exception))
+        #    else:
+        #        self.outcome = Outcome(False, str(doc.bozo_exception))
         return doc
 
     def set_entries(self, doc, sub):
@@ -182,8 +192,11 @@ class Wanted():
         if hasattr(sub, 'max_number'):
             self.limit(sub)
         self.dic = {x: combo.dic[x] for x in self.lst}
+        # feed isn't handed over to subupgrade so save important bits here
         self.feed_etag = feed.etag
+        self.feed_modified = feed.modified
         self.feed_image = feed.image
+        #print(sub.title, self.feed_etag, self.feed_modified)
 
     def match_filename(self, dic, filter_text):
         '''The episode filename must match a regex/string'''

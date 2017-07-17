@@ -42,6 +42,7 @@ class Subjar:
         self.db_filename = os.path.join(paths.db_dir, sub.title.text)
         self.sub = sub
         self.etag = None
+        self.modified = None
         self.lst = []
         self.dic = {}
         self.del_lst = []

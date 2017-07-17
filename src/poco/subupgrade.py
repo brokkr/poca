@@ -66,6 +66,7 @@ class SubUpgrade():
         if not self.failed:
             subdata.jar.sub = subdata.sub
             subdata.jar.etag = subdata.wanted.feed_etag
+            subdata.jar.modified = subdata.wanted.feed_modified
         subdata.jar.save()
 
         # download cover image
