@@ -21,7 +21,11 @@ from poco.outcome import Outcome
 # download functions
 def download_file(url, file_path, settings):
     '''Download function with block time outs'''
+    my_thread = current_thread()
+    if getattr(my_thread, "kill", False):
+        return Outcome(None, 'Download stopped')
     try:
+        # a timeout of 60 secs is a problem when we're trying to ctrl-c
         r = requests.get(url, stream=True, timeout=60)
     except (requests.exceptions.ConnectionError,
             requests.exceptions.HTTPError) as e:
@@ -30,24 +34,22 @@ def download_file(url, file_path, settings):
     except requests.exceptions.Timeout:
         r.close()
         return Outcome(False, 'Download timed out')
-    my_thread = current_thread()
     with open(file_path, 'wb') as f:
         try:
             for chunk in r.iter_content(chunk_size=1024):
                 if getattr(my_thread, "kill", False):
-                    print('ok shutting down')
                     r.close()
-                    os.remove(f.name)
-                    return Outcome(None, 'Download stopped')
+                    outcome = delete_file(f.name)
+                    return Outcome(None, 'Download cancelled')
                 if chunk:
                     f.write(chunk)
         except requests.exceptions.ConnectionError as e:
             r.close()
-            os.remove(f.name)
+            outcome = delete_file(f.name)
             return Outcome(False, 'Download broke off: %s' % str(e))
         except requests.exceptions.Timeout:
             r.close()
-            os.remove(f.name)
+            outcome = delete_file(f.name)
             return Outcome(False, 'Download timed out')
     r.close()
     return Outcome(True, '')

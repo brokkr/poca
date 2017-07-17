@@ -13,7 +13,6 @@
 
 import sys
 from queue import Queue
-#from threading import Event
 from time import sleep
 
 import poco
@@ -44,33 +43,24 @@ def main():
         # upgrade loop
         upgrade_threads = []
         while len(upgrade_threads) < len(valid_subs):
-        #and run_event.is_set():
-            while (len([t for t in upgrade_threads if t.is_alive()]) \
-                   < args.threads and
-                   #run_event.is_set() and
-                   not update_q.empty()):
+            while (len([t for t in upgrade_threads if t.is_alive()])
+                   < args.threads and not update_q.empty()):
                 upgrade_thread = poco.subupgrade.SubUpgradeThread(
                     update_q, poco.subupgrade.SubUpgrade)
                 upgrade_threads.append(upgrade_thread)
                 upgrade_thread.start()
                 sleep(1)
-                #print(update_q.qsize())
-        for t in upgrade_threads:
-            t.join()
+        for upgrade_thread in upgrade_threads:
+            upgrade_thread.join()
 
         # wrap up
         poco.output.all_fails(args)
         poco.output.email_summary()
 
     except KeyboardInterrupt:
-        print('clearing')
-        #RUN_EVENT.clear()
         for thread in upgrade_threads:
             setattr(thread, "kill", True)
-        print('cleared')
         sys.exit()
 
 if __name__ == '__main__':
-    #RUN_EVENT = Event()
-    #RUN_EVENT.set()
     main()

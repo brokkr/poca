@@ -34,6 +34,10 @@ class SubUpgradeThread(Thread):
 class SubUpgrade():
     '''Use the SubData packet to implement file operations'''
     def __init__(self, subdata):
+
+        # know thyself
+        self.my_thread = current_thread()
+
         # prepare list for summary
         self.removed, self.downed, self.failed = [], [], []
 
@@ -59,9 +63,8 @@ class SubUpgrade():
                 continue
             entry = subdata.wanted.dic[uid]
             outcome = self.acquire(uid, entry, subdata)
-            my_thread = current_thread()
-            if getattr(my_thread, "kill", False):
-                print(outcome)
+            if outcome.success is None:
+                output.geninfo('%s: Download cancelled' % entry.title)
                 return
 
         # save etag and subsettings after succesful update
@@ -86,7 +89,7 @@ class SubUpgrade():
         wantedindex = subdata.wanted.lst.index(uid) - len(self.failed)
         outcome = files.download_file(entry['poca_url'], entry['poca_abspath'],
                                       subdata.conf.xml.settings)
-        if outcome.success:
+        if outcome.success is True:
             outcome = tag.tag_audio_file(subdata.conf.xml.settings,
                                          subdata.sub, subdata.jar, entry)
             if not outcome.success:

@@ -35,9 +35,8 @@ class SubUpdateThread(Thread):
 
     def run(self):
         subdata = self.target(*self.args)
-        #time.sleep(360)
         self.queue.put(subdata)
-        print('update thread done')
+        #print('update thread done')
 
 
 class SubUpdate():
