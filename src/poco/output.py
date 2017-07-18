@@ -60,6 +60,7 @@ def subplans(subdata):
     STREAM.info(msg)
 
 # file operations individually (for stdout)
+# 'debug' indicates that the output is only delivered if runing verbose
 def notice_udeleted(entry):
     '''One line per entry telling user of episodes deleted by user'''
     msg = ' ' + "\N{WARNING SIGN}" + ' ' + entry['poca_filename'] + \
