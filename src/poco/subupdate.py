@@ -36,9 +36,7 @@ class SubUpdateThread(Thread):
 
     def run(self):
         subdata = self.target(*self.args)
-        #print(subdata.skip)
         self.queue.put(subdata)
-        #print('update thread done')
 
 
 class SubUpdate():
@@ -48,7 +46,6 @@ class SubUpdate():
         # basic sub set up and prerequisites
         self.conf = conf
         self.sub = sub
-        self.skip = True
         self.outcome = Outcome(True, '')
         self.sub_dir = os.path.join(self.conf.xml.settings.base_dir.text,
                                     self.sub.title.text)
@@ -75,9 +72,17 @@ class SubUpdate():
 
         # get feed, combine with jar and filter the lot
         feed = Feed(self.sub, self.jar, self.udeleted)
-        self.outcome = feed.outcome
-        if not self.outcome.success:
+        self.status = feed.status
+        if self.status in [0, 401, 403, 404, 500, 503]:
+            self.outcome = Outcome(False, feed.bozo_exception)
             return
+        elif self.status in [304]:
+            self.outcome = Outcome(True, 'Not modified')
+            self.unwanted, self.lacking = ([], [])
+            return
+        elif self.status in [301]:
+            # we'll deal with these later, for now just process like 200
+            pass
         combo = Combo(feed, self.jar, self.sub, self.sub_dir)
         self.wanted = Wanted(self.sub, feed, combo, self.jar.del_lst)
         from_the_top = self.sub.find('from_the_top') or 'no'
@@ -87,8 +92,6 @@ class SubUpdate():
         # subupgrade will delete unwanted and download lacking
         self.unwanted = [x for x in self.jar.lst if x not in self.wanted.lst]
         self.lacking = [x for x in self.wanted.lst if x not in self.jar.lst]
-        self.skip = False if self.unwanted or self.lacking or self.udeleted \
-                    or feed.fresh else True
 
     def check_jar(self):
         '''Check for user deleted files so we can filter them out'''
@@ -109,40 +112,19 @@ class SubUpdate():
 class Feed:
     '''Constructs a container for feed entries'''
     def __init__(self, sub, jar, udeleted):
-        self.outcome = Outcome(True, '')
-        self.etag = getattr(jar, 'etag', None)
-        self.modified = getattr(jar, 'modified', None)
-        #print(sub.title, self.etag, self.modified)
+        etag = getattr(jar, 'etag', None)
+        modified = getattr(jar, 'modified', None)
         sub_str = etree.tostring(sub, encoding='unicode')
         jarsub_str = etree.tostring(jar.sub, encoding='unicode')
         if sub_str != jarsub_str or udeleted:
-            self.etag = None
-            self.modified = None
-            print(sub.title, 'reset etag')
-        doc = self.update(sub)
+            etag = None
+            modified = None
+        doc = feedparser.parse(sub.url.text, etag=etag, modified=modified)
+        self.status = getattr(doc, 'status', 0)
+        self.etag = getattr(doc, 'etag', etag)
+        self.modified = getattr(doc, 'modified', modified)
+        self.bozo_exception = getattr(doc, 'bozo_exception', str())
         self.set_entries(doc, sub)
-
-    def update(self, sub):
-        '''Check feed, return the xml'''
-        doc = feedparser.parse(sub.url.text, etag=self.etag,
-                               modified=self.modified)
-        #print(sub.title, getattr(doc, 'status', None))
-        # save new etag if there is one in doc
-        new_etag = getattr(doc, 'etag', None)
-        new_modified = getattr(doc, 'modified', None)
-        self.fresh = False if self.etag == new_etag and self.modified == \
-                     new_modified else True
-        self.etag, self.modified = (new_etag, new_modified)
-        #print(sub.title, self.etag, self.modified, self.fresh)
-        # only bozo for actual errors
-        #if doc.bozo and not doc.entries:
-        #    if 'status' in doc:
-        #        # if etag is 304 doc.entries is empty and we proceed as normal
-        #        if doc.status != 304:
-        #            self.outcome = Outcome(False, str(doc.bozo_exception))
-        #    else:
-        #        self.outcome = Outcome(False, str(doc.bozo_exception))
-        return doc
 
     def set_entries(self, doc, sub):
         '''Extract entries from the feed xml'''
@@ -176,6 +158,7 @@ class Combo:
         else:
             self.lst = list(feed.lst)
             self.lst.extend(uid for uid in jar.lst if uid not in feed.lst)
+        # why are we entryinfo'ing every single entry in feed? do we need to?
         self.dic = {uid: entryinfo.expand(feed.dic[uid], sub, sub_dir)
                     for uid in feed.lst if uid not in jar.lst}
         self.dic.update(jar.dic)
