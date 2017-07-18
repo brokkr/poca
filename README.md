@@ -1,6 +1,7 @@
 ## Poca
 Poca is a command line podcast client, written in Python 3. It is developed for
-stability and ease of use.
+stability and ease of use. Version 0.9 introduces multithreading, adding
+lightning fast updates and the option for multiple, concurrent downloads to the mix.
 
 ### Features
 With Poca you can set custom options for each individual subscription or use
@@ -31,7 +32,8 @@ global defaults to have them apply to every subscription.
 
 Poca also: has excellent unicode support for feeds, filenames and tags, gets 
 cover images for feeds, has the ability to spoof user agents, can pause your
-subscriptions, remembers which downloads actually completed, and more.
+subscriptions, deals intelligently with interruptions, updates moved feeds
+(HTTP 301) automatically, can add track numbers to feeds without them and more.
 
 See the [Configuration](https://github.com/brokkr/poca/wiki/Configuration) 
 section of the wiki for more details on features.
@@ -67,6 +69,6 @@ To remove Poca - having installed it using pip - simply do:
 
 ### Dependencies
  * You will need Python 3 for setup and running the program
- * The following third-party modules are required: `feedparser`, `lxml`, `mutagen`
+ * The following third-party modules are required: `feedparser`, `lxml`, `mutagen`, `requests`
  * The following third-party modules are recommended: `audiosearch`
  * Pip can install all of these using 'pip3 install [name of module]'
