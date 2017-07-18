@@ -81,8 +81,7 @@ class SubUpdate():
             self.unwanted, self.lacking = ([], [])
             return
         elif self.status in [301]:
-            # we'll deal with these later, for now just process like 200
-            pass
+            self.new_url = feed.href
         combo = Combo(feed, self.jar, self.sub, self.sub_dir)
         self.wanted = Wanted(self.sub, feed, combo, self.jar.del_lst)
         from_the_top = self.sub.find('from_the_top') or 'no'
@@ -124,6 +123,7 @@ class Feed:
         self.etag = getattr(doc, 'etag', etag)
         self.modified = getattr(doc, 'modified', modified)
         self.bozo_exception = getattr(doc, 'bozo_exception', str())
+        self.href = getattr(doc, 'href', sub.url.text)
         self.set_entries(doc, sub)
 
     def set_entries(self, doc, sub):

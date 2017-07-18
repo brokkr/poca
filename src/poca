@@ -14,6 +14,7 @@
 import sys
 from queue import Queue
 from time import sleep
+from argparse import Namespace
 
 import poco
 
@@ -43,6 +44,7 @@ def main():
         # upgrade loop
         upgrade_threads = []
         skip_subs = []
+        moved_permanently = []
         while len(upgrade_threads) + len(skip_subs) < len(valid_subs):
             while (len([t for t in upgrade_threads if t.is_alive()])
                    < args.threads and not update_q.empty()):
@@ -60,9 +62,20 @@ def main():
                         subdata, update_q, poco.subupgrade.SubUpgrade)
                     upgrade_threads.append(upgrade_thread)
                     upgrade_thread.start()
+                if subdata.status == 301:
+                    moved_permanently.append(subdata)
             sleep(0.5)
         for upgrade_thread in upgrade_threads:
             upgrade_thread.join()
+
+        # fixing 301s by altering the sub url in the config file
+        if moved_permanently:
+            conf = poco.config.Config(args, merge_default=True)
+            for subdata in moved_permanently:
+                pseudo_args = Namespace(title=subdata.sub.title, url=None)
+                sub = poco.subscribe.search(conf.xml, pseudo_args)[0]
+                sub.url = subdata.new_url
+                poco.subscribe.write(conf)
 
         # wrap up
         poco.output.all_fails(args)
