@@ -9,7 +9,7 @@
 
 """Basic info"""
 
-__version__ = 'threads'
+__version__ = '0.9beta'
 VERSION = __version__
 MAINTAINER = "Mads Michelsen <mail@brokkr.net>"
 DESCRIPTION = "A cron-friendly command line podcast aggregator"
