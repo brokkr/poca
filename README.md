@@ -1,7 +1,7 @@
 ## Poca
-Poca is a command line podcast client, written in Python 3. It is developed for
-stability and ease of use. Version 0.9 introduces multithreading, adding
-lightning fast updates and the option for multiple, concurrent downloads to the mix.
+Poca is an command line podcast client, written in Python 3, with a focus on 
+user customization. Version 0.9 introduces multithreading, adding lightning 
+fast updates and the option for multiple, concurrent downloads to the mix.
 
 ### Features
 With Poca you can set custom options for each individual subscription or use
@@ -13,20 +13,20 @@ global defaults to have them apply to every subscription.
    Savage in the artist field (rather than The Stranger), poca will 
    automatically update the metadata upon download of each new episode. Set
    'genre' to be overwritten by 'Podcast' as a default. Or have poca add track
-   numbers to shows that have forgotten them.
- * **Filter a feed** using criteria such as filename and title, or the hour,
-   weekday or date of publishing. Only want news reports in the morning or on
-   Wednesdays? You got it.
- * **From the top**. Some podcasts are best if you start at the beginning. Poca 
-   introduces a special mode that gets the oldest episodes first, rather 
+   numbers to shows that have left them out.
+ * **Filter a feed** Only want news reports in the morning or on Wednesdays? 
+   Use criteria such as filename and title, or the hour, weekday or date of 
+   publishing to filter what you want from a feed.
+ * **From the top**. A latecomer to 'Serial' or other audiobook style podcasts?
+   Poca introduces a special mode that gets the oldest episodes first, rather 
    than the latest. To move on to later episodes simply delete old ones and 
    poca will fill up with the next in line.
  * **Keeping track**. Poca logs downloads and removals to a local file so you
    easily see what's changed. Or configure it with an SMTP server and get
    notified when a feed stops working.
  * **Manage your shows** by editing an easy-to-understand xml file. Or use
-   the accompanying tool to add, delete, sort them and get neat ascii
-   graphs showing the publishing frequency, average episode length and more.
+   the accompanying tool to add, delete, sort them, or get info about their
+   publishing frequency, average episode length and more.
  * **... and find new ones** with the accompanying search tool using the
    Audiosear.ch API.
 
