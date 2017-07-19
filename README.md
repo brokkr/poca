@@ -39,7 +39,7 @@ See the [Configuration](https://github.com/brokkr/poca/wiki/Configuration)
 section of the wiki for more details on features.
 
 ### Interface
-[![asciicast](https://asciinema.org/a/cwf8k4e154s6dkw2hiohqxj68.png)](https://asciinema.org/a/cwf8k4e154s6dkw2hiohqxj68)
+[![asciicast](https://asciinema.org/a/pONMnNfk3TcqYolnz0y1kC3jG.png)](https://asciinema.org/a/pONMnNfk3TcqYolnz0y1kC3jG)
 
 Poca is designed to be as intutive as possible. All configuration is done in 
 a single XML-format file and the output is easy to read. For maximal cron job 
