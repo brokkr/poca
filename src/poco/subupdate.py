@@ -12,16 +12,14 @@
 import os
 import re
 import time
-
-from threading import Thread
 from copy import deepcopy
-from lxml import etree
+from threading import Thread
 
 import feedparser
-
+from lxml import etree
 from poco import files, history, entryinfo
-from poco.outcome import Outcome
 from poco.config import merge
+from poco.outcome import Outcome
 
 
 class SubUpdateThread(Thread):
