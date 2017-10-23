@@ -98,9 +98,7 @@ class SubUpdate():
             outcome = files.verify_file(entry)
             if not outcome.success:
                 self.udeleted.append(entry)
-                #self.jar.del_lst.append(self.jar.lst.pop(index))
                 self.jar.del_lst.append(uid)
-                # do we actually use/need del_dic?
                 self.jar.del_dic[uid] = self.jar.dic.pop(uid)
         self.jar.lst = [x for x in self.jar.lst if x not in self.jar.del_lst]
         self.jar.save()
