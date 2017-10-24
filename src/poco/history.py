@@ -15,6 +15,7 @@ import pickle
 from poco import files
 from poco.outcome import Outcome
 
+
 def open_jar(db_filename):
     '''Tries opening existing jar'''
     try:
@@ -26,6 +27,7 @@ def open_jar(db_filename):
         jar = None
     return jar, outcome
 
+
 def get_subjar(paths, sub):
     '''Returns existing jar if any, else creates a new one'''
     db_filename = os.path.join(paths.db_dir, sub.title.text)
@@ -34,12 +36,14 @@ def get_subjar(paths, sub):
     else:
         jar = Subjar(paths, sub)
         outcome = jar.save()
+    jar.db_filename = db_filename
     return jar, outcome
+
 
 class Subjar:
     '''Creates standard subscription info container with save method'''
     def __init__(self, paths, sub):
-        self.db_filename = os.path.join(paths.db_dir, sub.title.text)
+        self.db_filename = str()
         self.sub = sub
         self.etag = None
         self.modified = None
@@ -53,18 +57,20 @@ class Subjar:
         outcome = files.check_path(os.path.dirname(self.db_filename))
         # havent we just checked this before?
         if outcome.success:
-            #try:
+            # try:
             with open(self.db_filename, 'wb') as f:
                 pickle.dump(self, f)
             outcome = Outcome(True, 'Pickle successful')
             # need more specific exceptions here
-            #except:
+            # except:
             #    outcome = Outcome(False, 'Pickle failed')
         return outcome
+
 
 class Jar(Subjar):
     '''Old name for Subjar. Needed for unpickling old instances'''
     pass
+
 
 def get_statejar(paths):
     '''Returns existing jar if any, else creates a new one'''
@@ -75,6 +81,7 @@ def get_statejar(paths):
         jar = Statejar(db_filename)
         outcome = jar.save()
     return jar, outcome
+
 
 class Statejar:
     '''Creates standard subscription info container with save method'''
