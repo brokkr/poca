@@ -54,16 +54,13 @@ class Subjar:
 
     def save(self):
         '''Saves jar instance to file using pickle'''
-        outcome = files.check_path(os.path.dirname(self.db_filename))
-        # havent we just checked this before?
-        if outcome.success:
-            # try:
+        try:
             with open(self.db_filename, 'wb') as f:
                 pickle.dump(self, f)
             outcome = Outcome(True, 'Pickle successful')
-            # need more specific exceptions here
-            # except:
-            #    outcome = Outcome(False, 'Pickle failed')
+        # need more specific exceptions here
+        except:
+            outcome = Outcome(False, 'Pickle failed')
         return outcome
 
 

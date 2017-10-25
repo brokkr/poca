@@ -67,7 +67,7 @@ class SubUpgrade():
             subdata.jar.sub = subdata.sub
             subdata.jar.etag = subdata.wanted.feed_etag
             subdata.jar.modified = subdata.wanted.feed_modified
-        subdata.jar.save()
+        self.outcome = subdata.jar.save()
 
         # download cover image
         if self.downed and subdata.wanted.feed_image:
@@ -83,13 +83,14 @@ class SubUpgrade():
         # see https://github.com/brokkr/poca/wiki/Architecture#wantedindex
         output.downloading(entry)
         wantedindex = subdata.wanted.lst.index(uid) - len(self.failed)
-        outcome = files.download_file(entry['poca_url'], entry['poca_abspath'],
-                                      subdata.conf.xml.settings)
-        if outcome.success is True:
-            outcome = tag.tag_audio_file(subdata.conf.xml.settings,
-                                         subdata.sub, subdata.jar, entry)
-            if not outcome.success:
-                output.tag_fail(outcome)
+        self.outcome = files.download_file(entry['poca_url'],
+                                           entry['poca_abspath'],
+                                           subdata.conf.xml.settings)
+        if self.outcome.success is True:
+            tag.tag_audio_file(subdata.conf.xml.settings, subdata.sub,
+                               subdata.jar, entry)
+            if not self.outcome.success:
+                output.tag_fail(self.outcome)
                 # add to failed? no, it would mess with wanted_index
             self.add_to_jar(uid, entry, wantedindex, subdata)
             self.downed.append(entry)
@@ -103,7 +104,6 @@ class SubUpgrade():
         subdata.jar.lst.insert(wantedindex, uid)
         subdata.jar.dic[uid] = entry
         self.outcome = subdata.jar.save()
-        # currently no jar-save checks
 
     def remove(self, uid, entry, subdata):
         '''Deletes the file and removes the entry from the jar'''
@@ -113,5 +113,4 @@ class SubUpgrade():
         subdata.jar.lst.remove(uid)
         del(subdata.jar.dic[uid])
         self.outcome = subdata.jar.save()
-        # currently no jar-save checks
         self.removed.append(entry)

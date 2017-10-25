@@ -67,6 +67,8 @@ class SubUpdate():
         if not self.outcome.success:
             return
         self.check_jar()
+        if not self.outcome.success:
+            return
 
         # get feed, combine with jar and filter the lot
         feed = Feed(self.sub, self.jar, self.udeleted)
@@ -101,8 +103,7 @@ class SubUpdate():
                 self.jar.del_lst.append(uid)
                 self.jar.del_dic[uid] = self.jar.dic.pop(uid)
         self.jar.lst = [x for x in self.jar.lst if x not in self.jar.del_lst]
-        self.jar.save()
-        # currently no jar-save checks
+        self.outcome = self.jar.save()
 
 class Feed:
     '''Constructs a container for feed entries'''
