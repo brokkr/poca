@@ -97,12 +97,12 @@ def tag_fail(outcome):
 
 def del_fail(outcome):
     '''Subline telling user of single entry deletion failure'''
-    msg = '   Deletion failed. ' + outcome.msg
+    msg = '   Error encountered while removing files. ' + outcome.msg
     STREAM.debug(msg)
     STREAMFAIL.info(msg)
 
 def all_fails(args):
-    '''Outputs all buffered failures in one go if not running verbose 
+    '''Outputs all buffered failures in one go if not running verbose
        (in which case they already have been output)'''
     if args.verbose:
         return

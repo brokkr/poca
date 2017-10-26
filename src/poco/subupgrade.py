@@ -57,10 +57,14 @@ class SubUpgrade():
             if uid not in subdata.lacking:
                 continue
             entry = subdata.wanted.dic[uid]
-            outcome = self.acquire(uid, entry, subdata)
-            if outcome.success is None:
+            self.acquire(uid, entry, subdata)
+            if self.outcome.success is None:
                 output.geninfo('%s: Download cancelled' % entry.title)
                 return
+            elif self.outcome.success is False:
+                output.geninfo('%s: Download encountered errors: %s' % self.outcome.msg)
+                return
+
 
         # save etag and subsettings after succesful update
         if not self.failed:
@@ -68,10 +72,13 @@ class SubUpgrade():
             subdata.jar.etag = subdata.wanted.feed_etag
             subdata.jar.modified = subdata.wanted.feed_modified
         self.outcome = subdata.jar.save()
+        if self.outcome.success is False:
+            output.geninfo('%s: Download encountered errors: %s' % self.outcome.msg)
+            return
 
         # download cover image
         if self.downed and subdata.wanted.feed_image:
-            outcome = files.download_img_file(subdata.wanted.feed_image,
+            self.outcome = files.download_img_file(subdata.wanted.feed_image,
                                               subdata.sub_dir,
                                               subdata.conf.xml.settings)
 
@@ -94,10 +101,9 @@ class SubUpgrade():
                 # add to failed? no, it would mess with wanted_index
             self.add_to_jar(uid, entry, wantedindex, subdata)
             self.downed.append(entry)
-        elif outcome.success is False:
-            output.dl_fail(outcome)
+        elif self.outcome.success is False:
+            output.dl_fail(self.outcome)
             self.failed.append(entry)
-        return outcome
 
     def add_to_jar(self, uid, entry, wantedindex, subdata):
         '''Add new entry to jar'''
