@@ -44,7 +44,7 @@ class SubUpdate():
         # basic sub set up and prerequisites
         self.conf = conf
         self.sub = sub
-        self.outcome = Outcome(True, '')
+        self.status = 0
         self.sub_dir = os.path.join(self.conf.xml.settings.base_dir.text,
                                     self.sub.title.text)
         self.outcome = files.check_path(self.sub_dir)
@@ -136,6 +136,8 @@ class Feed:
                             for entry in doc.entries}
             except (KeyError, AttributeError):
                 self.outcome = Outcome(False, 'Cant find entries in feed.')
+                # should we set an artificial status here? Or does feedparser?
+                # return
         from_the_top = sub.find('from_the_top') or 'no'
         if from_the_top == 'yes':
             self.lst.reverse()

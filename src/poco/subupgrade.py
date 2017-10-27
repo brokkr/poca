@@ -61,10 +61,6 @@ class SubUpgrade():
             if self.outcome.success is None:
                 output.geninfo('%s: Download cancelled' % entry.title)
                 return
-            elif self.outcome.success is False:
-                output.geninfo('%s: Download encountered errors: %s' % self.outcome.msg)
-                return
-
 
         # save etag and subsettings after succesful update
         if not self.failed:
@@ -77,9 +73,11 @@ class SubUpgrade():
 
         # download cover image
         if self.downed and subdata.wanted.feed_image:
-            self.outcome = files.download_img_file(subdata.wanted.feed_image,
+            _outcome = files.download_img_file(subdata.wanted.feed_image,
                                               subdata.sub_dir,
                                               subdata.conf.xml.settings)
+            if _outcome.success is False:
+                output.dl_fail(self.outcome.msg)
 
         # print summary of operations in file log
         output.file_summary(subdata, self.removed, self.downed, self.failed)
@@ -93,13 +91,12 @@ class SubUpgrade():
                                            entry['poca_abspath'],
                                            subdata.conf.xml.settings)
         if self.outcome.success is True:
-            tag.tag_audio_file(subdata.conf.xml.settings, subdata.sub,
-                               subdata.jar, entry)
-            if not self.outcome.success:
-                output.tag_fail(self.outcome)
-                # add to failed? no, it would mess with wanted_index
             self.add_to_jar(uid, entry, wantedindex, subdata)
             self.downed.append(entry)
+            _outcome = tag.tag_audio_file(subdata.conf.xml.settings,
+                                          subdata.sub, subdata.jar, entry)
+            if not _outcome.success:
+                output.tag_fail(_outcome)
         elif self.outcome.success is False:
             output.dl_fail(self.outcome)
             self.failed.append(entry)

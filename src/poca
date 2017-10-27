@@ -52,6 +52,7 @@ def main():
                 if subdata.outcome.success:
                     poco.output.subplans(subdata)
                 else:
+                    # suberror is classified as 'non-fatal'...?
                     poco.output.suberror(subdata)
                 if subdata.status in [0, 304, 401, 403, 404, 500, 503]:
                     skip_subs.append(subdata)

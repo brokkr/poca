@@ -35,7 +35,6 @@ def get_subjar(paths, sub):
         jar, outcome = open_jar(db_filename)
     else:
         jar = Subjar(paths, sub)
-        outcome = jar.save()
     jar.db_filename = db_filename
     return jar, outcome
 
