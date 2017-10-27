@@ -28,6 +28,7 @@ def get_logger(logger_name):
     logger.addHandler(null_handler)
     return logger
 
+
 def start_streamlogger(args):
     '''Starts up a stream logger'''
     logger = get_logger('POCASTREAM')
@@ -47,6 +48,7 @@ def start_streamlogger(args):
     logger.addHandler(stream_handler)
     return logger
 
+
 def start_streamfaillogger(args):
     logger = get_logger('POCASTREAMFAIL')
     logger.setLevel(logging.INFO)
@@ -54,6 +56,7 @@ def start_streamfaillogger(args):
     stream_handler.setLevel(logging.INFO)
     stream_formatter = logging.Formatter("%(message)s")
     stream_handler.setFormatter(stream_formatter)
+    # Suggestion: memory_handler creation is under else and no pass
     memory_handler = logging.handlers.MemoryHandler(100000, flushLevel=50,
                                                     target=stream_handler)
     if args.quiet:
@@ -63,6 +66,7 @@ def start_streamfaillogger(args):
         logger.addHandler(memory_handler)
         logger.poca_memory_handler = memory_handler
     return logger
+
 
 def start_summarylogger(args, paths, settings):
     '''Starts up the summary logger (for use in file and email logging)'''
@@ -83,6 +87,7 @@ def start_summarylogger(args, paths, settings):
         logger.poca_email_handler = bsmtp_handler
     return logger
 
+
 def get_file_handler(paths):
     '''Adds a file handler to the logger'''
     file_handler = logging.FileHandler(paths.log_file)
@@ -91,6 +96,7 @@ def get_file_handler(paths):
                                        datefmt='%Y-%m-%d %H:%M')
     file_handler.setFormatter(file_formatter)
     return file_handler
+
 
 class BufferSMTPHandler(handlers.BufferingHandler):
     '''SMTPHandler that send one email per flush'''

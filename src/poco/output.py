@@ -101,6 +101,12 @@ def del_fail(outcome):
     STREAM.debug(msg)
     STREAMFAIL.info(msg)
 
+def db_fail(outcome):
+    '''Subline telling user of failure to save jar'''
+    msg = '   Error encountered while saving database. ' + outcome.msg
+    STREAM.debug(msg)
+    STREAMFAIL.info(msg)
+
 def all_fails(args):
     '''Outputs all buffered failures in one go if not running verbose
        (in which case they already have been output)'''

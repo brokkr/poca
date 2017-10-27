@@ -71,10 +71,9 @@ class SubUpgrade():
             subdata.jar.sub = subdata.sub
             subdata.jar.etag = subdata.wanted.feed_etag
             subdata.jar.modified = subdata.wanted.feed_modified
-        self.outcome = subdata.jar.save()
-        if self.outcome.success is False:
-            output.geninfo('%s: Download encountered errors: %s' % self.outcome.msg)
-            return
+        _outcome = subdata.jar.save()
+        if _outcome.success is False:
+            output.db_fail(self.outcome.msg)
 
         # download cover image
         if self.downed and subdata.wanted.feed_image:
@@ -109,14 +108,18 @@ class SubUpgrade():
         '''Add new entry to jar'''
         subdata.jar.lst.insert(wantedindex, uid)
         subdata.jar.dic[uid] = entry
-        self.outcome = subdata.jar.save()
+        _outcome = subdata.jar.save()
+        if _outcome.success is False:
+            output.db_fail(self.outcome.msg)
 
     def remove(self, uid, entry, subdata):
         '''Deletes the file and removes the entry from the jar'''
         self.outcome = files.delete_file(entry['poca_abspath'])
         if not self.outcome.success:
             return
+        self.removed.append(entry)
         subdata.jar.lst.remove(uid)
         del(subdata.jar.dic[uid])
-        self.outcome = subdata.jar.save()
-        self.removed.append(entry)
+        _outcome = subdata.jar.save()
+        if _outcome.success is False:
+            output.db_fail(self.outcome.msg)
