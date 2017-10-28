@@ -73,15 +73,17 @@ class SubUpdate():
         # get feed, combine with jar and filter the lot
         feed = Feed(self.sub, self.jar, self.udeleted)
         self.status = feed.status
-        if self.status in [0, 401, 403, 404, 500, 503]:
+        if self.status == 301:
+            self.outcome = Outcome(True, 'Moved permanently')
+            self.new_url = feed.href
+        elif self.status == 304:
+            self.outcome = Outcome(True, 'Not modified')
+            return
+        elif self.status >= 400:
             self.outcome = Outcome(False, feed.bozo_exception)
             return
-        elif self.status in [304]:
-            self.outcome = Outcome(True, 'Not modified')
-            self.unwanted, self.lacking = ([], [])
-            return
-        elif self.status in [301]:
-            self.new_url = feed.href
+        else:
+            self.outcome = Outcome(True, 'Success')
         combo = Combo(feed, self.jar, self.sub, self.sub_dir)
         self.wanted = Wanted(self.sub, feed, combo, self.jar.del_lst)
         from_the_top = self.sub.find('from_the_top') or 'no'
@@ -116,7 +118,7 @@ class Feed:
             etag = None
             modified = None
         doc = feedparser.parse(sub.url.text, etag=etag, modified=modified)
-        self.status = getattr(doc, 'status', 0)
+        self.status = getattr(doc, 'status', 418)
         self.etag = getattr(doc, 'etag', etag)
         self.modified = getattr(doc, 'modified', modified)
         self.bozo_exception = getattr(doc, 'bozo_exception', str())
