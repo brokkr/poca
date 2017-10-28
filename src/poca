@@ -40,6 +40,11 @@ def main():
                 update_q, poco.subupdate.SubUpdate, conf, sub)
             update_threads.append(update_thread)
             update_thread.start()
+        for update_thread in update_threads:
+            update_thread.join()
+        print('all update threads have come home...')
+        sleep(20)
+        print('... now moving on...')
 
         # upgrade loop
         upgrade_threads = []

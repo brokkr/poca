@@ -69,7 +69,7 @@ class SubUpgrade():
             subdata.jar.modified = subdata.wanted.feed_modified
         _outcome = subdata.jar.save()
         if _outcome.success is False:
-            output.db_fail(self.outcome)
+            output.db_fail(_outcome)
 
         # download cover image
         if self.downed and subdata.wanted.feed_image:
@@ -77,7 +77,7 @@ class SubUpgrade():
                                               subdata.sub_dir,
                                               subdata.conf.xml.settings)
             if _outcome.success is False:
-                output.dl_fail(self.outcome)
+                output.dl_fail(_outcome)
 
         # print summary of operations in file log
         output.file_summary(subdata, self.removed, self.downed, self.failed)
@@ -107,7 +107,7 @@ class SubUpgrade():
         subdata.jar.dic[uid] = entry
         _outcome = subdata.jar.save()
         if _outcome.success is False:
-            output.db_fail(self.outcome.msg)
+            output.db_fail(_outcome)
 
     def remove(self, uid, entry, subdata):
         '''Deletes the file and removes the entry from the jar'''
@@ -119,4 +119,4 @@ class SubUpgrade():
         del(subdata.jar.dic[uid])
         _outcome = subdata.jar.save()
         if _outcome.success is False:
-            output.db_fail(self.outcome.msg)
+            output.db_fail(_outcome)
