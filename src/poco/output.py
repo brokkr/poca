@@ -102,13 +102,13 @@ def tag_fail(outcome):
 
 def del_fail(outcome):
     '''Subline telling user of single entry deletion failure'''
-    msg = '   Error encountered while removing files. ' + outcome.msg
+    msg = '   Error deleting file: ' + outcome.msg
     STREAM.debug(msg)
     STREAMFAIL.info(msg)
 
 def db_fail(outcome):
     '''Subline telling user of failure to save jar'''
-    msg = '   Error encountered while saving database. ' + outcome.msg
+    msg = '   Error saving database: ' + outcome.msg
     STREAM.debug(msg)
     STREAMFAIL.info(msg)
 

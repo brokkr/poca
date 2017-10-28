@@ -61,8 +61,7 @@ class Subjar:
             outcome = Outcome(True, 'Pickle successful')
         # need more specific exceptions here
         except:
-            outcome = Outcome(False, 'Error saving database: %s' %
-                              self.db_filename)
+            outcome = Outcome(False, self.db_filename)
         return outcome
 
 
