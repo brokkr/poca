@@ -35,7 +35,6 @@ def get_poca_args():
                         help='Number of concurrent downloads to allow')
     return parser.parse_args()
 
-import pdb; pdb.set_trace()  # XXX BREAKPOINT
 def get_poca_subscribe_args():
     '''Returns arguments from a command line argument parser'''
     blurb = "poca-subscribe " + about.VERSION + " : " + about.DESCRIPTION_SUB
