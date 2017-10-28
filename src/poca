@@ -49,6 +49,7 @@ def main():
             while (len([t for t in upgrade_threads if t.is_alive()])
                    < args.threads and not update_q.empty()):
                 subdata = update_q.get()
+                print(subdata.sub.title.text, subdata.status)
                 if subdata.outcome.success:
                     poco.output.subplans(subdata)
                 else:

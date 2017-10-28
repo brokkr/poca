@@ -21,7 +21,7 @@ def open_jar(db_filename):
     try:
         with open(db_filename, mode='rb') as f:
             jar = pickle.load(f)
-            outcome = Outcome(True, 'Pickle loaded')
+            outcome = Outcome(True, 'Jar loaded')
     except (PermissionError, pickle.UnpicklingError, EOFError) as e:
         outcome = Outcome(False, str(e))
         jar = None
@@ -35,7 +35,9 @@ def get_subjar(paths, sub):
         jar, outcome = open_jar(db_filename)
     else:
         jar = Subjar(paths, sub)
-    jar.db_filename = db_filename
+        outcome = Outcome(True, 'New jar created')
+    if outcome.success is True:
+        jar.db_filename = db_filename
     return jar, outcome
 
 
@@ -59,7 +61,8 @@ class Subjar:
             outcome = Outcome(True, 'Pickle successful')
         # need more specific exceptions here
         except:
-            outcome = Outcome(False, 'Error saving database: %s' % self.db_filename)
+            outcome = Outcome(False, 'Error saving database: %s' %
+                              self.db_filename)
         return outcome
 
 
