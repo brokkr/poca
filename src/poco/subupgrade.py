@@ -69,7 +69,7 @@ class SubUpgrade():
             subdata.jar.modified = subdata.wanted.feed_modified
         _outcome = subdata.jar.save()
         if _outcome.success is False:
-            output.db_fail(self.outcome.msg)
+            output.db_fail(self.outcome)
 
         # download cover image
         if self.downed and subdata.wanted.feed_image:
@@ -77,7 +77,7 @@ class SubUpgrade():
                                               subdata.sub_dir,
                                               subdata.conf.xml.settings)
             if _outcome.success is False:
-                output.dl_fail(self.outcome.msg)
+                output.dl_fail(self.outcome)
 
         # print summary of operations in file log
         output.file_summary(subdata, self.removed, self.downed, self.failed)
