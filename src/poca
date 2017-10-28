@@ -58,9 +58,10 @@ def main():
                 if subdata.status == 301:
                     moved_permanently.append(subdata)
                 if subdata.status == 304:
-                    print(subdata.sub.title.text, subdata.status)
+                    #print(subdata.sub.title.text, subdata.status)
                     skip_subs.append(subdata)
                     update_q.task_done()
+                    poco.output.subnotmodified(subdata)
                     continue
                 poco.output.subplans(subdata)
                 upgrade_thread = poco.subupgrade.SubUpgradeThread(

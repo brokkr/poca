@@ -104,6 +104,7 @@ class SubUpdate():
                 self.udeleted.append(entry)
                 self.jar.del_lst.append(uid)
                 self.jar.del_dic[uid] = self.jar.dic.pop(uid)
+        # save jar changes or no as a permissions check (better now than later)
         self.jar.lst = [x for x in self.jar.lst if x not in self.jar.del_lst]
         self.outcome = self.jar.save()
 

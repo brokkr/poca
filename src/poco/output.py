@@ -39,6 +39,11 @@ def suberror(subdata):
     STREAM.error(msg)
     SUMMARY.error(msg)
 
+def subnotmodified(subdata):
+    '''No changes made, just output title'''
+    msg = subdata.sub.title.text.upper()
+    STREAM.info(msg)
+
 def subplans(subdata):
     '''Summary of files to be downloaded and deleted'''
     msg = subdata.sub.title.text.upper()
