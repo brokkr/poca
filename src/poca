@@ -79,7 +79,6 @@ def main():
 
         # fixing 301s by altering the sub url in the config file
         if moved_permanently:
-            poco.output.geninfo('')
             conf = poco.config.Config(args, merge_default=True)
             for subdata in moved_permanently:
                 pseudo_args = Namespace(title=subdata.sub.title, url=None)

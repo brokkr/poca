@@ -58,7 +58,6 @@ class SubUpgrade():
             entry = subdata.wanted.dic[uid]
             self.acquire(uid, entry, subdata)
             if self.outcome.success is None:
-                output.geninfo('%s: Download cancelled' % entry.title)
                 return
 
         # save etag and subsettings after succesful update

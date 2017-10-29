@@ -17,10 +17,6 @@ STREAMFAIL = logging.getLogger('POCASTREAMFAIL')
 SUMMARY = logging.getLogger('POCASUMMARY')
 
 # generic output
-def geninfo(msg):
-    '''Generic info'''
-    STREAM.info(msg)
-
 def generror(msg):
     '''Generic error'''
     err = "\N{Heavy Exclamation Mark Symbol}"
