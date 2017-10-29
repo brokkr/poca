@@ -35,6 +35,7 @@ def start_streamlogger(args):
     stream_handler = logging.StreamHandler()
     stream_formatter = logging.Formatter("%(message)s")
     stream_handler.setFormatter(stream_formatter)
+    # is this really necessary? doesn't argparse take care of it?
     if not hasattr(args, 'verbose'):
         args.verbose = False
     if args.quiet:
@@ -50,6 +51,8 @@ def start_streamlogger(args):
 
 
 def start_streamfaillogger(args):
+    '''A streamlogger for multithreading. Soaks up non-fatal errors and
+       flushes them at the end.'''
     logger = get_logger('POCASTREAMFAIL')
     logger.setLevel(logging.INFO)
     stream_handler = logging.StreamHandler()
@@ -59,6 +62,8 @@ def start_streamfaillogger(args):
     # Suggestion: memory_handler creation is under else and no pass
     memory_handler = logging.handlers.MemoryHandler(100000, flushLevel=50,
                                                     target=stream_handler)
+    # if args.quiet or args.verbose ?
+    # it seems like verbose are currently getting the info twice...?
     if args.quiet:
         logger.poca_memory_handler = None
         pass

@@ -96,6 +96,7 @@ class SubUpdate():
 
     def check_jar(self):
         '''Check for user deleted files so we can filter them out'''
+        # why is this called check_jar? its the files we're checking, right?
         #for index, uid in enumerate(deepcopy(self.jar.lst)):
         for uid in self.jar.lst:
             entry = self.jar.dic[uid]

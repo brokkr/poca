@@ -46,7 +46,6 @@ class SubUpgrade():
             self.remove(uid, entry, subdata)
             if not self.outcome.success:
                 output.del_fail(self.outcome)
-                return
             else:
                 output.removing(entry)
 
