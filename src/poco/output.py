@@ -12,11 +12,15 @@
 import logging
 
 
-STREAM = logging.getLogger('POCASTREAM')
-STREAMFAIL = logging.getLogger('POCASTREAMFAIL')
-SUMMARY = logging.getLogger('POCASUMMARY')
+STREAM = logging.getLogger('POCA_STREAM')
+AFTER_STREAM = logging.getLogger('POCA_AFTER_STREAM')
+SUMMARY = logging.getLogger('POCA_SUMMARY')
 
-# generic output
+# subscribe output
+
+# geninfo is no more!
+# subscribe will need fixing!
+
 def generror(msg):
     '''Generic error'''
     err = "\N{Heavy Exclamation Mark Symbol}"
@@ -88,36 +92,36 @@ def dl_fail(outcome):
     '''Subline telling user of single entry download failure'''
     msg = '   ' + outcome.msg
     STREAM.debug(msg)
-    STREAMFAIL.info(msg)
+    AFTER_STREAM.info(msg)
 
 def tag_fail(outcome):
     '''Subline telling user of single entry tagging failure'''
     msg = '   Tagging failed. ' + outcome.msg
     STREAM.debug(msg)
-    STREAMFAIL.info(msg)
+    AFTER_STREAM.info(msg)
 
 def del_fail(outcome):
     '''Subline telling user of single entry deletion failure'''
     msg = '   Error deleting file: ' + outcome.msg
     STREAM.debug(msg)
-    STREAMFAIL.info(msg)
+    AFTER_STREAM.info(msg)
 
 def db_fail(outcome):
     '''Subline telling user of failure to save jar'''
     msg = '   Error saving database: ' + outcome.msg
     STREAM.debug(msg)
-    STREAMFAIL.info(msg)
+    AFTER_STREAM.info(msg)
 
 def all_fails(args):
     '''Outputs all buffered failures in one go if not running verbose
        (in which case they already have been output)'''
     if args.verbose:
         return
-    if STREAMFAIL.poca_memory_handler:
-        if STREAMFAIL.poca_memory_handler.buffer:
+    if AFTER_STREAM.poca_memory_handler:
+        if AFTER_STREAM.poca_memory_handler.buffer:
             STREAM.info('The following errors were encountered: ')
-            STREAMFAIL.poca_memory_handler.flush()
-            STREAMFAIL.poca_memory_handler.close()
+            AFTER_STREAM.poca_memory_handler.flush()
+            AFTER_STREAM.poca_memory_handler.close()
 
 # file operations summary (for file log)
 def file_summary(subdata, removed, downed, failed):

@@ -31,7 +31,7 @@ def get_logger(logger_name):
 
 def start_streamlogger(args):
     '''Starts up a stream logger'''
-    logger = get_logger('POCASTREAM')
+    logger = get_logger('POCA_STREAM')
     stream_handler = logging.StreamHandler()
     stream_formatter = logging.Formatter("%(message)s")
     stream_handler.setFormatter(stream_formatter)
@@ -53,7 +53,7 @@ def start_streamlogger(args):
 def start_streamfaillogger(args):
     '''A streamlogger for multithreading. Soaks up non-fatal errors and
        flushes them at the end.'''
-    logger = get_logger('POCASTREAMFAIL')
+    logger = get_logger('POCA_AFTER_STREAM')
     logger.setLevel(logging.INFO)
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.INFO)
@@ -75,7 +75,7 @@ def start_streamfaillogger(args):
 
 def start_summarylogger(args, paths, settings):
     '''Starts up the summary logger (for use in file and email logging)'''
-    logger = get_logger('POCASUMMARY')
+    logger = get_logger('POCA_SUMMARY')
     logger.setLevel(logging.INFO)
     logger.poca_file_handler = None
     logger.poca_email_handler = None
