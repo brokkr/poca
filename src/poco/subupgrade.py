@@ -34,6 +34,7 @@ class SubUpgrade():
         self.my_thread = current_thread()
 
         # prepare list for summary
+        self.fail_flag = False
         self.removed, self.downed, self.failed = [], [], []
 
         # loop through user deleted and indicate recognition
@@ -44,10 +45,6 @@ class SubUpgrade():
         for uid in subdata.unwanted:
             entry = subdata.jar.dic[uid]
             self.remove(uid, entry, subdata)
-            if not self.outcome.success:
-                output.fail_delete(self.outcome)
-            else:
-                output.processing_removal(entry)
 
         # loop through wanted (list) entries to acquire
         # WHY OH WHY aren't we just looping through lacking? we still have
@@ -61,7 +58,7 @@ class SubUpgrade():
                 return
 
         # save etag and subsettings after succesful update
-        if not self.failed:
+        if self.fail_flag is False:
             subdata.jar.sub = subdata.sub
             subdata.jar.etag = subdata.wanted.feed_etag
             subdata.jar.modified = subdata.wanted.feed_modified
@@ -88,33 +85,35 @@ class SubUpgrade():
         self.outcome = files.download_file(entry['poca_url'],
                                            entry['poca_abspath'],
                                            subdata.conf.xml.settings)
-        if self.outcome.success is True:
-            self.add_to_jar(uid, entry, wantedindex, subdata)
-            self.downed.append(entry)
-            _outcome = tag.tag_audio_file(subdata.conf.xml.settings,
-                                          subdata.sub, subdata.jar, entry)
-            if not _outcome.success:
-                output.fail_tag(_outcome)
-        elif self.outcome.success is False:
+        if self.outcome.success is False:
+            self.fail_flag = True
             output.fail_download(self.outcome)
             self.failed.append(entry)
-
-    def add_to_jar(self, uid, entry, wantedindex, subdata):
-        '''Add new entry to jar'''
+            return
         subdata.jar.lst.insert(wantedindex, uid)
         subdata.jar.dic[uid] = entry
         _outcome = subdata.jar.save()
         if _outcome.success is False:
+            self.fail_flag = True
             output.fail_database(_outcome)
+        self.downed.append(entry)
+        _outcome = tag.tag_audio_file(subdata.conf.xml.settings,
+                                        subdata.sub, subdata.jar, entry)
+        if not _outcome.success:
+            output.fail_tag(_outcome)
 
     def remove(self, uid, entry, subdata):
         '''Deletes the file and removes the entry from the jar'''
         self.outcome = files.delete_file(entry['poca_abspath'])
-        if not self.outcome.success:
+        if self.outcome.success is False:
+            self.fail_flag = True
+            output.fail_delete(self.outcome)
             return
+        output.processing_removal(entry)
         self.removed.append(entry)
         subdata.jar.lst.remove(uid)
         del(subdata.jar.dic[uid])
         _outcome = subdata.jar.save()
         if _outcome.success is False:
+            self.fail_flag = True
             output.fail_database(_outcome)
