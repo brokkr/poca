@@ -23,34 +23,34 @@ def download_file(url, file_path, settings):
     '''Download function with block time outs'''
     my_thread = current_thread()
     if getattr(my_thread, "kill", False):
-        return Outcome(None, 'Download stopped')
+        return Outcome(None, 'Download cancelled by user')
     try:
         # a timeout of 60 secs is a problem when we're trying to ctrl-c
         r = requests.get(url, stream=True, timeout=60)
     except (requests.exceptions.ConnectionError,
             requests.exceptions.HTTPError) as e:
         r.close()
-        return Outcome(False, 'Download failed: %s' % str(e))
+        return Outcome(False, 'Download of %s failed' % url)
     except requests.exceptions.Timeout:
         r.close()
-        return Outcome(False, 'Download timed out')
+        return Outcome(False, 'Download of %s timed out' % url)
     with open(file_path, 'wb') as f:
         try:
             for chunk in r.iter_content(chunk_size=1024):
                 if getattr(my_thread, "kill", False):
                     r.close()
                     outcome = delete_file(f.name)
-                    return Outcome(None, 'Download cancelled')
+                    return Outcome(None, 'Download cancelled by user')
                 if chunk:
                     f.write(chunk)
         except requests.exceptions.ConnectionError as e:
             r.close()
             outcome = delete_file(f.name)
-            return Outcome(False, 'Download broke off: %s' % str(e))
+            return Outcome(False, 'Download of %s broke off' % url)
         except requests.exceptions.Timeout:
             r.close()
             outcome = delete_file(f.name)
-            return Outcome(False, 'Download timed out')
+            return Outcome(False, 'Download of %s timed out' % url)
     r.close()
     return Outcome(True, '')
 
@@ -59,7 +59,7 @@ def download_img_file(url, sub_dir, settings):
     try:
         r = requests.get(url, timeout=60)
     except requests.exceptions.RequestException:
-        return Outcome(False, 'Download failed')
+        return Outcome(False, 'Download of %s failed' % url)
     content_type = r.headers['content-type']
     mime_dic = {'image/bmp': '.bmp',
                 'image/gif': '.gif',
@@ -68,7 +68,8 @@ def download_img_file(url, sub_dir, settings):
                 'image/webp': '.webp'}
     extension = mime_dic.get(content_type, None)
     if extension is None:
-        return Outcome(False, 'Unknown image MIME type')
+        return Outcome(False, 'Download of image %s failed. Unknown MIME type.'
+                       % url)
     else:
         file_path = os.path.join(sub_dir, 'cover' + extension)
         with open(file_path, 'wb') as f:
@@ -82,7 +83,7 @@ def delete_file(file_path):
         os.remove(file_path)
         return Outcome(True, file_path + ': File was successfully deleted')
     except OSError as e:
-        return Outcome(False, file_path + ': ' + str(e))
+        return Outcome(False, 'Removal of %s failed' % file_path)
 
 def verify_file(entry):
     '''Check to see if recorded file exists or has been removed'''
@@ -94,14 +95,14 @@ def check_path(check_dir):
     '''Create a directory'''
     if os.path.isdir(check_dir):
         if os.access(check_dir, os.W_OK):
-            return Outcome(True, check_dir + ': Dir exists already.')
+            return Outcome(True, '%s exists already' % check_dir)
         else:
-            return Outcome(False, check_dir + ': Lacks permissions to dir.')
+            return Outcome(False, 'Could not save files to %s' % check_dir)
     try:
         os.makedirs(check_dir)
-        return Outcome(True, check_dir + ': Dir was successfully created.')
+        return Outcome(True, '%s was successfully created' % check_dir)
     except OSError:
-        return Outcome(False, check_dir + ': Dir could not be created.')
+        return Outcome(False, 'Could not create %s' % check_dir)
 
 
 # subscription reset

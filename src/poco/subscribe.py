@@ -15,13 +15,14 @@ import os
 import re
 from lxml import etree, objectify
 from mutagen.easyid3 import EasyID3
+from argparse import Namespace
 
 try:
     import audiosearch
 except ImportError:
     audiosearch = None
 
-from poco import files, output
+from poco import files, output, config, outcome
 from poco.feedstats import Feedstats
 
 
@@ -248,3 +249,15 @@ def search_show(conf, args):
     except (ValueError, IndexError):
         return (None, None)
     return user_input_add_sub(url=choice['rss_url'])
+
+def update_url(args, subdata):
+    '''Used to implement 301 status code changes into conf'''
+    pseudo_args = Namespace(title=subdata.sub.title, url=None)
+    # lock conf file
+    conf = config.Config(args, merge_default=True)
+    sub = search(conf.xml, pseudo_args)[0]
+    sub.url = subdata.new_url
+    write(conf)
+    # unlock conf file
+    _outcome = outcome.Outcome(True, 'Updated URL: %s' % subdata.new_url)
+    return _outcome

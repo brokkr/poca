@@ -16,10 +16,14 @@ STREAM = logging.getLogger('POCA_STREAM')
 AFTER_STREAM = logging.getLogger('POCA_AFTER_STREAM')
 SUMMARY = logging.getLogger('POCA_SUMMARY')
 
-# subscribe output
 
-# geninfo is no more!
-# subscribe will need fixing!
+# ####################################### #
+# SUBSCRIBE                               #
+# ####################################### #
+
+def geninfo(msg):
+    '''Generic info'''
+    STREAM.info(msg)
 
 def generror(msg):
     '''Generic error'''
@@ -27,24 +31,42 @@ def generror(msg):
     msg = err + 'ERROR' + err + ' ' + msg
     STREAM.error(msg)
 
-# config reporting
-def conffatal(msg):
+
+# ####################################### #
+# GLOBAL                                  #
+# ####################################### #
+
+def config_fatal(msg):
     '''Fatal errors encountered during config read'''
     STREAM.fatal(msg)
 
-# subscription plans and error reporting
-def suberror(subdata):
-    '''Non-fatal errors encountered processing a specific subscription'''
-    msg = "%s. %s" % (subdata.sub.title.text.upper(), subdata.outcome.msg)
-    STREAM.error(msg)
-    SUMMARY.error(msg)
 
-def subnotmodified(subdata):
+# ####################################### #
+# PLANNING                                #
+# ####################################### #
+
+def plans_error(subdata):
+    '''sub-fatal errors encountered processing a specific subscription'''
+    stream_msg = "%s. %s" % (subdata.sub.title.text.upper(), subdata.outcome.msg)
+    after_stream_msg = 'SUB ERROR: %s' % (subdata.outcome.msg)
+    STREAM.debug(stream_msg)
+    AFTER_STREAM.info(after_stream_msg)
+    SUMMARY.error(stream_msg)
+
+def plans_moved(subdata):
+    '''Sub has moved (http status 301)'''
+    stream_msg = "%s. %s" % (subdata.sub.title.text.upper(), subdata.outcome.msg)
+    after_stream_msg = 'SUB MOVED: %s' % (subdata.outcome.msg)
+    STREAM.debug(stream_msg)
+    AFTER_STREAM.info(after_stream_msg)
+    SUMMARY.error(stream_msg)
+
+def plans_nochanges(subdata):
     '''No changes made, just output title'''
     msg = subdata.sub.title.text.upper()
     STREAM.info(msg)
 
-def subplans(subdata):
+def plans_upgrade(subdata):
     '''Summary of files to be downloaded and deleted'''
     msg = subdata.sub.title.text.upper()
     no_udeleted = len(subdata.udeleted)
@@ -64,22 +86,25 @@ def subplans(subdata):
         msg = msg + str(no_lacking) + ' ' + "\N{HEAVY PLUS SIGN}"
     STREAM.info(msg)
 
-# file operations individually (for stdout)
-# 'debug' indicates that the output is only delivered if runing verbose
-def notice_udeleted(entry):
+
+# ####################################### #
+# PROCESSING                              #
+# ####################################### #
+
+def processing_user_deleted(entry):
     '''One line per entry telling user of episodes deleted by user'''
     msg = ' ' + "\N{WARNING SIGN}" + ' ' + entry['poca_filename'] + \
         ' deleted by user'
     STREAM.debug(msg)
 
-def removing(entry):
+def processing_removal(entry):
     '''One line per entry telling user of episodes being deleted by poca'''
     size = entry['poca_mb']
     size_str = ' [' + str(round(size)) + ' Mb]' if size else ' [Unknown]'
     msg = ' ' + "\N{CANCELLATION X}" + ' ' + entry['poca_filename'] + size_str
     STREAM.debug(msg)
 
-def downloading(entry):
+def processing_download(entry):
     '''One line per entry telling user of episodes being downloaded by poca'''
     size = entry['poca_mb']
     size_str = ' [' + str(round(size)) + ' Mb]' if size else ' [Unknown]'
@@ -87,41 +112,52 @@ def downloading(entry):
         entry['poca_filename'] + size_str
     STREAM.debug(msg)
 
-# file operations failures
-def dl_fail(outcome):
+
+# ####################################### #
+# FAIL                                    #
+# ####################################### #
+
+def fail_download(outcome):
     '''Subline telling user of single entry download failure'''
     msg = '   ' + outcome.msg
+    after_stream_msg = 'DOWNLOAD ERROR: %s' % (outcome.msg)
     STREAM.debug(msg)
-    AFTER_STREAM.info(msg)
+    AFTER_STREAM.info(after_stream_msg)
 
-def tag_fail(outcome):
+def fail_tag(outcome):
     '''Subline telling user of single entry tagging failure'''
-    msg = '   Tagging failed. ' + outcome.msg
+    msg = '   ' + outcome.msg
+    after_stream_msg = 'TAGGING ERROR: %s' % (outcome.msg)
     STREAM.debug(msg)
-    AFTER_STREAM.info(msg)
+    AFTER_STREAM.info(after_stream_msg)
 
-def del_fail(outcome):
+def fail_delete(outcome):
     '''Subline telling user of single entry deletion failure'''
-    msg = '   Error deleting file: ' + outcome.msg
+    msg = '   ' + outcome.msg
+    after_stream_msg = 'DELETE ERROR: %s' % (outcome.msg)
     STREAM.debug(msg)
-    AFTER_STREAM.info(msg)
+    AFTER_STREAM.info(after_stream_msg)
 
-def db_fail(outcome):
+def fail_database(outcome):
     '''Subline telling user of failure to save jar'''
-    msg = '   Error saving database: ' + outcome.msg
+    msg = '   ' + outcome.msg
+    after_stream_msg = 'DATABASE ERROR: %s' % (outcome.msg)
     STREAM.debug(msg)
-    AFTER_STREAM.info(msg)
+    AFTER_STREAM.info(after_stream_msg)
 
-def all_fails(args):
-    '''Outputs all buffered failures in one go if not running verbose
-       (in which case they already have been output)'''
-    if args.verbose:
-        return
+def after_stream_flush():
+    '''Outputs all buffered failures in one go. In verbose mode after_stream
+       is not enabled.'''
     if AFTER_STREAM.poca_memory_handler:
         if AFTER_STREAM.poca_memory_handler.buffer:
-            STREAM.info('The following errors were encountered: ')
+            STREAM.info('The following issues were encountered: ')
             AFTER_STREAM.poca_memory_handler.flush()
             AFTER_STREAM.poca_memory_handler.close()
+
+
+# ####################################### #
+# SUMMARY                                 #
+# ####################################### #
 
 # file operations summary (for file log)
 def file_summary(subdata, removed, downed, failed):

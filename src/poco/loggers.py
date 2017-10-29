@@ -29,7 +29,7 @@ def get_logger(logger_name):
     return logger
 
 
-def start_streamlogger(args):
+def start_stream_logger(args):
     '''Starts up a stream logger'''
     logger = get_logger('POCA_STREAM')
     stream_handler = logging.StreamHandler()
@@ -50,30 +50,26 @@ def start_streamlogger(args):
     return logger
 
 
-def start_streamfaillogger(args):
+def start_after_stream_logger(args):
     '''A streamlogger for multithreading. Soaks up non-fatal errors and
        flushes them at the end.'''
     logger = get_logger('POCA_AFTER_STREAM')
     logger.setLevel(logging.INFO)
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.INFO)
-    stream_formatter = logging.Formatter("%(message)s")
+    stream_formatter = logging.Formatter(" * %(message)s")
     stream_handler.setFormatter(stream_formatter)
-    # Suggestion: memory_handler creation is under else and no pass
-    memory_handler = logging.handlers.MemoryHandler(100000, flushLevel=50,
-                                                    target=stream_handler)
-    # if args.quiet or args.verbose ?
-    # it seems like verbose are currently getting the info twice...?
-    if args.quiet:
+    if args.quiet or args.verbose:
         logger.poca_memory_handler = None
-        pass
     else:
+        memory_handler = logging.handlers.MemoryHandler(10000, flushLevel=50,
+                                                        target=stream_handler)
         logger.addHandler(memory_handler)
         logger.poca_memory_handler = memory_handler
     return logger
 
 
-def start_summarylogger(args, paths, settings):
+def start_summary_logger(args, paths, settings):
     '''Starts up the summary logger (for use in file and email logging)'''
     logger = get_logger('POCA_SUMMARY')
     logger.setLevel(logging.INFO)

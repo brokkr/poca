@@ -14,7 +14,6 @@
 import sys
 from queue import Queue
 from time import sleep
-from argparse import Namespace
 
 import poco
 
@@ -22,12 +21,13 @@ import poco
 def main():
     '''Main script'''
     try:
+
         # setup
         args = poco.args.get_poca_args()
-        stream_logger = poco.loggers.start_streamlogger(args)
-        streamfail_logger = poco.loggers.start_streamfaillogger(args)
+        stream_logger = poco.loggers.start_stream_logger(args)
+        streamfail_logger = poco.loggers.start_after_stream_logger(args)
         conf = poco.config.Config(args, merge_default=True)
-        summary_logger = poco.loggers.start_summarylogger(args, conf.paths,
+        summary_logger = poco.loggers.start_summary_logger(args, conf.paths,
                                                           conf.xml.settings)
 
         # update loop
@@ -43,32 +43,31 @@ def main():
         for update_thread in update_threads:
             update_thread.join()
         print('all update threads have come home...')
-        sleep(20)
+        sleep(1)
         print('... now moving on...')
 
         # upgrade loop
         upgrade_threads = []
         skip_subs = []
-        moved_permanently = []
         while len(upgrade_threads) + len(skip_subs) < len(valid_subs):
             while (len([t for t in upgrade_threads if t.is_alive()])
                    < args.threads and not update_q.empty()):
                 subdata = update_q.get()
                 if subdata.outcome.success is False:
-                    # suberror is classified as 'non-fatal'...?
-                    poco.output.suberror(subdata)
+                    poco.output.plans_error(subdata)
                     skip_subs.append(subdata)
                     update_q.task_done()
                     continue
                 if subdata.status == 301:
-                    moved_permanently.append(subdata)
+                    _outcome = poco.subscribe.update_url(args, subdata)
+                    poco.output.plans_moved(_outcome)
                 if subdata.status == 304:
                     #print(subdata.sub.title.text, subdata.status)
                     skip_subs.append(subdata)
                     update_q.task_done()
-                    poco.output.subnotmodified(subdata)
+                    poco.output.plans_nochanges(subdata)
                     continue
-                poco.output.subplans(subdata)
+                poco.output.plans_upgrade(subdata)
                 upgrade_thread = poco.subupgrade.SubUpgradeThread(
                     subdata, update_q, poco.subupgrade.SubUpgrade)
                 upgrade_threads.append(upgrade_thread)
@@ -77,20 +76,8 @@ def main():
         for upgrade_thread in upgrade_threads:
             upgrade_thread.join()
 
-        # fixing 301s by altering the sub url in the config file
-        if moved_permanently:
-            conf = poco.config.Config(args, merge_default=True)
-            for subdata in moved_permanently:
-                pseudo_args = Namespace(title=subdata.sub.title, url=None)
-                sub = poco.subscribe.search(conf.xml, pseudo_args)[0]
-                sub.url = subdata.new_url
-                poco.subscribe.write(conf)
-                subdata.outcome = poco.outcome.Outcome(
-                    True, 'Updated URL: %s' % subdata.new_url)
-                poco.output.suberror(subdata)
-
         # wrap up
-        poco.output.all_fails(args)
+        poco.output.after_stream_flush()
         poco.output.email_summary()
 
     except KeyboardInterrupt:

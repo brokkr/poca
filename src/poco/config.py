@@ -42,7 +42,7 @@ DEFAULT_XML = E.poca(
 
 def confquit(msg):
     '''Something wasn't right about the preferences. Leave'''
-    output.conffatal(msg)
+    output.config_fatal(msg)
     sys.exit()
 
 def merge(user_el, new_el, default_el, errors=[]):

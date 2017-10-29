@@ -38,16 +38,16 @@ class SubUpgrade():
 
         # loop through user deleted and indicate recognition
         for entry in subdata.udeleted:
-            output.notice_udeleted(entry)
+            output.processing_user_deleted(entry)
 
         # loop through unwanted (set) entries to remove
         for uid in subdata.unwanted:
             entry = subdata.jar.dic[uid]
             self.remove(uid, entry, subdata)
             if not self.outcome.success:
-                output.del_fail(self.outcome)
+                output.fail_delete(self.outcome)
             else:
-                output.removing(entry)
+                output.processing_removal(entry)
 
         # loop through wanted (list) entries to acquire
         # WHY OH WHY aren't we just looping through lacking? we still have
@@ -67,7 +67,7 @@ class SubUpgrade():
             subdata.jar.modified = subdata.wanted.feed_modified
         _outcome = subdata.jar.save()
         if _outcome.success is False:
-            output.db_fail(_outcome)
+            output.fail_database(_outcome)
 
         # download cover image
         if self.downed and subdata.wanted.feed_image:
@@ -75,7 +75,7 @@ class SubUpgrade():
                                               subdata.sub_dir,
                                               subdata.conf.xml.settings)
             if _outcome.success is False:
-                output.dl_fail(_outcome)
+                output.fail_download(_outcome)
 
         # print summary of operations in file log
         output.file_summary(subdata, self.removed, self.downed, self.failed)
@@ -83,7 +83,7 @@ class SubUpgrade():
     def acquire(self, uid, entry, subdata):
         '''Get new entries, tag them and add to history'''
         # see https://github.com/brokkr/poca/wiki/Architecture#wantedindex
-        output.downloading(entry)
+        output.processing_download(entry)
         wantedindex = subdata.wanted.lst.index(uid) - len(self.failed)
         self.outcome = files.download_file(entry['poca_url'],
                                            entry['poca_abspath'],
@@ -94,9 +94,9 @@ class SubUpgrade():
             _outcome = tag.tag_audio_file(subdata.conf.xml.settings,
                                           subdata.sub, subdata.jar, entry)
             if not _outcome.success:
-                output.tag_fail(_outcome)
+                output.fail_tag(_outcome)
         elif self.outcome.success is False:
-            output.dl_fail(self.outcome)
+            output.fail_download(self.outcome)
             self.failed.append(entry)
 
     def add_to_jar(self, uid, entry, wantedindex, subdata):
@@ -105,7 +105,7 @@ class SubUpgrade():
         subdata.jar.dic[uid] = entry
         _outcome = subdata.jar.save()
         if _outcome.success is False:
-            output.db_fail(_outcome)
+            output.fail_database(_outcome)
 
     def remove(self, uid, entry, subdata):
         '''Deletes the file and removes the entry from the jar'''
@@ -117,4 +117,4 @@ class SubUpgrade():
         del(subdata.jar.dic[uid])
         _outcome = subdata.jar.save()
         if _outcome.success is False:
-            output.db_fail(_outcome)
+            output.fail_database(_outcome)

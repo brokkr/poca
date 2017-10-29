@@ -24,7 +24,8 @@ def tag_audio_file(settings, sub, jar, entry):
     frames = sub.xpath('./metadata/*')
     audio = mutagen.File(entry['poca_abspath'])
     if audio is None:
-        return Outcome(False, 'Invalid file type')
+        return Outcome(False, '%s is invalid file type for tagging' %
+                       entry['poca_abspath'])
     if audio.tags is None:
         audio.add_tags()
     if isinstance(audio, mutagen.mp3.MP3):

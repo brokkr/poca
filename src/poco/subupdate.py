@@ -74,7 +74,7 @@ class SubUpdate():
         feed = Feed(self.sub, self.jar, self.udeleted)
         self.status = feed.status
         if self.status == 301:
-            self.outcome = Outcome(True, 'Moved permanently')
+            self.outcome = Outcome(True, 'Feed has moved. Config updated.')
             self.new_url = feed.href
         elif self.status == 304:
             self.outcome = Outcome(True, 'Not modified')

@@ -23,7 +23,7 @@ def open_jar(db_filename):
             jar = pickle.load(f)
             outcome = Outcome(True, 'Jar loaded')
     except (PermissionError, pickle.UnpicklingError, EOFError) as e:
-        outcome = Outcome(False, str(e))
+        outcome = Outcome(False, 'Could not read history from %s' % db_filename)
         jar = None
     return jar, outcome
 
@@ -61,7 +61,8 @@ class Subjar:
             outcome = Outcome(True, 'Pickle successful')
         # need more specific exceptions here
         except:
-            outcome = Outcome(False, self.db_filename)
+            outcome = Outcome(False, 'Could not save history to %s' %
+                              self.db_filename)
         return outcome
 
 
