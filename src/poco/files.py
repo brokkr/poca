@@ -22,6 +22,7 @@ from poco.outcome import Outcome
 def download_file(url, file_path, settings):
     '''Download function with block time outs'''
     my_thread = current_thread()
+    #url = 'http://askljdalksjdqweqwe.net/asdadwerwerwerw.mp3'
     if getattr(my_thread, "kill", False):
         return Outcome(None, 'Download cancelled by user')
     try:
@@ -29,10 +30,8 @@ def download_file(url, file_path, settings):
         r = requests.get(url, stream=True, timeout=60)
     except (requests.exceptions.ConnectionError,
             requests.exceptions.HTTPError) as e:
-        r.close()
         return Outcome(False, 'Download of %s failed' % url)
     except requests.exceptions.Timeout:
-        r.close()
         return Outcome(False, 'Download of %s timed out' % url)
     with open(file_path, 'wb') as f:
         try:
