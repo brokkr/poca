@@ -42,9 +42,6 @@ def main():
             update_thread.start()
         for update_thread in update_threads:
             update_thread.join()
-        print('all update threads have come home...')
-        sleep(1)
-        print('... now moving on...')
 
         # upgrade loop
         upgrade_threads = []
@@ -53,6 +50,7 @@ def main():
             while (len([t for t in upgrade_threads if t.is_alive()])
                    < args.threads and not update_q.empty()):
                 subdata = update_q.get()
+                #print(subdata.sub.title.text, subdata.status)
                 if subdata.outcome.success is False:
                     poco.output.plans_error(subdata)
                     skip_subs.append(subdata)
@@ -60,9 +58,8 @@ def main():
                     continue
                 if subdata.status == 301:
                     _outcome = poco.subscribe.update_url(args, subdata)
-                    poco.output.plans_moved(_outcome)
+                    poco.output.plans_moved(subdata, _outcome)
                 if subdata.status == 304:
-                    #print(subdata.sub.title.text, subdata.status)
                     skip_subs.append(subdata)
                     update_q.task_done()
                     poco.output.plans_nochanges(subdata)

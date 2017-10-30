@@ -53,10 +53,10 @@ def plans_error(subdata):
     AFTER_STREAM.info(after_stream_msg)
     SUMMARY.error(stream_msg)
 
-def plans_moved(subdata):
+def plans_moved(subdata, _outcome):
     '''Sub has moved (http status 301)'''
-    stream_msg = "%s. %s" % (subdata.sub.title.text.upper(), subdata.outcome.msg)
-    after_stream_msg = 'SUB MOVED: %s' % (subdata.outcome.msg)
+    stream_msg = "%s. %s" % (subdata.sub.title.text.upper(), _outcome.msg)
+    after_stream_msg = 'SUB MOVED: %s' % (_outcome.msg)
     STREAM.debug(stream_msg)
     AFTER_STREAM.info(after_stream_msg)
     SUMMARY.error(stream_msg)
@@ -75,7 +75,7 @@ def plans_upgrade(subdata):
     if no_udeleted > 0 or no_unwanted > 0 or no_lacking > 0:
         msg = msg + '. '
     if no_udeleted > 0:
-        msg = msg + str(no_udeleted) + ' ' + "\N{WARNING SIGN}"
+        msg = msg + str(no_udeleted) + ' ' + "\N{CIRCLE WITH SUPERIMPOSED X}"
     if no_udeleted > 0 and (no_unwanted > 0 or no_lacking > 0):
         msg = msg + ' / '
     if no_unwanted > 0:
@@ -93,7 +93,7 @@ def plans_upgrade(subdata):
 
 def processing_user_deleted(entry):
     '''One line per entry telling user of episodes deleted by user'''
-    msg = ' ' + "\N{WARNING SIGN}" + ' ' + entry['poca_filename'] + \
+    msg = ' ' + "\N{CIRCLE WITH SUPERIMPOSED X}" + ' ' + entry['poca_filename'] + \
         ' deleted by user'
     STREAM.debug(msg)
 
@@ -117,33 +117,30 @@ def processing_download(entry):
 # FAIL                                    #
 # ####################################### #
 
+def fail_common(msg, after_stream_msg):
+    stream_msg = ' \N{WARNING SIGN} ' + msg
+    STREAM.debug(stream_msg)
+    AFTER_STREAM.info(after_stream_msg)
+
 def fail_download(outcome):
     '''Subline telling user of single entry download failure'''
-    msg = '   ' + outcome.msg
     after_stream_msg = 'DOWNLOAD ERROR: %s' % (outcome.msg)
-    STREAM.debug(msg)
-    AFTER_STREAM.info(after_stream_msg)
+    fail_common(outcome.msg, after_stream_msg)
 
 def fail_tag(outcome):
     '''Subline telling user of single entry tagging failure'''
-    msg = '   ' + outcome.msg
     after_stream_msg = 'TAGGING ERROR: %s' % (outcome.msg)
-    STREAM.debug(msg)
-    AFTER_STREAM.info(after_stream_msg)
+    fail_common(outcome.msg, after_stream_msg)
 
 def fail_delete(outcome):
     '''Subline telling user of single entry deletion failure'''
-    msg = '   ' + outcome.msg
     after_stream_msg = 'DELETE ERROR: %s' % (outcome.msg)
-    STREAM.debug(msg)
-    AFTER_STREAM.info(after_stream_msg)
+    fail_common(outcome.msg, after_stream_msg)
 
 def fail_database(outcome):
     '''Subline telling user of failure to save jar'''
-    msg = '   ' + outcome.msg
     after_stream_msg = 'DATABASE ERROR: %s' % (outcome.msg)
-    STREAM.debug(msg)
-    AFTER_STREAM.info(after_stream_msg)
+    fail_common(outcome.msg, after_stream_msg)
 
 def after_stream_flush():
     '''Outputs all buffered failures in one go. In verbose mode after_stream

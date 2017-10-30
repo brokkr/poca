@@ -259,5 +259,5 @@ def update_url(args, subdata):
     sub.url = subdata.new_url
     write(conf)
     # unlock conf file
-    _outcome = outcome.Outcome(True, 'Updated URL: %s' % subdata.new_url)
+    _outcome = outcome.Outcome(True, 'Have updated feed url to %s' % subdata.new_url)
     return _outcome

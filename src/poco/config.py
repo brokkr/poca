@@ -89,8 +89,11 @@ class Config:
                 xml_object = objectify.parse(f)
             return xml_object.getroot()
         except etree.XMLSyntaxError as e:
-            msg = ('The settings file could not be parsed. \n' +
-                   'Parser said: ' + str(e))
+            msg = 'Could not parse %s. Parser said:\n%s' % \
+                (self.paths.config_file, str(e))
+            confquit(msg)
+        except PermissionError:
+            msg = 'Could not read %s' % self.paths.config_file
             confquit(msg)
 
 class Paths:

@@ -22,7 +22,6 @@ from poco.outcome import Outcome
 def download_file(url, file_path, settings):
     '''Download function with block time outs'''
     my_thread = current_thread()
-    #url = 'http://askljdalksjdqweqwe.net/asdadwerwerwerw.mp3'
     if getattr(my_thread, "kill", False):
         return Outcome(None, 'Download cancelled by user')
     try:
@@ -33,6 +32,8 @@ def download_file(url, file_path, settings):
         return Outcome(False, 'Download of %s failed' % url)
     except requests.exceptions.Timeout:
         return Outcome(False, 'Download of %s timed out' % url)
+    if r.status_code >= 400:
+        return Outcome(False, 'Download of %s failed' % url)
     with open(file_path, 'wb') as f:
         try:
             for chunk in r.iter_content(chunk_size=1024):
@@ -82,7 +83,7 @@ def delete_file(file_path):
         os.remove(file_path)
         return Outcome(True, file_path + ': File was successfully deleted')
     except OSError as e:
-        return Outcome(False, 'Removal of %s failed' % file_path)
+        return Outcome(False, 'Could not delete %s' % file_path)
 
 def verify_file(entry):
     '''Check to see if recorded file exists or has been removed'''
