@@ -161,9 +161,8 @@ class Combo:
         else:
             self.lst = list(feed.lst)
             self.lst.extend(uid for uid in jar.lst if uid not in feed.lst)
-        # why are we entryinfo'ing every single entry in feed? do we need to?
-        self.dic = {uid: entryinfo.expand(feed.dic[uid], sub, sub_dir)
-                    for uid in feed.lst if uid not in jar.lst}
+        self.dic = {uid: entryinfo.validate(feed.dic[uid]) for uid in feed.lst
+                    if uid not in jar.lst}
         self.dic.update(jar.dic)
 
 class Wanted():
@@ -177,7 +176,7 @@ class Wanted():
         # we don't know that max_number is a number
         if hasattr(sub, 'max_number'):
             self.limit(sub)
-        self.dic = {x: combo.dic[x] for x in self.lst}
+        self.dic = {x: entryinfo.expand(combo.dic[uid]) for uid in self.lst}
         # feed isn't handed over to subupgrade so save important bits here
         self.feed_etag = feed.etag
         self.feed_modified = feed.modified

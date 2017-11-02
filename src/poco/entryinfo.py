@@ -13,14 +13,22 @@ from os import path
 import urllib.request, urllib.error, urllib.parse
 
 
-def expand(entry, sub, sub_dir):
-    '''Expands entry with url, paths and size'''
+def validate(entry):
+    '''Validates entry if it contains an enclosure'''
     try:
         entry['poca_url'] = entry.enclosures[0]['href']
         entry['valid'] = True
     except (KeyError, IndexError, AttributeError):
         entry['valid'] = False
         return entry
+    parsed_url = urllib.parse.urlparse(entry['poca_url'])
+    parsed_path = urllib.parse.unquote(parsed_url.path)
+    entry['poca_filename'] = path.basename(parsed_path)
+    return entry
+
+
+def expand(entry, sub, sub_dir):
+    '''Expands entry with url, paths and size'''
     try:
         entry['poca_size'] = int(entry.enclosures[0]['length'])
         if entry['poca_size'] == 0:
@@ -29,11 +37,8 @@ def expand(entry, sub, sub_dir):
     except (KeyError, ValueError, TypeError):
         entry['poca_size'] = None
         entry['poca_mb'] = None
-    parsed_url = urllib.parse.urlparse(entry['poca_url'])
-    parsed_path = urllib.parse.unquote(parsed_url.path)
-    entry['poca_filename'] = path.basename(parsed_path)
-    entry['poca_basename'] = entry['poca_filename'].split('.')[0]
-    entry['poca_ext'] = path.splitext(entry['poca_filename'])[1].lower()
+    entry['poca_basename'], _ext = path.splitext(entry['poca_filename'])
+    entry['poca_ext'] = _ext[1:]
     entry['poca_abspath'] = path.join(sub_dir, entry['poca_filename'])
     entry['valid'] = True
     return entry
