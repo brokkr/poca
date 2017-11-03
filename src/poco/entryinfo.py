@@ -45,22 +45,21 @@ def expand(entry, sub, sub_dir):
     entry['poca_filename'] = '.'.join((entry['poca_basename'],
                                       entry['poca_ext']))
     entry['poca_abspath'] = path.join(sub_dir, entry['poca_filename'])
-    print(entry['poca_abspath'])
     entry['valid'] = True
     return entry
 
 
 def rename(entry, sub):
-    element_lst = [el for el in sub.rename.iterchildren()]
-    rename_lst = []
-    for el in element_lst:
-        if el.tag == 'published_parsed':
-            _str = time.strftime('%Y-%m-%d', entry['published_parsed'])
-        elif el.tag == 'title':
-            _str = sub.title.text
-        rename_lst.append(_str)
+    date = time.strftime('%Y-%m-%d', entry['published_parsed']) if \
+        'published_parsed' in entry else 'missing_pub_date'
+    uid = entry['id'] if 'id' in entry else 'missing_uid'
+    rename_dic = {'org_name': entry['poca_basename'],
+                  'title': sub.title.text,
+                  'uid' : uid,
+                  'date': date}
+    rename_lst = [rename_dic[el.tag] for el in sub.rename.iterchildren() if
+                  el.tag in rename_dic]
     divider = sub.rename.get('divider') or '_'
     if rename_lst:
         entry['poca_basename'] = divider.join(rename_lst)
-    print(entry['poca_basename'])
     return entry
