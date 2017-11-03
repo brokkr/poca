@@ -9,6 +9,7 @@
 
 """Get more information on a single feed entry"""
 
+import time
 from os import path
 import urllib.request, urllib.error, urllib.parse
 
@@ -39,6 +40,24 @@ def expand(entry, sub, sub_dir):
         entry['poca_mb'] = None
     entry['poca_basename'], _ext = path.splitext(entry['poca_filename'])
     entry['poca_ext'] = _ext[1:]
+    if hasattr(entry, 'rename'):
+        entry = rename(entry, sub)
     entry['poca_abspath'] = path.join(sub_dir, entry['poca_filename'])
+    print(entry['poca_abspath'])
     entry['valid'] = True
+    return entry
+
+
+def rename(entry, sub):
+    element_lst = [el for el in sub.rename.iterchildren()]
+    rename_lst = []
+    for el in element_lst:
+        if el.tag == 'published_parsed':
+            _str = time.strftime('%Y-%m-%d', entry['published_parsed'])
+        elif el.tag == 'title':
+            _str = sub['title']
+        rename_lst.append(_str)
+    divider = entry.rename.get('divider') or '_'
+    if rename_lst:
+        entry['poca_basename'] = divider.join(rename_lst)
     return entry
