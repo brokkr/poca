@@ -40,8 +40,10 @@ def expand(entry, sub, sub_dir):
         entry['poca_mb'] = None
     entry['poca_basename'], _ext = path.splitext(entry['poca_filename'])
     entry['poca_ext'] = _ext[1:]
-    if hasattr(entry, 'rename'):
+    if hasattr(sub, 'rename'):
         entry = rename(entry, sub)
+    entry['poca_filename'] = '.'.join((entry['poca_basename'],
+                                      entry['poca_ext']))
     entry['poca_abspath'] = path.join(sub_dir, entry['poca_filename'])
     print(entry['poca_abspath'])
     entry['valid'] = True
@@ -55,9 +57,10 @@ def rename(entry, sub):
         if el.tag == 'published_parsed':
             _str = time.strftime('%Y-%m-%d', entry['published_parsed'])
         elif el.tag == 'title':
-            _str = sub['title']
+            _str = sub.title.text
         rename_lst.append(_str)
-    divider = entry.rename.get('divider') or '_'
+    divider = sub.rename.get('divider') or '_'
     if rename_lst:
         entry['poca_basename'] = divider.join(rename_lst)
+    print(entry['poca_basename'])
     return entry

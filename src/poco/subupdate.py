@@ -84,8 +84,8 @@ class SubUpdate():
             return
         else:
             self.outcome = Outcome(True, 'Success')
-        combo = Combo(feed, self.jar, self.sub, self.sub_dir)
-        self.wanted = Wanted(self.sub, feed, combo, self.jar.del_lst)
+        combo = Combo(feed, self.jar, self.sub)
+        self.wanted = Wanted(self.sub, feed, combo, self.jar.del_lst, self.sub_dir)
         from_the_top = self.sub.find('from_the_top') or 'no'
         if from_the_top == 'no':
             self.wanted.lst.reverse()
@@ -153,7 +153,7 @@ class Feed:
 class Combo:
     '''Constructs a container holding all combined feed and jar
     entries. Copies feed then adds non-duplicates from jar'''
-    def __init__(self, feed, jar, sub, sub_dir):
+    def __init__(self, feed, jar, sub):
         from_the_top = sub.find('from_the_top') or 'no'
         if from_the_top == 'yes':
             self.lst = list(jar.lst)
@@ -167,7 +167,7 @@ class Combo:
 
 class Wanted():
     '''Filters the combo entries and decides which ones to go for'''
-    def __init__(self, sub, feed, combo, del_lst):
+    def __init__(self, sub, feed, combo, del_lst, sub_dir):
         self.lst = combo.lst
         self.lst = list(filter(lambda x: x not in del_lst, self.lst))
         self.lst = list(filter(lambda x: combo.dic[x]['valid'], self.lst))
@@ -176,7 +176,10 @@ class Wanted():
         # we don't know that max_number is a number
         if hasattr(sub, 'max_number'):
             self.limit(sub)
-        self.dic = {x: entryinfo.expand(combo.dic[uid]) for uid in self.lst}
+        # problem: unlike combo we're running expand on old entries as well
+        # this way we could be 'renaming' old files as well (in db, not disk)
+        self.dic = {uid: entryinfo.expand(combo.dic[uid], sub, sub_dir)
+                    for uid in self.lst}
         # feed isn't handed over to subupgrade so save important bits here
         self.feed_etag = feed.etag
         self.feed_modified = feed.modified
