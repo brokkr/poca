@@ -55,13 +55,16 @@ def rename(entry, sub):
     uid = entry['id'] if 'id' in entry else 'missing_uid'
     if not str.isalnum(uid):
         uid = ''.join([x for x in uid if str.isalnum(x)])
+    episode_title = entry['title'] if 'title' in entry else 'missing_title'
     rename_dic = {'org_name': entry['poca_basename'],
                   'title': sub.title.text,
+                  'episode_title' : episode_title,
                   'uid' : uid,
                   'date': date}
     rename_lst = [rename_dic[el.tag] for el in sub.rename.iterchildren() if
                   el.tag in rename_dic]
     divider = sub.rename.get('divider') or '_'
+    space = sub.rename.get('space') or ' '
     if rename_lst:
-        entry['poca_basename'] = divider.join(rename_lst)
+        entry['poca_basename'] = divider.join(rename_lst).replace(' ', space)
     return entry
