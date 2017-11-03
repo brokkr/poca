@@ -53,6 +53,8 @@ def rename(entry, sub):
     date = time.strftime('%Y-%m-%d', entry['published_parsed']) if \
         'published_parsed' in entry else 'missing_pub_date'
     uid = entry['id'] if 'id' in entry else 'missing_uid'
+    if not str.isalnum(uid):
+        uid = ''.join([x for x in uid if str.isalnum(x)])
     rename_dic = {'org_name': entry['poca_basename'],
                   'title': sub.title.text,
                   'uid' : uid,
