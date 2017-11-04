@@ -86,6 +86,9 @@ class SubUpdate():
             self.outcome = Outcome(True, 'Success')
         combo = Combo(feed, self.jar, self.sub)
         self.wanted = Wanted(self.sub, feed, combo, self.jar.del_lst, self.sub_dir)
+        self.outcome = self.wanted.outcome
+        if not self.outcome.success:
+            return
         from_the_top = self.sub.find('from_the_top') or 'no'
         if from_the_top == 'no':
             self.wanted.lst.reverse()
@@ -168,6 +171,7 @@ class Combo:
 class Wanted():
     '''Filters the combo entries and decides which ones to go for'''
     def __init__(self, sub, feed, combo, del_lst, sub_dir):
+        self.outcome = Outcome(True, 'Wanted entries assembled')
         self.lst = combo.lst
         self.lst = list(filter(lambda x: x not in del_lst, self.lst))
         self.lst = list(filter(lambda x: combo.dic[x]['valid'], self.lst))
@@ -176,10 +180,12 @@ class Wanted():
         # we don't know that max_number is a number
         if hasattr(sub, 'max_number'):
             self.limit(sub)
-        # problem: unlike combo we're running expand on old entries as well
-        # this way we could be 'renaming' old files as well (in db, not disk)
         self.dic = {uid: entryinfo.expand(combo.dic[uid], sub, sub_dir)
                     for uid in self.lst}
+        filename_set = {self.dic[uid]['poca_filename'] for uid in self.lst}
+        if len(filename_set) < len(self.lst):
+            self.outcome = Outcome(False, "Filename used more than once. "
+                                   "Use rename tag to fix.")
         # feed isn't handed over to subupgrade so save important bits here
         self.feed_etag = feed.etag
         self.feed_modified = feed.modified
@@ -189,7 +195,7 @@ class Wanted():
     def match_filename(self, dic, filter_text):
         '''The episode filename must match a regex/string'''
         self.lst = [x for x in self.lst if
-                    bool(re.search(filter_text, dic[x]['poca_filename']))]
+                    bool(re.search(filter_text, dic[x]['filename']))]
 
     def match_title(self, dic, filter_text):
         '''The episode title must match a regex/string'''
@@ -199,7 +205,7 @@ class Wanted():
     def match_weekdays(self, dic, filter_text):
         '''Only return episodes published on specific week days'''
         self.lst = [x for x in self.lst if
-                    str(dic[x]['updated_parsed'].tm_wday) in list(filter_text)]
+                    str(dic[x]['published_parsed'].tm_wday) in list(filter_text)]
 
     def match_date(self, dic, filter_text):
         '''Only return episodes published after a specific date'''
@@ -209,7 +215,7 @@ class Wanted():
 
     def match_hour(self, dic, filter_text):
         '''Only return episodes published at a specific hour of the day'''
-        self.lst = [x for x in self.lst if dic[x]['updated_parsed'].tm_hour ==
+        self.lst = [x for x in self.lst if dic[x]['published_parsed'].tm_hour ==
                     int(filter_text)]
 
     def apply_filters(self, sub, combo):

@@ -16,6 +16,7 @@ import urllib.request, urllib.error, urllib.parse
 
 def validate(entry):
     '''Validates entry if it contains an enclosure'''
+    entry['expanded'] = False
     try:
         entry['poca_url'] = entry.enclosures[0]['href']
         entry['valid'] = True
@@ -24,12 +25,14 @@ def validate(entry):
         return entry
     parsed_url = urllib.parse.urlparse(entry['poca_url'])
     parsed_path = urllib.parse.unquote(parsed_url.path)
-    entry['poca_filename'] = path.basename(parsed_path)
+    entry['filename'] = path.basename(parsed_path)
     return entry
 
 
 def expand(entry, sub, sub_dir):
     '''Expands entry with url, paths and size'''
+    if entry['expanded'] is True:
+        return entry
     try:
         entry['poca_size'] = int(entry.enclosures[0]['length'])
         if entry['poca_size'] == 0:
@@ -38,14 +41,14 @@ def expand(entry, sub, sub_dir):
     except (KeyError, ValueError, TypeError):
         entry['poca_size'] = None
         entry['poca_mb'] = None
-    entry['poca_basename'], _ext = path.splitext(entry['poca_filename'])
+    entry['poca_basename'], _ext = path.splitext(entry['filename'])
     entry['poca_ext'] = _ext[1:]
     if hasattr(sub, 'rename'):
         entry = rename(entry, sub)
     entry['poca_filename'] = '.'.join((entry['poca_basename'],
                                       entry['poca_ext']))
     entry['poca_abspath'] = path.join(sub_dir, entry['poca_filename'])
-    entry['valid'] = True
+    entry['expanded'] = True
     return entry
 
 
@@ -63,7 +66,7 @@ def rename(entry, sub):
                   'date': date}
     rename_lst = [rename_dic[el.tag] for el in sub.rename.iterchildren() if
                   el.tag in rename_dic]
-    divider = sub.rename.get('divider') or '_'
+    divider = sub.rename.get('divider') or ' '
     space = sub.rename.get('space') or ' '
     if rename_lst:
         entry['poca_basename'] = divider.join(rename_lst).replace(' ', space)
