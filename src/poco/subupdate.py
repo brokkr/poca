@@ -53,10 +53,14 @@ class SubUpdate():
 
         # merge sub settings and defaults
         defaults = deepcopy(self.conf.xml.defaults)
+        rename = deepcopy(self.sub.rename) if hasattr(self.sub, 'rename') \
+                 else None
         errors = merge(self.sub, defaults, self.conf.xml.defaults, errors=[])
         self.outcome = errors[0] if errors else Outcome(True, '')
         defaults.tag = "subscription"
         self.sub = defaults
+        if rename:
+            self.sub.rename = rename
         if not self.outcome.success:
             return
 
