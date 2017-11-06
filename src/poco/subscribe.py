@@ -188,18 +188,18 @@ def search_show(conf, args):
     if not audiosearch:
         msg = ("Missing audiosearch module. Please install with "
                "'pip3 install audiosearch'")
-        output.generror(msg)
+        output.subscribe_error(msg)
         return(None, None)
     if not oauth_id or not oauth_secret:
         msg = ("Missing audiosear.ch key and/or secret."
                 " Please get yours at https://www.audiosear.ch/oauth/applications")
-        output.generror(msg)
+        output.subscribe_error(msg)
         return(None, None)
     try:
         client = audiosearch.client.Client(oauth_id, oauth_secret)
     except Exception as e:
         msg = "Audiosear.ch connection or authentication failed."
-        output.generror(msg)
+        output.subscribe_error(msg)
         return (None, None)
     if args.list_networks:
         networks = [network['name'].lower() for network in
@@ -224,9 +224,9 @@ def search_show(conf, args):
         if args.network.lower() in networks:
             search_dic["filters[network.name]"] = args.network
         else:
-            output.geninfo("Network not in audiosear.ch db. Run "
-                           "poca-subscribe search --list-networks for a "
-                           "list of known networks")
+            output.subscribe_info("Network not in audiosear.ch db. Run "
+                                  "poca-subscribe search --list-networks for "
+                                  "a list of known networks")
             return (None, None)
     search_query = client.search(search_dic, type='shows')
     results = search_query['results']
@@ -241,7 +241,7 @@ def search_show(conf, args):
         print(' ', desc)
     no_search_results = len(results)
     if no_search_results == 0:
-        output.geninfo('No results from search')
+        output.subscribe_info('No results from search')
         return (None, None)
     select = input("Choose 0-%i: " % (no_search_results-1))
     try:

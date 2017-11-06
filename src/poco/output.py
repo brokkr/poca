@@ -21,14 +21,14 @@ SUMMARY = logging.getLogger('POCA_SUMMARY')
 # SUBSCRIBE                               #
 # ####################################### #
 
-def geninfo(msg):
+def subscribe_info(msg):
     '''Generic info'''
     STREAM.info(msg)
 
-def generror(msg):
+def subscribe_error(msg):
     '''Generic error'''
-    err = "\N{Heavy Exclamation Mark Symbol}"
-    msg = err + 'ERROR' + err + ' ' + msg
+    err = " \N{WARNING SIGN} "
+    msg = err + msg
     STREAM.error(msg)
 
 
