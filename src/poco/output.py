@@ -9,6 +9,8 @@
 
 """String formatting and logging operations"""
 
+
+import sys
 import logging
 
 
@@ -38,7 +40,8 @@ def subscribe_error(msg):
 
 def config_fatal(msg):
     '''Fatal errors encountered during config read'''
-    STREAM.fatal(msg)
+    STREAM.fatal(' \N{WARNING SIGN} ' + msg)
+    sys.exit(1)
 
 
 # ####################################### #

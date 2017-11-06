@@ -35,6 +35,11 @@ def main():
         update_q = Queue()
         xp_str = './subscription[not(@state="inactive")][title][url]'
         valid_subs = conf.xml.subscriptions.xpath(xp_str)
+        sub_names = [sub.title.text for sub in valid_subs]
+        dupes = set([x for x in sub_names if sub_names.count(x) > 1])
+        if len(dupes) > 0:
+            msg = "Found the following duplicate titles: %s" % ', '.join(dupes)
+            poco.output.config_fatal(msg)
         for sub in valid_subs:
             update_thread = poco.subupdate.SubUpdateThread(
                 update_q, poco.subupdate.SubUpdate, conf, sub)

@@ -9,7 +9,6 @@
 
 """A config parser using lxml objectify and XPath"""
 
-import sys
 from os import path
 from lxml import etree, objectify
 from copy import deepcopy
@@ -39,11 +38,6 @@ DEFAULT_XML = E.poca(
                       E.defaults(),
                       E.subscriptions()
                      )
-
-def confquit(msg):
-    '''Something wasn't right about the preferences. Leave'''
-    output.config_fatal(msg)
-    sys.exit()
 
 def merge(user_el, new_el, default_el, errors=[]):
     '''Updating one lxml objectify elements with another
@@ -78,7 +72,7 @@ class Config:
             user_xml = self.get_xml()
             errors = merge(user_xml, self.xml, DEFAULT_XML, errors=[])
             for outcome in errors:
-                confquit(outcome.msg)
+                output.config_fatal(outcome.msg)
         else:
             self.xml = self.get_xml()
 
@@ -91,10 +85,10 @@ class Config:
         except etree.XMLSyntaxError as e:
             msg = 'Could not parse %s. Parser said:\n%s' % \
                 (self.paths.config_file, str(e))
-            confquit(msg)
+            output.config_fatal(msg)
         except PermissionError:
             msg = 'Could not read %s' % self.paths.config_file
-            confquit(msg)
+            output.config_fatal(msg)
 
 class Paths:
     '''A data-holder object for all program paths'''
@@ -119,10 +113,10 @@ class Paths:
         for check_dir in [self.config_dir, self.db_dir]:
             outcome = files.check_path(check_dir)
             if not outcome.success:
-                confquit(outcome.msg)
+                output.config_fatal(msg)
         if not path.isfile(self.config_file):
             outcome = xmlconf.write_template(self.config_file)
-            confquit(outcome.msg)
+            output.config_fatal(msg)
 
 class Sub:
     '''Legacy class to avoid breakage with old saved subs'''
