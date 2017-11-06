@@ -90,6 +90,8 @@ class SubUpgrade():
             output.fail_download(self.outcome)
             self.failed.append(entry)
             return
+        if self.outcome.success is None:
+            return
         subdata.jar.lst.insert(wantedindex, uid)
         subdata.jar.dic[uid] = entry
         _outcome = subdata.jar.save()

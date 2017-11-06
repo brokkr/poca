@@ -60,10 +60,11 @@ def download_img_file(url, sub_dir, settings):
         r = requests.get(url, timeout=60)
     except requests.exceptions.RequestException:
         return Outcome(False, 'Download of %s failed' % url)
-    content_type = r.headers['content-type']
+    content_type = r.headers['content-type'].lower()
     mime_dic = {'image/bmp': '.bmp',
                 'image/gif': '.gif',
                 'image/jpeg': '.jpg',
+                'image/jpg': '.jpg',
                 'image/png': '.png',
                 'image/webp': '.webp'}
     extension = mime_dic.get(content_type, None)

@@ -59,7 +59,7 @@ class SubUpdate():
         self.outcome = errors[0] if errors else Outcome(True, '')
         defaults.tag = "subscription"
         self.sub = defaults
-        if rename:
+        if rename is not None:
             self.sub.rename = rename
         if not self.outcome.success:
             return
