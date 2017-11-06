@@ -18,7 +18,7 @@ def main():
     '''Main script'''
     args = poco.args.get_poca_subscribe_args()
     args.quiet = False
-    stream_logger = poco.loggers.start_streamlogger(args)
+    stream_logger = poco.loggers.start_stream_logger(args)
     conf = poco.config.Config(args, merge_default=False)
     if args.cmd_name == 'delete':
         poco.subscribe.delete(conf, args)

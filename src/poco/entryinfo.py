@@ -53,11 +53,11 @@ def expand(entry, sub, sub_dir):
 
 
 def rename(entry, sub):
+    forbidden = ['/', '\\', ':', '\'', '\"', ',', ';', '.']
     date = time.strftime('%Y-%m-%d', entry['published_parsed']) if \
         'published_parsed' in entry else 'missing_pub_date'
     uid = entry['id'] if 'id' in entry else 'missing_uid'
-    if not str.isalnum(uid):
-        uid = ''.join([x for x in uid if str.isalnum(x)])
+    uid = ''.join([x for x in uid if x not in forbidden])
     episode_title = entry['title'] if 'title' in entry else 'missing_title'
     rename_dic = {'org_name': entry['poca_basename'],
                   'title': sub.title.text,
@@ -69,5 +69,7 @@ def rename(entry, sub):
     divider = sub.rename.get('divider') or ' '
     space = sub.rename.get('space') or ' '
     if rename_lst:
-        entry['poca_basename'] = divider.join(rename_lst).replace(' ', space)
+        basename = divider.join(rename_lst).replace(' ', space)
+        entry['poca_basename'] = ''.join([x for x in basename if x not in \
+                                          forbidden])
     return entry
