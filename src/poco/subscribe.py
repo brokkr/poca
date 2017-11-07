@@ -13,6 +13,7 @@
 
 import os
 import re
+import fcntl
 from lxml import etree, objectify
 from mutagen.easyid3 import EasyID3
 from argparse import Namespace
@@ -51,7 +52,13 @@ def write(conf):
     '''Writes the resulting conf file back to poca.xml'''
     root_str = pretty_print(conf.xml)
     with open(conf.paths.config_file, 'w') as f:
-        f.write(root_str)
+        try:
+            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            f.write(root_str)
+            fcntl.flock(f, fcntl.LOCK_UN)
+            return outcome.Outcome(True, 'Config file updated')
+        except BlockingIOError:
+            return outcome.Outcome(False, 'Config file blocked')
 
 def delete(conf, args):
     '''Remove xml subscription and delete audio and log files'''
@@ -253,11 +260,11 @@ def search_show(conf, args):
 def update_url(args, subdata):
     '''Used to implement 301 status code changes into conf'''
     pseudo_args = Namespace(title=subdata.sub.title, url=None)
-    # lock conf file
     conf = config.Config(args, merge_default=True)
     sub = search(conf.xml, pseudo_args)[0]
     sub.url = subdata.new_url
-    write(conf)
-    # unlock conf file
-    _outcome = outcome.Outcome(True, 'Have updated feed url to %s' % subdata.new_url)
+    _outcome = write(conf)
+    if _outcome.success is True:
+        _outcome = outcome.Outcome(True, 'Have updated feed url to %s' % \
+                                   subdata.new_url)
     return _outcome

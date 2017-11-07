@@ -29,10 +29,12 @@ def main():
         conf = poco.config.Config(args, merge_default=True)
         summary_logger = poco.loggers.start_summary_logger(args, conf.paths,
                                                           conf.xml.settings)
-
-        # update loop
         update_threads = []
         update_q = Queue()
+        upgrade_threads = []
+        skip_subs = []
+
+        # update loop
         xp_str = './subscription[not(@state="inactive")][title][url]'
         valid_subs = conf.xml.subscriptions.xpath(xp_str)
         sub_names = [sub.title.text for sub in valid_subs]
@@ -49,8 +51,6 @@ def main():
             update_thread.join()
 
         # upgrade loop
-        upgrade_threads = []
-        skip_subs = []
         while len(upgrade_threads) + len(skip_subs) < len(valid_subs):
             while (len([t for t in upgrade_threads if t.is_alive()])
                    < args.threads and not update_q.empty()):
@@ -63,7 +63,8 @@ def main():
                     continue
                 if subdata.status == 301:
                     _outcome = poco.subscribe.update_url(args, subdata)
-                    poco.output.plans_moved(subdata, _outcome)
+                    if _outcome.success is True:
+                        poco.output.plans_moved(subdata, _outcome)
                 if subdata.status == 304:
                     skip_subs.append(subdata)
                     update_q.task_done()
