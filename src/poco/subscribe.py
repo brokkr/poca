@@ -51,9 +51,11 @@ def pretty_print(el):
 def write(conf):
     '''Writes the resulting conf file back to poca.xml'''
     root_str = pretty_print(conf.xml)
-    with open(conf.paths.config_file, 'w') as f:
+    with open(conf.paths.config_file, 'r+') as f:
         try:
             fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            f.seek(0)
+            f.truncate()
             f.write(root_str)
             fcntl.flock(f, fcntl.LOCK_UN)
             return outcome.Outcome(True, 'Config file updated')
@@ -260,7 +262,7 @@ def search_show(conf, args):
 def update_url(args, subdata):
     '''Used to implement 301 status code changes into conf'''
     pseudo_args = Namespace(title=subdata.sub.title, url=None)
-    conf = config.Config(args, merge_default=True)
+    conf = config.Config(args, merge_default=False)
     sub = search(conf.xml, pseudo_args)[0]
     sub.url = subdata.new_url
     _outcome = write(conf)
