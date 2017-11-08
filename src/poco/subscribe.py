@@ -94,8 +94,8 @@ def toggle(conf, args):
     results = search(conf.xml, args)
     for result in results:
         state = result.get('state') if 'state' in result.attrib else 'active'
-        state_input = input("%s is currently %s. Set to active (a) "
-                            "or inactive (i)? " % (result.title.text, state))
+        state_input = input("%s is currently %s. Set to active (a) or inactive"
+                            " (i)? " % (result.title.text, state.upper()))
         state_dic = {'a': 'active', 'i': 'inactive'}
         try:
             state = state_dic[state_input]
@@ -104,7 +104,7 @@ def toggle(conf, args):
         result.set('state', state)
         if state_input == 'i':
             files.delete_sub(conf, result.title.text)
-    write(conf)
+        write(conf)
 
 def user_input_add_sub(url=None):
     '''Get user input for new subscription'''
