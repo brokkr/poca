@@ -46,12 +46,7 @@ class SubUpgrade():
             entry = subdata.jar.dic[uid]
             self.remove(uid, entry, subdata)
 
-        # loop through wanted (list) entries to acquire
-        # WHY OH WHY aren't we just looping through lacking? we still have
-        # access to wanted's dictionary?
-        for uid in subdata.wanted.lst:
-            if uid not in subdata.lacking:
-                continue
+        for uid in subdata.lacking:
             entry = subdata.wanted.dic[uid]
             self.acquire(uid, entry, subdata)
             if self.outcome.success is None:

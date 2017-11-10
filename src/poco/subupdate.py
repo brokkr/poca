@@ -41,7 +41,6 @@ class SubUpdate():
     '''Data carrier for subscription: entries to dl, entries to remove,
        user deleted entries, etc.'''
     def __init__(self, conf, sub):
-        # basic sub set up and prerequisites
         self.conf = conf
         self.sub = sub
         self.status = 0
@@ -93,6 +92,7 @@ class SubUpdate():
         self.outcome = self.wanted.outcome
         if not self.outcome.success:
             return
+        # huh?
         from_the_top = self.sub.find('from_the_top') or 'no'
         if from_the_top == 'no':
             self.wanted.lst.reverse()
@@ -181,7 +181,6 @@ class Wanted():
         self.lst = list(filter(lambda x: combo.dic[x]['valid'], self.lst))
         if hasattr(sub, 'filters'):
             self.apply_filters(sub, combo)
-        # we don't know that max_number is a number
         if hasattr(sub, 'max_number'):
             self.limit(sub)
         self.dic = {uid: entryinfo.expand(combo.dic[uid], sub, sub_dir)
@@ -190,11 +189,9 @@ class Wanted():
         if len(filename_set) < len(self.lst):
             self.outcome = Outcome(False, "Filename used more than once. "
                                    "Use rename tag to fix.")
-        # feed isn't handed over to subupgrade so save important bits here
         self.feed_etag = feed.etag
         self.feed_modified = feed.modified
         self.feed_image = feed.image
-        #print(sub.title, self.feed_etag, self.feed_modified)
 
     def match_filename(self, dic, filter_text):
         '''The episode filename must match a regex/string'''
@@ -236,4 +233,8 @@ class Wanted():
 
     def limit(self, sub):
         '''Limit the number of episodes to that set in max_number'''
-        self.lst = self.lst[:int(sub.max_number)]
+        try:
+            self.lst = self.lst[:int(sub.max_number)]
+        except ValueError:
+            pass
+
