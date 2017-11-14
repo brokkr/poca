@@ -23,7 +23,9 @@ def download_file(url, file_path, settings):
     '''Download function with block time outs'''
     my_thread = current_thread()
     headers = requests.utils.default_headers()
-    if settings.useragent
+    if settings.useragent.text:
+        useragent = {'User-Agent': settings.useragent.text}
+        headers.update(useragent)
     if getattr(my_thread, "kill", False):
         return Outcome(None, 'Download cancelled by user')
     try:
