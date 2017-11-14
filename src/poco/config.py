@@ -17,7 +17,7 @@ from poco import files, output, xmlconf
 from poco.outcome import Outcome
 
 
-E = objectify.E
+E = objectify.ElementMaker(annotate=False)
 DEFAULT_XML = E.poca(
                      E.settings(
                                 E.base_dir('/tmp/poca'),
@@ -117,6 +117,18 @@ class Paths:
         if not path.isfile(self.config_file):
             outcome = xmlconf.write_template(self.config_file)
             output.config_fatal(msg)
+
+
+def subs(conf):
+    xp_str = './subscription[not(@state="inactive")][title][url]'
+    valid_subs = conf.xml.subscriptions.xpath(xp_str)
+    sub_names = [sub.title.text for sub in valid_subs]
+    dupes = set([x for x in sub_names if sub_names.count(x) > 1])
+    if len(dupes) > 0:
+        msg = "Found the following duplicate titles: %s" % ', '.join(dupes)
+        poco.output.config_fatal(msg)
+    return valid_subs
+
 
 class Sub:
     '''Legacy class to avoid breakage with old saved subs'''
