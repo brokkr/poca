@@ -16,6 +16,7 @@ from poco.outcome import Outcome
 
 def tag_audio_file(settings, sub, jar, entry):
     '''Metdata tagging using mutagen'''
+    # there seems to be no validation of these settings whatsoever! WTF?
     id3v1_dic = {'yes': 0, 'no': 2}
     id3v1 = id3v1_dic[settings.id3removev1.text]
     id3v2 = int(settings.id3v2version)
@@ -25,8 +26,11 @@ def tag_audio_file(settings, sub, jar, entry):
     try:
         audio = mutagen.File(entry['poca_abspath'])
     except mutagen.MutagenError:
-        return Outcome(False, '%s is invalid file type for tagging' %
-                       entry['poca_abspath'])
+        return Outcome(False, '%s not found or invalid file type for tagging'
+                       % entry['poca_abspath'])
+    except mutagen.mp3.HeaderNotFoundError:
+        return Outcome(False, '%s bad mp3'
+                       % entry['poca_abspath'])
     if audio is None:
         return Outcome(False, '%s is invalid file type for tagging' %
                        entry['poca_abspath'])
