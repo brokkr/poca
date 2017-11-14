@@ -229,12 +229,20 @@ class Wanted():
         filters = {node.tag for node in sub.filters.iterchildren()}
         valid_filters = filters & set(func_dic.keys())
         for key in valid_filters:
-            func_dic[key](combo.dic, sub.filters[key].text)
+            try:
+                func_dic[key](combo.dic, sub.filters[key].text)
+                self.outcome = Outcome(True, 'Filters applied successfully')
+            except KeyError as e:
+                self.outcome = Outcome(False, 'Entry is missing info: %s' % e)
+            except (ValueError, TypeError, SyntaxError) as e:
+                self.outcome = Outcome(False, 'Bad filter setting')
+
 
     def limit(self, sub):
         '''Limit the number of episodes to that set in max_number'''
         try:
             self.lst = self.lst[:int(sub.max_number)]
+            self.outcome = Outcome(True, 'Number limited successfully')
         except ValueError:
-            pass
+            self.outcome = Outcome(False, 'Bad max_number setting')
 
