@@ -1,7 +1,6 @@
 ## Poca
-Poca is an command line podcast client, written in Python 3, with a focus on 
-user customization. Version 0.9 introduces multithreading, adding lightning 
-fast updates and the option for multiple, concurrent downloads to the mix.
+Poca is a fast, multi-threaded command line podcast client, written in Python 3.
+As of version 1.0 poca is considered feature complete.
 
 ### Features
 With Poca you can set custom options for each individual subscription or use
@@ -17,6 +16,9 @@ global defaults to have them apply to every subscription.
  * **Filter a feed** Only want news reports in the morning or on Wednesdays? 
    Use criteria such as filename and title, or the hour, weekday or date of 
    publishing to filter what you want from a feed.
+ * **Renames files automatically** Not all feeds have sensibly named media 
+   files. Specify a renaming template like date_title to know what you're
+   dealing with.
  * **From the top**. A latecomer to 'Serial' or other audiobook style podcasts?
    Poca introduces a special mode that gets the oldest episodes first, rather 
    than the latest. To move on to later episodes simply delete old ones and 
@@ -27,8 +29,6 @@ global defaults to have them apply to every subscription.
  * **Manage your shows** by editing an easy-to-understand xml file. Or use
    the accompanying tool to add, delete, sort them, or get info about their
    publishing frequency, average episode length and more.
- * **... and find new ones** with the accompanying search tool using the
-   Audiosear.ch API.
 
 Poca also: has excellent unicode support for feeds, filenames and tags, gets 
 cover images for feeds, has the ability to spoof user agents, can pause your
@@ -43,7 +43,7 @@ section of the wiki for more details on features.
 
 Poca is designed to be as intutive as possible. All configuration is done in 
 a single XML-format file and the output is easy to read. For maximal cron job 
-compatibility, Poca has both a file logging and quiet mode.
+compatibility, Poca has a quiet, normal and verbose mode.
 
 ### Installing
 You can install poca using only setuptools but `pip` is recommended. Find pip 
@@ -70,5 +70,4 @@ To remove Poca - having installed it using pip - simply do:
 ### Dependencies
  * You will need Python 3 for setup and running the program
  * The following third-party modules are required: `feedparser`, `lxml`, `mutagen`, `requests`
- * The following third-party modules are recommended: `audiosearch`
  * Pip can install all of these using 'pip3 install [name of module]'
