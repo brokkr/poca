@@ -22,11 +22,13 @@ from poco.outcome import Outcome
 def download_file(url, file_path, settings):
     '''Download function with block time outs'''
     my_thread = current_thread()
+    headers = requests.utils.default_headers()
+    if settings.useragent
     if getattr(my_thread, "kill", False):
         return Outcome(None, 'Download cancelled by user')
     try:
         # a timeout of 60 secs is a problem when we're trying to ctrl-c
-        r = requests.get(url, stream=True, timeout=60)
+        r = requests.get(url, stream=True, timeout=60, headers=headers)
     except (requests.exceptions.ConnectionError,
             requests.exceptions.HTTPError) as e:
         return Outcome(False, 'Download of %s failed' % url)
