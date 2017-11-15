@@ -120,6 +120,8 @@ class Paths:
 
 
 def subs(conf):
+    # figure out how to a) filter out empty titles / urls
+    # b) make a list of filtered subs and inform user
     xp_str = './subscription[not(@state="inactive")][title][url]'
     valid_subs = conf.xml.subscriptions.xpath(xp_str)
     sub_names = [sub.title.text for sub in valid_subs]
