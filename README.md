@@ -1,6 +1,6 @@
 ## Poca
- A fast, multithreaded and highly customizable command line podcast client, 
- written in Python 3
+Poca is a fast, multithreaded and highly customizable command line podcast client, 
+written in Python 3. 
 
 ### Features
 Poca allows both for options for each individual subscription and
@@ -41,8 +41,7 @@ section of the wiki for more details on features.
 ### Interface
 [![asciicast](https://asciinema.org/a/pONMnNfk3TcqYolnz0y1kC3jG.png)](https://asciinema.org/a/pONMnNfk3TcqYolnz0y1kC3jG)
 
-Poca is designed to be as intutive as possible. All configuration is done in 
-a single XML-format file and the output is easy to read. For cron job 
+All configuration is done in a single XML-format file. For cron job 
 compatibility, Poca has a quiet mode in addition to normal and verbose.
 
 ### Installing
