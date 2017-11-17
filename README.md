@@ -1,5 +1,6 @@
 ## Poca
-Poca is a fast, multi-threaded command line podcast client, written in Python 3.
+ A fast, multithreaded and highly customizable command line podcast client, 
+ written in Python 3
 
 ### Features
 Poca allows both for options for each individual subscription and
@@ -15,9 +16,9 @@ global defaults that apply to every subscription.
  * **Filter a feed.** Only want news reports in the morning or on Wednesdays? 
    Use criteria such as filename and title, or the hour, weekday or date of 
    publishing to filter what you want from a feed.
- * **Renames files automatically.** Not all feeds have sensibly named media 
+ * **Rename files automatically.** Not all feeds have sensibly named media 
    files. Specify a renaming template like date_title to know what you're
-   dealing with.
+   dealing with or to get alphabetical ordering to match chronology.
  * **From the top.** A latecomer to _Serial_ or other audiobook style podcasts?
    Poca introduces a special mode that gets the oldest episodes first, rather 
    than the latest. To move on to later episodes simply delete old ones and 
