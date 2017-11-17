@@ -1,39 +1,38 @@
 ## Poca
 Poca is a fast, multi-threaded command line podcast client, written in Python 3.
-As of version 1.0 poca is considered feature complete.
 
 ### Features
-With Poca you can set custom options for each individual subscription or use
-global defaults to have them apply to every subscription.
+Poca allows both for options for each individual subscription and
+global defaults that apply to every subscription.
 
- * **Maximum amount**. Specify how many episodes the subscription should get 
+ * **Maximum amount.** Specify how many episodes the subscription should get 
    before deleting old episodes to make room for new ones.
- * **Override ID3/Vorbis metadata**. If you want 'Savage Love' to have Dan 
-   Savage in the artist field (rather than The Stranger), poca will 
+ * **Override ID3/Vorbis metadata.** If you want _Savage Love_ to have _Dan 
+   Savage_ in the artist field (rather than _The Stranger_), poca will 
    automatically update the metadata upon download of each new episode. Set
    'genre' to be overwritten by 'Podcast' as a default. Or have poca add track
    numbers to shows that have left them out.
- * **Filter a feed** Only want news reports in the morning or on Wednesdays? 
+ * **Filter a feed.** Only want news reports in the morning or on Wednesdays? 
    Use criteria such as filename and title, or the hour, weekday or date of 
    publishing to filter what you want from a feed.
- * **Renames files automatically** Not all feeds have sensibly named media 
+ * **Renames files automatically.** Not all feeds have sensibly named media 
    files. Specify a renaming template like date_title to know what you're
    dealing with.
- * **From the top**. A latecomer to 'Serial' or other audiobook style podcasts?
+ * **From the top.** A latecomer to _Serial_ or other audiobook style podcasts?
    Poca introduces a special mode that gets the oldest episodes first, rather 
    than the latest. To move on to later episodes simply delete old ones and 
    poca will fill up with the next in line.
- * **Keeping track**. Poca logs downloads and removals to a local file so you
+ * **Keeping track.** Poca logs downloads and removals to a local file so you
    easily see what's changed. Or configure it with an SMTP server and get
    notified when a feed stops working.
- * **Manage your shows** by editing an easy-to-understand xml file. Or use
+ * **Manage your shows.** by editing an easy-to-understand xml file. Or use
    the accompanying tool to add, delete, sort them, or get info about their
    publishing frequency, average episode length and more.
 
 Poca also: has excellent unicode support for feeds, filenames and tags, gets 
 cover images for feeds, has the ability to spoof user agents, can pause your
 subscriptions, deals intelligently with interruptions, updates moved feeds
-(HTTP 301) automatically, can add track numbers to feeds without them and more.
+(HTTP 301) automatically, and more.
 
 See the [Configuration](https://github.com/brokkr/poca/wiki/Configuration) 
 section of the wiki for more details on features.
@@ -42,8 +41,8 @@ section of the wiki for more details on features.
 [![asciicast](https://asciinema.org/a/pONMnNfk3TcqYolnz0y1kC3jG.png)](https://asciinema.org/a/pONMnNfk3TcqYolnz0y1kC3jG)
 
 Poca is designed to be as intutive as possible. All configuration is done in 
-a single XML-format file and the output is easy to read. For maximal cron job 
-compatibility, Poca has a quiet, normal and verbose mode.
+a single XML-format file and the output is easy to read. For cron job 
+compatibility, Poca has a quiet mode in addition to normal and verbose.
 
 ### Installing
 You can install poca using only setuptools but `pip` is recommended. Find pip 
