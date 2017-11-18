@@ -9,11 +9,15 @@
 
 """poca.xml configuration template"""
 
+from lxml import objectify
+from io import StringIO
+from os import path
+
 from poco.outcome import Outcome
+from poco.subscribe import pretty_print
 
 
-TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
-<poca version="1.0">
+TEMPLATE = """<poca version="1.0">
 
   <!-- Please see detailed settings documentation online:
   https://github.com/brokkr/poca/wiki/Settings. The available
@@ -69,15 +73,26 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 </poca>
 """
 
-def write_template(file_path):
-    '''Writes a string to file. Currently specific to creating config file.'''
-    msg = 'No config file found. Writing one... \n'
+def write_config_file(config_file_path):
+    '''Writes default config xml to config file'''
+    print('No config file found. Making one at %s.' % config_file_path)
+    default_base_dir = path.expanduser(path.join('~', 'poca'))
+    query = input("Please enter the full path for placing media files.\n"
+                  "Press Enter to use default (%s): " % default_base_dir)
+    template_file = StringIO(TEMPLATE)
+    config_xml = objectify.parse(template_file)
+    config_root = config_xml.getroot()
+    config_root.settings.base_dir = query if query else default_base_dir
+    config_xml_str = pretty_print(config_xml)
     try:
-        wfile = open(file_path, mode='wt', encoding='utf-8')
-        wfile.write(TEMPLATE)
-        wfile.close()
-        msg = msg + file_path + ': Config template created.'
+        config_file = open(config_file_path, mode='wt', encoding='utf-8')
+        config_file.write(config_xml_str)
+        config_file.close()
+        msg = ('Default config succesfully written to %s.\n'
+               'Please edit for further customization or run '
+               '\'poca-subscribe\' to add subscriptions.' % config_file_path)
         return Outcome(True, msg)
     except IOError as e:
-        msg = msg + file_path + ': ' + str(e)
+        msg = 'Failed writing config to %s.\nError: %s' % (config_file_path,
+                                                           str(e))
         return Outcome(False, msg)

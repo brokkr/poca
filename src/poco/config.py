@@ -115,7 +115,7 @@ class Paths:
             if not outcome.success:
                 output.config_fatal(outcome.msg)
         if not path.isfile(self.config_file):
-            outcome = xmlconf.write_template(self.config_file)
+            outcome = xmlconf.write_config_file(self.config_file)
             output.config_fatal(outcome.msg)
 
 
