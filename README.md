@@ -1,6 +1,17 @@
 ## Poca
-Poca is a fast, multithreaded and highly customizable command line podcast client, 
-written in Python 3. 
+Poca is a fast, multithreaded and highly customizable command line podcast 
+client, written in Python 3. As of 1.0 all planned features have been 
+implemented.
+
+## Upgrade to 1.0 note
+The 1.0 database is NOT backwards compatible. If you're upgrading to 1.0 
+from an 0.x release you will need to delete your media files and db folder. 
+The `db` folder can be found in the config directory (`~/.poca` by default). 
+The media files are in the folder designated by the `base_dir` setting in 
+poca.xml. Older versions of `poca.xml` will work with 1.0 but be aware that
+new options have been added and others deprecated. See 
+[Configuration](https://github.com/brokkr/poca/wiki/Configuration) 
+for details.
 
 ### Features
 Poca allows both for options for each individual subscription and
