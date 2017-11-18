@@ -13,21 +13,18 @@ from poco.outcome import Outcome
 
 
 TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
-<poca version="0.8">
+<poca version="1.0">
 
     <!-- Please see detailed configuration documentation online:
-     https://github.com/brokkr/poca/wiki/Configuration 
+     https://github.com/brokkr/poca/wiki/Configuration
      All tags can be removed for relying on default settings -->
 
     <!-- The meaning of the settings options are briefly as follows:
     * base_dir: Directory containing the individual subscription folders
     * id3v2version: 3 for id3v2.3, 4 for id3v2.4 (default)
     * id3removev1: Should we remove id3v1, only keeping v2 (yes or no)
-    * useragent: _Fallback_ user agent if connection is rejected for
+    * useragent: Fallback user agent if connection is rejected for
       default python user agent. Leave empty not to use a fallback.
-    * email logging setup not included by default, see wiki for details.
-    * audiosearch id/secret: keys required for 'poca-subscribe search'
-                             get yours @ https://www.audiosear.ch/oauth/applications
     -->
 
     <settings>
@@ -35,10 +32,6 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
         <id3v2version>4</id3v2version>
         <id3removev1>yes</id3removev1>
         <useragent></useragent>
-        <audiosearch>
-            <id></id>
-            <secret></secret>
-        </audiosearch>
     </settings>
 
     <!-- Defaults take the same options as any single subscription. A
@@ -52,55 +45,27 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 
     <subscriptions>
 
-        <!-- The meaning of the subscription options are brifly as follows:
-        * category: A category attribute on a subscription tag is helpful in 
-                    organizing the output of 'poca-subscribe list'.
-        * state: A state attribute is either 'active' or 'inactive'. inactive
-                 subs are not updated. subs without state attribute are active.
+        <!-- Use 'poca-subscribe add' to quickly add new subscriptions.
+        See https://github.com/brokkr/poca/wiki/Subscriptions for a
+        full explanation of options. The meaning of the subscription
+        options are brifly as follows:
         * title: Name used for the folder of the subscription (required)
         * url: The address of the rss feed (required)
         * max_number: Max number of files to keep in subscription (optional)
         * from_the_top: Get oldest files first, not newest (optional)
-        * metadata: Override id3 header fields with these values
-          (see https://github.com/brokkr/poca/wiki/ID3-frames for details)
-        * filters: Contains one or more of following tags (all optional)
-          * filename: Filename of the entry must match this string/regex
-          * title: Same as above, only for the title in the rss 
-          * hour: The hour (24h-format) at which the entry was published.
-          * weekdays: Only entries from one of these weekdays (as integers)
-          * after_date: Only use entries published after date specified.
+        * metadata: Contains one or more metadata overrides (optional)
+          (run 'poca-subscribe tags' for a list of valid values)
+        * filters: Contains one or more filters (all optional)
+        * rename: Contains template for renaming audio files (optional)
         -->
 
-        <subscription category="news">
-            <title>example 1 - basic unlimited</title>
-            <url>http://www.npr.org/rss/podcast.php?id=500005</url>
-        </subscription>
-
-        <subscription>
-            <title>example 2 - start with the two oldest episodes</title>
-            <url>http://nightvale.libsyn.com/rss</url>
-            <max_number>2</max_number>
-            <from_the_top>yes</from_the_top>
-        </subscription>
-
-        <subscription>
-            <title>example 3 - override id3 header fields</title>
-            <url>http://savagelove.savagelovecast.libsynpro.com/rss</url>
-            <max_number>2</max_number>
-            <track_numbering>yes</track_numbering>
+        <subscription comment="This is an example for illustration purposes">
+            <title>Serial</title>
+            <url>http://feeds.serialpodcast.org/serialpodcast?format=xml</url>
+            <max_number>3</max_number>
             <metadata>
-                <artist>Dan Savage</artist>
-                <genre>podcast</genre>
+                <genre>Podcast</genre>
             </metadata>
-        </subscription>
-
-        <subscription state="inactive">
-            <title>example 4 - filter based on weekday of publishing (only tuesdays)</title>
-            <url>http://www.bbc.co.uk/programmes/p002vsnk/episodes/downloads.rss</url>
-            <max_number>2</max_number>
-            <filters>
-                <weekdays>1</weekdays>
-            </filters>
         </subscription>
 
     </subscriptions>
