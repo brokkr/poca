@@ -113,10 +113,10 @@ class Paths:
         for check_dir in [self.config_dir, self.db_dir]:
             outcome = files.check_path(check_dir)
             if not outcome.success:
-                output.config_fatal(msg)
+                output.config_fatal(outcome.msg)
         if not path.isfile(self.config_file):
             outcome = xmlconf.write_template(self.config_file)
-            output.config_fatal(msg)
+            output.config_fatal(outcome.msg)
 
 
 def subs(conf):
