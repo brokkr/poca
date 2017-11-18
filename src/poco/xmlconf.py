@@ -24,15 +24,12 @@ TEMPLATE = """<poca version="1.0">
   options are briefly as follows:
   * base_dir: Directory containing the individual subscription folders
   * id3v2version: 3 for id3v2.3, 4 for id3v2.4 (default)
-  * id3removev1: Should we remove id3v1, only keeping v2 (yes or no)
-  * useragent: Fallback user agent if connection is rejected for
-    default python user agent. Leave empty not to use a fallback. -->
+  * id3removev1: Should we remove id3v1, only keeping v2 (yes or no) -->
 
   <settings>
     <base_dir>/tmp/poca</base_dir>
     <id3v2version>4</id3v2version>
     <id3removev1>yes</id3removev1>
-    <useragent></useragent>
   </settings>
 
   <!-- Defaults take the same options as any single subscription. A
