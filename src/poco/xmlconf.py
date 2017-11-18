@@ -15,8 +15,8 @@ from poco.outcome import Outcome
 TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 <poca version="1.0">
 
-  <!-- Please see detailed configuration documentation online:
-  https://github.com/brokkr/poca/wiki/Configuration. The settings
+  <!-- Please see detailed settings documentation online:
+  https://github.com/brokkr/poca/wiki/Settings. The available
   options are briefly as follows:
   * base_dir: Directory containing the individual subscription folders
   * id3v2version: 3 for id3v2.3, 4 for id3v2.4 (default)
