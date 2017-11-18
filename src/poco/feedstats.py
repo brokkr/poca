@@ -15,6 +15,8 @@ import time
 import feedparser
 
 
+empty_entry = {'title': 'n/a', 'published_parsed': None}
+
 class Feedstats():
     '''Gathers stats for feed and arranges output'''
     def __init__(self, url):
@@ -22,9 +24,15 @@ class Feedstats():
         self.url = url
         self.doc = feedparser.parse(self.url)
         now = time.localtime()
-        age = lambda x: (time.mktime(now) - time.mktime(x)) / (24*3600)
-        self.entries = [x for x in self.doc.entries if \
-                        age(x['published_parsed']) < 35]
+        self.entries = [entry for entry in self.doc.entries if \
+                        self.age(now, entry['published_parsed']) < 35]
+
+    def age(self, now, date):
+        try:
+            days = (time.mktime(now) - time.mktime(date)) / (24*3600)
+        except TypeError:
+            days = 100
+        return round(days)
 
     def print_stats(self):
         '''Output the lef hand and right hand side of the matrix'''
@@ -40,9 +48,13 @@ class Feedstats():
                         else 'Unknown'
         lhs['title'] = self.doc.feed.title if 'title' in self.doc.feed else \
                        'Unknown'
-        last = self.doc.entries[0]
-        lhs['last_date'] = time.strftime('%d %b %Y', last['published_parsed'])
-        lhs['last_title'] = last['title']
+        last = self.doc.entries[0] if self.doc.entries else empty_entry
+        try:
+            lhs['last_date'] = time.strftime('%d %b %Y',
+                                             last['published_parsed'])
+        except TypeError:
+            lhs['last_date'] = 'n/a'
+        lhs['last_title'] = str(last['title']) if 'title' in last else 'n/a'
         lhs['avg_mb'] = self.get_avg_size()
         lhs['avg_duration'] = self.get_avg_duration()
         headers = {'author': 'Author: ', 'title': 'Title:  ',
@@ -61,7 +73,7 @@ class Feedstats():
 
     def get_avg_size(self):
         '''Average size in Mb of an episode in the feed'''
-        links = [entry['links'] for entry in self.entries]
+        links = [entry['links'] for entry in self.doc.entries]
         lengths = [enc['length'] for sublist in links for enc in sublist
                    if 'length' in enc]
         lengths = [int(x) for x in lengths if int(x) > 0]
@@ -73,7 +85,7 @@ class Feedstats():
 
     def get_avg_duration(self):
         '''Average duration in hours and minutes of an episode in the feed'''
-        duration_entries = [entry for entry in self.doc.entries if 
+        duration_entries = [entry for entry in self.doc.entries if
                             'itunes_duration' in entry]
         durations = list(map(self.itunes2seconds, duration_entries))
         durations = [entry for entry in durations if entry > 0]
