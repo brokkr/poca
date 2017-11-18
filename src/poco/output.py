@@ -48,7 +48,7 @@ def subscribe_error(msg):
 
 def config_fatal(msg):
     '''Fatal errors encountered during config read'''
-    STREAM.fatal(' %s ' % WARNING_SIGN)
+    STREAM.fatal(' %s %s' % (WARNING_SIGN, msg))
     sys.exit(1)
 
 
