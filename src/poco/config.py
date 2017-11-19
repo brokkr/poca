@@ -132,13 +132,3 @@ def subs(conf):
         msg = "Found the following duplicate titles: %s" % ', '.join(dupes)
         output.config_fatal(msg)
     return valid_subs
-
-
-class Sub:
-    '''Legacy class to avoid breakage with old saved subs'''
-    pass
-
-
-class Prefs:
-    '''Legacy class to avoid breakage with old saved subs'''
-    pass

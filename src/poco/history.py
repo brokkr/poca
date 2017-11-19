@@ -60,17 +60,11 @@ class Subjar:
             with open(self.db_filename, 'wb') as f:
                 pickle.dump(self, f)
             outcome = Outcome(True, 'Pickle successful')
-        # need more specific exceptions here
         except (pickle.PickleError, PermissionError, FileNotFoundError,
                 IsADirectoryError):
             outcome = Outcome(False, 'Could not save history to %s' %
                               self.db_filename)
         return outcome
-
-
-class Jar(Subjar):
-    '''Old name for Subjar. Needed for unpickling old instances'''
-    pass
 
 
 def get_statejar(paths):

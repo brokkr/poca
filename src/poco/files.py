@@ -29,7 +29,6 @@ def download_file(url, file_path, settings):
     if getattr(my_thread, "kill", False):
         return Outcome(None, 'Download cancelled by user')
     try:
-        # a timeout of 60 secs is a problem when we're trying to ctrl-c
         r = requests.get(url, stream=True, timeout=60, headers=headers)
     except (requests.exceptions.ConnectionError,
             requests.exceptions.HTTPError) as e:

@@ -16,7 +16,6 @@ from poco.outcome import Outcome
 
 def tag_audio_file(settings, sub, jar, entry):
     '''Metdata tagging using mutagen'''
-    # there seems to be no validation of these settings whatsoever! WTF?
     id3v1_dic = {'yes': 0, 'no': 2}
     id3v1 = id3v1_dic[settings.id3removev1.text]
     id3v2 = int(settings.id3v2version)
@@ -57,8 +56,6 @@ def tag_audio_file(settings, sub, jar, entry):
         jar.track_no = track_no
         jar.save()
         audio['tracknumber'] = str(track_no)
-        # note: we save the jar before we know if tagging is succesful
-        # could mean skipped track numbers
     if isinstance(audio, mutagen.mp3.EasyMP3):
         audio.save(v1=id3v1, v2_version=id3v2)
     else:

@@ -34,7 +34,6 @@ def start_stream_logger(args):
     stream_handler = logging.StreamHandler()
     stream_formatter = logging.Formatter("%(message)s")
     stream_handler.setFormatter(stream_formatter)
-    # is this really necessary? doesn't argparse take care of it?
     if not hasattr(args, 'verbose'):
         args.verbose = False
     if args.quiet:

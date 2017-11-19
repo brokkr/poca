@@ -75,9 +75,9 @@ class SubUpgrade():
 
     def acquire(self, uid, entry, subdata):
         '''Get new entries, tag them and add to history'''
-        # see https://github.com/brokkr/poca/wiki/Architecture#wantedindex
         output.processing_download(entry)
         wantedindex = subdata.wanted.lst.index(uid) - len(self.failed)
+        # see https://github.com/brokkr/poca/wiki/__Developer-notes__
         self.outcome = files.download_file(entry['poca_url'],
                                            entry['poca_abspath'],
                                            subdata.conf.xml.settings)
