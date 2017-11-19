@@ -41,8 +41,8 @@ def main():
                 update_q, poco.subupdate.SubUpdate, conf, sub)
             update_threads.append(update_thread)
             update_thread.start()
-        for update_thread in update_threads:
-            update_thread.join()
+        #for update_thread in update_threads:
+        #    update_thread.join()
 
         # upgrade loop
         while len(upgrade_threads) + len(skip_subs) < len(valid_subs):
