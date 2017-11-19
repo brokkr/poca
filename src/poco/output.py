@@ -59,7 +59,8 @@ def config_fatal(msg):
 def plans_error(subdata):
     '''sub-fatal errors encountered processing a specific subscription'''
     stream_msg = '%s. %s' % (subdata.sub.title.text.upper(), subdata.outcome.msg)
-    after_stream_msg = 'SUB ERROR: %s' % (subdata.outcome.msg)
+    after_stream_msg = 'SUB ERROR (%s): %s' % (subdata.sub.title.text,
+                                               subdata.outcome.msg)
     STREAM.debug(stream_msg)
     AFTER_STREAM.info(after_stream_msg)
     SUMMARY.error(stream_msg)
@@ -67,7 +68,8 @@ def plans_error(subdata):
 def plans_moved(subdata, _outcome):
     '''Sub has moved (http status 301)'''
     stream_msg = '%s. %s' % (subdata.sub.title.text.upper(), _outcome.msg)
-    after_stream_msg = 'SUB MOVED: %s' % (_outcome.msg)
+    after_stream_msg = 'SUB MOVED (%s): %s' % (subdata.sub.title.text,
+                                               _outcome.msg)
     STREAM.debug(stream_msg)
     AFTER_STREAM.info(after_stream_msg)
     SUMMARY.error(stream_msg)
@@ -131,19 +133,19 @@ def fail_common(msg, after_stream_msg):
     STREAM.debug(stream_msg)
     AFTER_STREAM.info(after_stream_msg)
 
-def fail_download(outcome):
+def fail_download(title, outcome):
     '''Subline telling user of single entry download failure'''
-    after_stream_msg = 'DOWNLOAD ERROR: %s' % (outcome.msg)
+    after_stream_msg = 'DOWNLOAD ERROR (%s): %s' % (title, outcome.msg)
     fail_common(outcome.msg, after_stream_msg)
 
-def fail_tag(outcome):
+def fail_tag(title, outcome):
     '''Subline telling user of single entry tagging failure'''
-    after_stream_msg = 'TAGGING ERROR: %s' % (outcome.msg)
+    after_stream_msg = 'TAGGING ERROR (%s): %s' % (title, outcome.msg)
     fail_common(outcome.msg, after_stream_msg)
 
-def fail_delete(outcome):
+def fail_delete(title, outcome):
     '''Subline telling user of single entry deletion failure'''
-    after_stream_msg = 'DELETE ERROR: %s' % (outcome.msg)
+    after_stream_msg = 'DELETE ERROR (%s): %s' % (title, outcome.msg)
     fail_common(outcome.msg, after_stream_msg)
 
 def fail_database(outcome):

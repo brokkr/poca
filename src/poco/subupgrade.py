@@ -67,7 +67,7 @@ class SubUpgrade():
                                               subdata.sub_dir,
                                               subdata.conf.xml.settings)
             if _outcome.success is False:
-                output.fail_download(_outcome)
+                output.fail_download(subdata.sub.title.text, _outcome)
 
         # print summary of operations in file log
         output.file_summary(subdata, self.removed, self.downed, self.failed)
@@ -82,7 +82,7 @@ class SubUpgrade():
                                            subdata.conf.xml.settings)
         if self.outcome.success is False:
             self.fail_flag = True
-            output.fail_download(self.outcome)
+            output.fail_download(subdata.sub.title.text, self.outcome)
             self.failed.append(entry)
             return
         if self.outcome.success is None:
@@ -97,14 +97,14 @@ class SubUpgrade():
         _outcome = tag.tag_audio_file(subdata.conf.xml.settings,
                                         subdata.sub, subdata.jar, entry)
         if not _outcome.success:
-            output.fail_tag(_outcome)
+            output.fail_tag(subdata.sub.title.text, _outcome)
 
     def remove(self, uid, entry, subdata):
         '''Deletes the file and removes the entry from the jar'''
         self.outcome = files.delete_file(entry['poca_abspath'])
         if self.outcome.success is False:
             self.fail_flag = True
-            output.fail_delete(self.outcome)
+            output.fail_delete(subdata.sub.title.text, self.outcome)
             return
         output.processing_removal(entry)
         self.removed.append(entry)
