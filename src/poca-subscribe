@@ -38,6 +38,7 @@ def main():
         if sub_dic:
             poco.subscribe.add_sub(conf, sub_category, sub_dic)
 
+
 if __name__ == '__main__':
     try:
         main()

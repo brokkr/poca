@@ -48,16 +48,10 @@ def tag_audio_file(settings, sub, jar, entry):
                      if override.tag in audio.tags.valid_keys.keys()]
     else:
         overrides = [(override.tag, override.text) for override in frames]
-    #if isinstance(audio, mutagen.oggvorbis.OggVorbis):
-    #    pass
-    #if isinstance(audio, mutagen.oggopus.OggOpus):
-    #    pass
-    #if isinstance(audio, mutagen.flac.FLAC):
-    #    pass
     for override in overrides:
         audio[override[0]] = override[1]
-    if tracks == 'yes' or (tracks == 'if missing' and not
-                           'tracknumber' in audio):
+    if tracks == 'yes' or (tracks == 'if missing' and 'tracknumber' not in
+                           audio):
         track_no = jar.track_no if hasattr(jar, 'track_no') else 0
         track_no += 1
         jar.track_no = track_no

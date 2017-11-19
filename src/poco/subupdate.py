@@ -53,7 +53,7 @@ class SubUpdate():
         # merge sub settings and defaults
         defaults = deepcopy(self.conf.xml.defaults)
         rename = deepcopy(self.sub.rename) if hasattr(self.sub, 'rename') \
-                 else None
+            else None
         errors = merge(self.sub, defaults, self.conf.xml.defaults, errors=[])
         self.outcome = errors[0] if errors else Outcome(True, '')
         defaults.tag = "subscription"
@@ -88,7 +88,8 @@ class SubUpdate():
         else:
             self.outcome = Outcome(True, 'Success')
         combo = Combo(feed, self.jar, self.sub)
-        self.wanted = Wanted(self.sub, feed, combo, self.jar.del_lst, self.sub_dir)
+        self.wanted = Wanted(self.sub, feed, combo, self.jar.del_lst,
+                             self.sub_dir)
         self.outcome = self.wanted.outcome
         if not self.outcome.success:
             return
@@ -103,8 +104,6 @@ class SubUpdate():
 
     def check_jar(self):
         '''Check for user deleted files so we can filter them out'''
-        # why is this called check_jar? its the files we're checking, right?
-        #for index, uid in enumerate(deepcopy(self.jar.lst)):
         for uid in self.jar.lst:
             entry = self.jar.dic[uid]
             outcome = files.verify_file(entry)
@@ -115,6 +114,7 @@ class SubUpdate():
         # save jar changes or no as a permissions check (better now than later)
         self.jar.lst = [x for x in self.jar.lst if x not in self.jar.del_lst]
         self.outcome = self.jar.save()
+
 
 class Feed:
     '''Constructs a container for feed entries'''
@@ -138,12 +138,12 @@ class Feed:
         '''Extract entries from the feed xml'''
         try:
             self.lst = [entry.id for entry in doc.entries]
-            self.dic = {entry.id : entry for entry in doc.entries}
+            self.dic = {entry.id: entry for entry in doc.entries}
         except (KeyError, AttributeError):
             try:
                 self.lst = [entry.enclosures[0]['href']
                             for entry in doc.entries]
-                self.dic = {entry.enclosures[0]['href'] : entry
+                self.dic = {entry.enclosures[0]['href']: entry
                             for entry in doc.entries}
             except (KeyError, AttributeError):
                 self.outcome = Outcome(False, 'Cant find entries in feed.')
@@ -156,6 +156,7 @@ class Feed:
             self.image = doc.feed.image['href']
         except (AttributeError, KeyError):
             self.image = None
+
 
 class Combo:
     '''Constructs a container holding all combined feed and jar
@@ -171,6 +172,7 @@ class Combo:
         self.dic = {uid: entryinfo.validate(feed.dic[uid]) for uid in feed.lst
                     if uid not in jar.lst}
         self.dic.update(jar.dic)
+
 
 class Wanted():
     '''Filters the combo entries and decides which ones to go for'''
@@ -206,7 +208,8 @@ class Wanted():
     def match_weekdays(self, dic, filter_text):
         '''Only return episodes published on specific week days'''
         self.lst = [x for x in self.lst if
-                    str(dic[x]['published_parsed'].tm_wday) in list(filter_text)]
+                    str(dic[x]['published_parsed'].tm_wday) in
+                    list(filter_text)]
 
     def match_date(self, dic, filter_text):
         '''Only return episodes published after a specific date'''
@@ -216,8 +219,8 @@ class Wanted():
 
     def match_hour(self, dic, filter_text):
         '''Only return episodes published at a specific hour of the day'''
-        self.lst = [x for x in self.lst if dic[x]['published_parsed'].tm_hour ==
-                    int(filter_text)]
+        self.lst = [x for x in self.lst if dic[x]['published_parsed'].tm_hour
+                    == int(filter_text)]
 
     def apply_filters(self, sub, combo):
         '''Apply all filters set to be used on the subscription'''
@@ -237,7 +240,6 @@ class Wanted():
             except (ValueError, TypeError, SyntaxError) as e:
                 self.outcome = Outcome(False, 'Bad filter setting')
 
-
     def limit(self, sub):
         '''Limit the number of episodes to that set in max_number'''
         try:
@@ -245,4 +247,3 @@ class Wanted():
             self.outcome = Outcome(True, 'Number limited successfully')
         except ValueError:
             self.outcome = Outcome(False, 'Bad max_number setting')
-

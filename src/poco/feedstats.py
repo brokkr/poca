@@ -17,6 +17,7 @@ import feedparser
 
 empty_entry = {'title': 'n/a', 'published_parsed': None}
 
+
 class Feedstats():
     '''Gathers stats for feed and arranges output'''
     def __init__(self, url):
@@ -24,7 +25,7 @@ class Feedstats():
         self.url = url
         self.doc = feedparser.parse(self.url)
         now = time.localtime()
-        self.entries = [entry for entry in self.doc.entries if \
+        self.entries = [entry for entry in self.doc.entries if
                         self.age(now, entry['published_parsed']) < 35]
 
     def age(self, now, date):
@@ -45,9 +46,9 @@ class Feedstats():
         '''Collect feedinfo and arrange the lhs'''
         lhs = {}
         lhs['author'] = self.doc.feed.author if 'author' in self.doc.feed \
-                        else 'Unknown'
+            else 'Unknown'
         lhs['title'] = self.doc.feed.title if 'title' in self.doc.feed else \
-                       'Unknown'
+            'Unknown'
         last = self.doc.entries[0] if self.doc.entries else empty_entry
         try:
             lhs['last_date'] = time.strftime('%d %b %Y',
@@ -103,7 +104,7 @@ class Feedstats():
         itunes_hms = entry['itunes_duration'].split(':')
         itunes_hms.reverse()
         seconds = 0
-        for index,entry in enumerate(itunes_hms):
+        for index, entry in enumerate(itunes_hms):
             seconds += pow(60, index) * int(entry)
         return int(seconds)
 

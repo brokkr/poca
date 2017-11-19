@@ -18,7 +18,6 @@ from . import subupgrade
 from . import config
 from . import entryinfo
 from . import files
-from . import id3v24_frames
 from . import history
 from . import loggers
 from . import subscribe

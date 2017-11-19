@@ -15,7 +15,6 @@ import smtplib
 import socket
 from email.mime.text import MIMEText
 from email.header import Header
-from lxml import etree
 
 from poco import history
 from poco.outcome import Outcome
@@ -82,7 +81,7 @@ def start_summary_logger(args, paths, settings):
     if args.email and settings.find('email[fromaddr][toaddr]') is not None:
         bsmtp_handler = BufferSMTPHandler(settings.email, paths)
         loglevel = logging.ERROR if settings.email.only_errors == 'yes' \
-                   else logging.INFO
+            else logging.INFO
         bsmtp_handler.setLevel(loglevel)
         logger.addHandler(bsmtp_handler)
         logger.poca_email_handler = bsmtp_handler

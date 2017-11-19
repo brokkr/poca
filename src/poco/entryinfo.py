@@ -11,7 +11,9 @@
 
 import time
 from os import path
-import urllib.request, urllib.error, urllib.parse
+import urllib.request
+import urllib.error
+import urllib.parse
 
 
 def validate(entry):
@@ -60,11 +62,12 @@ def rename(entry, sub):
         date = 'missing_pub_date'
     uid = str(entry['id']) if 'id' in entry else 'missing_uid'
     uid = ''.join([x for x in uid if x not in forbidden])
-    episode_title = str(entry['title']) if 'title' in entry else 'missing_title'
+    episode_title = str(entry['title']) if 'title' in entry else \
+        'missing_title'
     rename_dic = {'org_name': entry['poca_basename'],
                   'title': sub.title.text,
-                  'episode_title' : episode_title,
-                  'uid' : uid,
+                  'episode_title': episode_title,
+                  'uid': uid,
                   'date': date}
     rename_lst = [rename_dic[el.tag] for el in sub.rename.iterchildren() if
                   el.tag in rename_dic]
@@ -72,6 +75,6 @@ def rename(entry, sub):
     space = sub.rename.get('space') or ' '
     if rename_lst:
         basename = divider.join(rename_lst).replace(' ', space)
-        entry['poca_basename'] = ''.join([x for x in basename if x not in \
+        entry['poca_basename'] = ''.join([x for x in basename if x not in
                                           forbidden])
     return entry

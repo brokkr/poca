@@ -17,9 +17,9 @@ setup(
     name='poca',
     version='1.0beta',
     license='GPL3',
-    description='a command line podcast client',
-    long_description='A cron-friendly, disk-space-conscious, command line'
-                     'podcast aggregator, written in Python',
+    description='A command line podcast client',
+    long_description='A fast, multithreaded and highly customizable command '
+                     'line podcast client, written in Python 3',
     author='Mads Michelsen',
     author_email='mail@brokkr.net',
     url='https://github.com/brokkr/poca',
@@ -38,5 +38,5 @@ setup(
                  'Natural Language :: English',
                  'Operating System :: POSIX',
                  'Programming Language :: Python :: 3.5',
-                 'Topic :: Internet']
+                 'Topic :: Multimedia :: Sound/Audio']
 )

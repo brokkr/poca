@@ -42,11 +42,13 @@ def search(xml, args):
         print("No titles match your query.")
     return results
 
+
 def pretty_print(el):
     '''Debug helper function'''
     objectify.deannotate(el, cleanup_namespaces=True)
     pretty_xml = etree.tostring(el, encoding='unicode', pretty_print=True)
     return pretty_xml
+
 
 def write(conf):
     '''Writes the resulting conf file back to poca.xml'''
@@ -62,6 +64,7 @@ def write(conf):
         except BlockingIOError:
             return outcome.Outcome(False, 'Config file blocked')
 
+
 def delete(conf, args):
     '''Remove xml subscription and delete audio and log files'''
     results = search(conf.xml, args)
@@ -74,6 +77,7 @@ def delete(conf, args):
             conf.xml.subscriptions.remove(result)
             files.delete_sub(conf, result.title.text, reset=True)
     write(conf)
+
 
 def stats(conf, args):
     '''Remove xml subscription and delete audio and log files'''
@@ -88,6 +92,7 @@ def stats(conf, args):
             print()
             _ = input("Enter to continue ")
             print()
+
 
 def toggle(conf, args):
     '''Toggle subscription state between 'active' and 'inactive' '''
@@ -105,6 +110,7 @@ def toggle(conf, args):
         if state_input == 'i':
             files.delete_sub(conf, result.title.text)
         write(conf)
+
 
 def user_input_add_sub(url=None):
     '''Get user input for new subscription'''
@@ -135,11 +141,12 @@ def user_input_add_sub(url=None):
             break
     while sub_dic['from_the_top'] not in ['', 'yes', 'no']:
         sub_dic['from_the_top'] = input("Get earliest entries first? "
-                                         "(yes/no/Enter to skip) ")
+                                        "(yes/no/Enter to skip) ")
     sub_category = input("Category for subscription? ")
     print("To add metadata or filters settings, please edit poca.xml")
     sub_dic = {key: sub_dic[key] for key in sub_dic if sub_dic[key]}
     return (sub_dic, sub_category)
+
 
 def add_sub(conf, sub_category, sub_dic):
     '''A quick and dirty add-a-sub function'''
@@ -151,6 +158,7 @@ def add_sub(conf, sub_category, sub_dic):
     for key in sub_dic:
         setattr(new_sub, key, sub_dic[key])
     write(conf)
+
 
 def list_subs(conf):
     '''A simple columned output of subscriptions and their urls'''
@@ -183,12 +191,14 @@ def list_subs(conf):
             print(title, state, max_no, url)
         print()
 
+
 def list_id3_tags():
     '''list valid id3 tags to use in metadata overrides'''
     valid_tags = list(EasyID3.valid_keys.keys())
     valid_tags.sort()
     for tag in valid_tags:
         print(tag)
+
 
 def search_show(conf, args):
     '''Search for show title on audiosear.ch'''
@@ -200,8 +210,8 @@ def search_show(conf, args):
         output.subscribe_error(msg)
         return(None, None)
     if not oauth_id or not oauth_secret:
-        msg = ("Missing audiosear.ch key and/or secret."
-                " Please get yours at https://www.audiosear.ch/oauth/applications")
+        msg = ("Missing audiosear.ch key and/or secret. "
+               "Please get one at https://www.audiosear.ch/oauth/applications")
         output.subscribe_error(msg)
         return(None, None)
     try:
@@ -259,6 +269,7 @@ def search_show(conf, args):
         return (None, None)
     return user_input_add_sub(url=choice['rss_url'])
 
+
 def update_url(args, subdata):
     '''Used to implement 301 status code changes into conf'''
     pseudo_args = Namespace(title=subdata.sub.title, url=None)
@@ -267,6 +278,6 @@ def update_url(args, subdata):
     sub.url = subdata.new_url
     _outcome = write(conf)
     if _outcome.success is True:
-        _outcome = outcome.Outcome(True, 'Have updated feed url to %s' % \
+        _outcome = outcome.Outcome(True, 'Have updated feed url to %s' %
                                    subdata.new_url)
     return _outcome

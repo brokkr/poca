@@ -26,6 +26,7 @@ class SubUpgradeThread(Thread):
         sub_upgrade = self.target(self.subdata)
         self.queue.task_done()
 
+
 class SubUpgrade():
     '''Use the SubData packet to implement file operations'''
     def __init__(self, subdata):
@@ -64,8 +65,8 @@ class SubUpgrade():
         # download cover image
         if self.downed and subdata.wanted.feed_image:
             _outcome = files.download_img_file(subdata.wanted.feed_image,
-                                              subdata.sub_dir,
-                                              subdata.conf.xml.settings)
+                                               subdata.sub_dir,
+                                               subdata.conf.xml.settings)
             if _outcome.success is False:
                 output.fail_download(subdata.sub.title.text, _outcome)
 
@@ -95,7 +96,7 @@ class SubUpgrade():
             output.fail_database(_outcome)
         self.downed.append(entry)
         _outcome = tag.tag_audio_file(subdata.conf.xml.settings,
-                                        subdata.sub, subdata.jar, entry)
+                                      subdata.sub, subdata.jar, entry)
         if not _outcome.success:
             output.fail_tag(subdata.sub.title.text, _outcome)
 

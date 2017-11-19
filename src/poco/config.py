@@ -35,9 +35,10 @@ DEFAULT_XML = E.poca(
                                         E.password('')
                                        )
                                ),
-                      E.defaults(),
-                      E.subscriptions()
+                     E.defaults(),
+                     E.subscriptions()
                      )
+
 
 def merge(user_el, new_el, default_el, errors=[]):
     '''Updating one lxml objectify elements with another
@@ -51,7 +52,7 @@ def merge(user_el, new_el, default_el, errors=[]):
         if isinstance(child, objectify.ObjectifiedDataElement):
             right_type = type(child) == type(default_child)
             valid = child.text in default_child.attrib.values() \
-                    if default_child.attrib else True
+                if default_child.attrib else True
             if all((right_type, valid)):
                 new_el.replace(new_child, child)
             else:
@@ -60,6 +61,7 @@ def merge(user_el, new_el, default_el, errors=[]):
         elif isinstance(child, objectify.ObjectifiedElement):
             merge(child, new_child, default_child, errors=errors)
     return errors
+
 
 class Config:
     '''Collection of all configuration options'''
@@ -89,6 +91,7 @@ class Config:
         except PermissionError:
             msg = 'Could not read %s' % self.paths.config_file
             output.config_fatal(msg)
+
 
 class Paths:
     '''A data-holder object for all program paths'''
@@ -127,13 +130,14 @@ def subs(conf):
     dupes = set([x for x in sub_names if sub_names.count(x) > 1])
     if len(dupes) > 0:
         msg = "Found the following duplicate titles: %s" % ', '.join(dupes)
-        poco.output.config_fatal(msg)
+        output.config_fatal(msg)
     return valid_subs
 
 
 class Sub:
     '''Legacy class to avoid breakage with old saved subs'''
     pass
+
 
 class Prefs:
     '''Legacy class to avoid breakage with old saved subs'''

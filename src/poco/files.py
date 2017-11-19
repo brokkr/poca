@@ -18,7 +18,7 @@ from threading import current_thread
 
 from poco.outcome import Outcome
 
-# download functions
+
 def download_file(url, file_path, settings):
     '''Download function with block time outs'''
     my_thread = current_thread()
@@ -43,20 +43,21 @@ def download_file(url, file_path, settings):
             for chunk in r.iter_content(chunk_size=1024):
                 if getattr(my_thread, "kill", False):
                     r.close()
-                    outcome = delete_file(f.name)
+                    _outcome = delete_file(f.name)
                     return Outcome(None, 'Download cancelled by user')
                 if chunk:
                     f.write(chunk)
         except requests.exceptions.ConnectionError as e:
             r.close()
-            outcome = delete_file(f.name)
+            _outcome = delete_file(f.name)
             return Outcome(False, 'Download of %s broke off' % url)
         except requests.exceptions.Timeout:
             r.close()
-            outcome = delete_file(f.name)
+            _outcome = delete_file(f.name)
             return Outcome(False, 'Download of %s timed out' % url)
     r.close()
     return Outcome(True, '')
+
 
 def download_img_file(url, sub_dir, settings):
     '''Download an image file'''
@@ -81,7 +82,7 @@ def download_img_file(url, sub_dir, settings):
             f.write(r.content)
     return Outcome(True, '')
 
-# single file functions
+
 def delete_file(file_path):
     '''Deletes a file'''
     try:
@@ -90,12 +91,13 @@ def delete_file(file_path):
     except OSError as e:
         return Outcome(False, 'Could not delete %s' % file_path)
 
+
 def verify_file(entry):
     '''Check to see if recorded file exists or has been removed'''
     isfile = os.path.isfile(entry['poca_abspath'])
     return Outcome(isfile, entry['poca_abspath'] + ' exists: ' + str(isfile))
 
-# directory functions
+
 def check_path(check_dir):
     '''Create a directory'''
     if os.path.isdir(check_dir):
@@ -110,7 +112,6 @@ def check_path(check_dir):
         return Outcome(False, 'Could not create %s' % check_dir)
 
 
-# subscription reset
 def delete_sub(conf, title, reset=False):
     '''Delete subscription files (optionally including history)'''
     sub_dir = os.path.join(conf.xml.settings.base_dir.text, title)

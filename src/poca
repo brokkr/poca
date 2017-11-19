@@ -29,7 +29,7 @@ def main():
         conf = poco.config.Config(args, merge_default=True)
         valid_subs = poco.config.subs(conf)
         summary_logger = poco.loggers.start_summary_logger(args, conf.paths,
-                                                          conf.xml.settings)
+                                                           conf.xml.settings)
         update_threads = []
         update_q = Queue()
         upgrade_threads = []
@@ -41,15 +41,12 @@ def main():
                 update_q, poco.subupdate.SubUpdate, conf, sub)
             update_threads.append(update_thread)
             update_thread.start()
-        #for update_thread in update_threads:
-        #    update_thread.join()
 
         # upgrade loop
         while len(upgrade_threads) + len(skip_subs) < len(valid_subs):
             while (len([t for t in upgrade_threads if t.is_alive()])
                    < args.threads and not update_q.empty()):
                 subdata = update_q.get()
-                #print(subdata.sub.title.text, subdata.status)
                 if subdata.outcome.success is False:
                     poco.output.plans_error(subdata)
                     skip_subs.append(subdata)
@@ -81,6 +78,7 @@ def main():
         for thread in upgrade_threads:
             setattr(thread, "kill", True)
         sys.exit()
+
 
 if __name__ == '__main__':
     main()

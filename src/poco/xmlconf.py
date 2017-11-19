@@ -70,6 +70,7 @@ TEMPLATE = """<poca version="1.0">
 </poca>
 """
 
+
 def write_config_file(config_file_path):
     '''Writes default config xml to config file'''
     print('No config file found. Making one at %s.' % config_file_path)

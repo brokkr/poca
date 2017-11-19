@@ -35,6 +35,7 @@ def subscribe_info(msg):
     '''Generic info'''
     STREAM.info(msg)
 
+
 def subscribe_error(msg):
     '''Generic error'''
     err = ' %s ' % WARNING_SIGN
@@ -58,12 +59,14 @@ def config_fatal(msg):
 
 def plans_error(subdata):
     '''sub-fatal errors encountered processing a specific subscription'''
-    stream_msg = '%s. %s' % (subdata.sub.title.text.upper(), subdata.outcome.msg)
+    stream_msg = '%s. %s' % (subdata.sub.title.text.upper(),
+                             subdata.outcome.msg)
     after_stream_msg = 'SUB ERROR (%s): %s' % (subdata.sub.title.text,
                                                subdata.outcome.msg)
     STREAM.debug(stream_msg)
     AFTER_STREAM.info(after_stream_msg)
     SUMMARY.error(stream_msg)
+
 
 def plans_moved(subdata, _outcome):
     '''Sub has moved (http status 301)'''
@@ -74,10 +77,12 @@ def plans_moved(subdata, _outcome):
     AFTER_STREAM.info(after_stream_msg)
     SUMMARY.error(stream_msg)
 
+
 def plans_nochanges(subdata):
     '''No changes made, just output title'''
     msg = subdata.sub.title.text.upper()
     STREAM.info(msg)
+
 
 def plans_upgrade(subdata):
     '''Summary of files to be downloaded and deleted'''
@@ -109,12 +114,14 @@ def processing_user_deleted(entry):
     msg = ' %s %s deleted by user' % (CIRCLE_X, entry['poca_filename'])
     STREAM.debug(msg)
 
+
 def processing_removal(entry):
     '''One line per entry telling user of episodes being deleted by poca'''
     size = entry['poca_mb']
     size_str = ' [%s Mb]' % str(round(size)) if size else ' [Unknown]'
     msg = ' %s %s %s' % (CROSS_MARK, entry['poca_filename'], size_str)
     STREAM.debug(msg)
+
 
 def processing_download(entry):
     '''One line per entry telling user of episodes being downloaded by poca'''
@@ -133,25 +140,30 @@ def fail_common(msg, after_stream_msg):
     STREAM.debug(stream_msg)
     AFTER_STREAM.info(after_stream_msg)
 
+
 def fail_download(title, outcome):
     '''Subline telling user of single entry download failure'''
     after_stream_msg = 'DOWNLOAD ERROR (%s): %s' % (title, outcome.msg)
     fail_common(outcome.msg, after_stream_msg)
+
 
 def fail_tag(title, outcome):
     '''Subline telling user of single entry tagging failure'''
     after_stream_msg = 'TAGGING ERROR (%s): %s' % (title, outcome.msg)
     fail_common(outcome.msg, after_stream_msg)
 
+
 def fail_delete(title, outcome):
     '''Subline telling user of single entry deletion failure'''
     after_stream_msg = 'DELETE ERROR (%s): %s' % (title, outcome.msg)
     fail_common(outcome.msg, after_stream_msg)
 
+
 def fail_database(outcome):
     '''Subline telling user of failure to save jar'''
     after_stream_msg = 'DATABASE ERROR: %s' % (outcome.msg)
     fail_common(outcome.msg, after_stream_msg)
+
 
 def after_stream_flush():
     '''Outputs all buffered failures in one go. In verbose mode after_stream
@@ -183,6 +195,7 @@ def file_summary(subdata, removed, downed, failed):
     if failed:
         failed_files = [x['poca_filename'] for x in failed]
         SUMMARY.error(title + '. Failed: ' + ', '.join(failed_files))
+
 
 def email_summary():
     '''Empty out buffered email logs (if needed)'''
