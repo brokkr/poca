@@ -190,5 +190,4 @@ def email_summary():
         SUMMARY.poca_email_handler.close()
         outcome = SUMMARY.poca_email_handler.outcome
         if outcome.success is False:
-            config_fatal('Email log failed with: ')
-            config_fatal('  ' + outcome.msg)
+            config_fatal('Email log failed with: %s' % outcome.msg)
