@@ -7,7 +7,7 @@
 # the Free Software Foundation, either version 3 of the License,
 # or (at your option) any later version.
 
-"""Poco is the main library of Poca, a command line podcast client"""
+"""poca is the main library of Poca, a command line podcast client"""
 
 from . import about
 from . import args

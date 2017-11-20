@@ -15,7 +15,7 @@ import sys
 from queue import Queue
 from time import sleep
 
-import poco
+import poca
 
 
 def main():
@@ -23,12 +23,12 @@ def main():
     try:
 
         # setup
-        args = poco.args.get_poca_args()
-        stream_logger = poco.loggers.start_stream_logger(args)
-        streamfail_logger = poco.loggers.start_after_stream_logger(args)
-        conf = poco.config.Config(args, merge_default=True)
-        valid_subs = poco.config.subs(conf)
-        summary_logger = poco.loggers.start_summary_logger(args, conf.paths,
+        args = poca.args.get_poca_args()
+        stream_logger = poca.loggers.start_stream_logger(args)
+        streamfail_logger = poca.loggers.start_after_stream_logger(args)
+        conf = poca.config.Config(args, merge_default=True)
+        valid_subs = poca.config.subs(conf)
+        summary_logger = poca.loggers.start_summary_logger(args, conf.paths,
                                                            conf.xml.settings)
         update_threads = []
         update_q = Queue()
@@ -37,8 +37,8 @@ def main():
 
         # update loop
         for sub in valid_subs:
-            update_thread = poco.subupdate.SubUpdateThread(
-                update_q, poco.subupdate.SubUpdate, conf, sub)
+            update_thread = poca.subupdate.SubUpdateThread(
+                update_q, poca.subupdate.SubUpdate, conf, sub)
             update_threads.append(update_thread)
             update_thread.start()
 
@@ -48,22 +48,22 @@ def main():
                    < args.threads and not update_q.empty()):
                 subdata = update_q.get()
                 if subdata.outcome.success is False:
-                    poco.output.plans_error(subdata)
+                    poca.output.plans_error(subdata)
                     skip_subs.append(subdata)
                     update_q.task_done()
                     continue
                 if subdata.status == 301:
-                    _outcome = poco.subscribe.update_url(args, subdata)
+                    _outcome = poca.subscribe.update_url(args, subdata)
                     if _outcome.success is True:
-                        poco.output.plans_moved(subdata, _outcome)
+                        poca.output.plans_moved(subdata, _outcome)
                 if subdata.status == 304:
                     skip_subs.append(subdata)
                     update_q.task_done()
-                    poco.output.plans_nochanges(subdata)
+                    poca.output.plans_nochanges(subdata)
                     continue
-                poco.output.plans_upgrade(subdata)
-                upgrade_thread = poco.subupgrade.SubUpgradeThread(
-                    subdata, update_q, poco.subupgrade.SubUpgrade)
+                poca.output.plans_upgrade(subdata)
+                upgrade_thread = poca.subupgrade.SubUpgradeThread(
+                    subdata, update_q, poca.subupgrade.SubUpgrade)
                 upgrade_threads.append(upgrade_thread)
                 upgrade_thread.start()
             sleep(0.5)
@@ -71,8 +71,8 @@ def main():
             upgrade_thread.join()
 
         # wrap up
-        poco.output.after_stream_flush()
-        poco.output.email_summary()
+        poca.output.after_stream_flush()
+        poca.output.email_summary()
 
     except KeyboardInterrupt:
         for thread in upgrade_threads:

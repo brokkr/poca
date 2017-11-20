@@ -15,7 +15,7 @@ from distutils.core import setup
 
 setup(
     name='poca',
-    version='1.0beta2',
+    version='1.0beta3a',
     license='GPL3',
     description='A command line podcast client',
     long_description='A fast, multithreaded and highly customizable command '
@@ -24,13 +24,13 @@ setup(
     author_email='mail@brokkr.net',
     url='https://github.com/brokkr/poca',
     download_url='https://github.com/brokkr/poca/archive/v1.0beta2.tar.gz',
-    scripts=['src/poca', 'src/poca-subscribe'],
-    packages=['poco'],
-    package_dir={'poco': 'src/poco'},
+    scripts=['src/scripts/poca', 'src/scripts/poca-subscribe'],
+    packages=['poca'],
+    package_dir={'poca': 'src/poca'},
     data_files=[('share/man/man1', ["man/poca.1"]),
                 ('share/man/man1', ["man/poca-subscribe.1"])],
     requires=['feedparser', 'lxml', 'mutagen', 'requests'],
-    provides=['poco'],
+    provides=['poca'],
     platforms=['POSIX'],
     keywords=['podcast', 'client', 'aggregator', 'cli'],
     classifiers=['Development Status :: 4 - Beta',

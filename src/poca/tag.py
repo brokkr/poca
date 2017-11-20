@@ -11,7 +11,7 @@
 
 import mutagen
 
-from poco.outcome import Outcome
+from poca.outcome import Outcome
 
 
 def tag_audio_file(settings, sub, jar, entry):

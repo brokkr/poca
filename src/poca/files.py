@@ -16,7 +16,7 @@ import requests
 
 from threading import current_thread
 
-from poco.outcome import Outcome
+from poca.outcome import Outcome
 
 
 def download_file(url, file_path, settings):

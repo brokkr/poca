@@ -16,8 +16,8 @@ import socket
 from email.mime.text import MIMEText
 from email.header import Header
 
-from poco import history
-from poco.outcome import Outcome
+from poca import history
+from poca.outcome import Outcome
 
 
 def get_logger(logger_name):

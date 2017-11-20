@@ -10,7 +10,7 @@
 """Submodule for parsing and storing cli arguments"""
 
 import argparse
-from poco import about
+from poca import about
 
 
 def get_poca_args():

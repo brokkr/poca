@@ -23,8 +23,8 @@ try:
 except ImportError:
     audiosearch = None
 
-from poco import files, output, config, outcome
-from poco.feedstats import Feedstats
+from poca import files, output, config, outcome
+from poca.feedstats import Feedstats
 
 
 def search(xml, args):

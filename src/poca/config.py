@@ -13,8 +13,8 @@ from os import path
 from lxml import etree, objectify
 from copy import deepcopy
 
-from poco import files, output, xmlconf
-from poco.outcome import Outcome
+from poca import files, output, xmlconf
+from poca.outcome import Outcome
 
 
 E = objectify.ElementMaker(annotate=False)

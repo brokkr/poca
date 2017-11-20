@@ -11,7 +11,7 @@
 
 
 from threading import Thread, current_thread
-from poco import files, output, tag
+from poca import files, output, tag
 
 
 class SubUpgradeThread(Thread):

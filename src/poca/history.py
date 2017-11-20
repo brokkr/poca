@@ -12,8 +12,8 @@
 import os
 import pickle
 
-from poco import files
-from poco.outcome import Outcome
+from poca import files
+from poca.outcome import Outcome
 
 
 def open_jar(db_filename):

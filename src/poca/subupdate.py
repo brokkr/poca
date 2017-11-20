@@ -17,9 +17,9 @@ from threading import Thread
 
 import feedparser
 from lxml import etree
-from poco import files, history, entryinfo
-from poco.config import merge
-from poco.outcome import Outcome
+from poca import files, history, entryinfo
+from poca.config import merge
+from poca.outcome import Outcome
 
 
 class SubUpdateThread(Thread):
