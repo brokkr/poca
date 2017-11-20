@@ -5,13 +5,15 @@ implemented.
 
 ## Upgrade to 1.0 note
 The 1.0 database is NOT backwards compatible. If you're upgrading to 1.0 
-from an 0.x release you will need to delete your media files and db folder. 
-The `db` folder can be found in the config directory (`~/.poca` by default). 
-The media files are in the folder designated by the `base_dir` setting in 
-poca.xml. Older versions of `poca.xml` will work with 1.0 but be aware that
-new options have been added and others deprecated. See 
-[Configuration](https://github.com/brokkr/poca/wiki/Configuration) 
-for details.
+from any release prior to `1.0beta4` you will need to delete your media files 
+and db folder. The `db` folder can be found in the config directory 
+(`~/.poca/db` by default). The media files are in the folder designated by 
+the `base_dir` setting in poca.xml. 
+
+Older versions of `poca.xml` will work with 1.0 but be aware that new options
+have been added and others deprecated. See 
+[Settings](https://github.com/brokkr/poca/wiki/Settings) for 
+details.
 
 ### Features
 Poca allows both for options for each individual subscription and
@@ -50,34 +52,23 @@ See the [Configuration](https://github.com/brokkr/poca/wiki/Configuration)
 section of the wiki for more details on features.
 
 ### Interface
-[![asciicast](https://asciinema.org/a/pONMnNfk3TcqYolnz0y1kC3jG.png)](https://asciinema.org/a/pONMnNfk3TcqYolnz0y1kC3jG)
+[![asciicast](https://asciinema.org/a/OScSRCdsKGZLntYJ9K6LYSNMT.png)](https://asciinema.org/a/OScSRCdsKGZLntYJ9K6LYSNMT)
 
 All configuration is done in a single XML-format file. For cron job 
 compatibility, Poca has a quiet mode in addition to normal and verbose.
 
 ### Installing
-You can install poca using only setuptools but `pip` is recommended. Find pip 
-for your distro in your repositories (for debian/ubuntu its "python3-pip")
+You can install poca from [pypi](https://pypi.python.org/pypi/poca) using
+pip. Be mindful that poca is python 3 so use `pip3`:
 
-To generate a package installable by pip, in the source root directory (the 
-one with setup.py) do:
-
-    python3 ./setup.py sdist
-
-And then install the generated package (using root privileges)
-
-    pip3 install ./dist/poca-[VERSION].tar.gz
-
-Running `poca` on a fresh install (no configuration) will place a copy of the 
-example configuration in ~/.poca. The included feeds are there for illustrative
-purposes. Edit the configuration file, try them out or use `poca-subscribe
-delete` to clear it out and start afresh.
+    pip3 install poca
 
 To remove Poca - having installed it using pip - simply do:
 
     pip3 uninstall poca
 
+
 ### Dependencies
  * You will need Python 3 for setup and running the program
- * The following third-party modules are required: `feedparser`, `lxml`, `mutagen`, `requests`
- * Pip can install all of these using 'pip3 install [name of module]'
+ * The following third-party modules are required: `feedparser` `lxml` `mutagen` `requests`
+ * Pip will automatically install any one of these found missing
