@@ -9,7 +9,7 @@
 
 """Basic info"""
 
-__version__ = '1.0beta'
+__version__ = '1.0beta2'
 VERSION = __version__
 MAINTAINER = "Mads Michelsen <mail@brokkr.net>"
 DESCRIPTION = ("A fast, multithreaded and highly customizable command line "
