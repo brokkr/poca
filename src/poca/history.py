@@ -26,6 +26,11 @@ def open_jar(db_filename):
         outcome = Outcome(False, 'Could not read history from %s'
                           % db_filename)
         jar = None
+    except ImportError:
+        outcome = Outcome(False, 'Issue with db encountered. If you have '
+                          'upgraded from pre-1.0 release,\nplease delete '
+                          'your old database (%s)' % db_filename)
+        jar = None
     return jar, outcome
 
 
