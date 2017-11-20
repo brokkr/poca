@@ -25,7 +25,7 @@ setup(
     url='https://github.com/brokkr/poca',
     download_url='https://github.com/brokkr/poca/archive/v1.0beta2.tar.gz',
     scripts=['src/poca', 'src/poca-subscribe'],
-    packages=['poca', 'poco'],
+    packages=['poco'],
     package_dir={'poco': 'src/poco'},
     data_files=[('share/man/man1', ["man/poca.1"]),
                 ('share/man/man1', ["man/poca-subscribe.1"])],
