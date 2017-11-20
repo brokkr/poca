@@ -3,7 +3,7 @@ Poca is a fast, multithreaded and highly customizable command line podcast
 client, written in Python 3. As of 1.0 all planned features have been 
 implemented.
 
-## Upgrade to 1.0 note
+### Upgrade to 1.0 note
 The 1.0 database is NOT backwards compatible. If you're upgrading to 1.0 
 from any release prior to `1.0beta4` you will need to delete your media files 
 and db folder. The `db` folder can be found in the config directory 
