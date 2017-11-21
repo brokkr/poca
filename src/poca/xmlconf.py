@@ -14,7 +14,7 @@ from io import StringIO
 from os import path
 
 from poca.outcome import Outcome
-from poca.subscribe import pretty_print
+from poca.lxmlfuncs import pretty_print
 
 
 TEMPLATE = """<poca version="1.0">

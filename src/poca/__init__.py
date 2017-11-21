@@ -22,4 +22,5 @@ from . import history
 from . import loggers
 from . import subscribe
 from . import xmlconf
+from . import lxmlfuncs
 from . import tag

@@ -24,6 +24,7 @@ except ImportError:
     audiosearch = None
 
 from poca import files, output, config, outcome
+from poca.lxmlfuncs import pretty_print
 from poca.feedstats import Feedstats
 
 
@@ -41,13 +42,6 @@ def search(xml, args):
     if not results:
         print("No titles match your query.")
     return results
-
-
-def pretty_print(el):
-    '''Debug helper function'''
-    objectify.deannotate(el, cleanup_namespaces=True)
-    pretty_xml = etree.tostring(el, encoding='unicode', pretty_print=True)
-    return pretty_xml
 
 
 def write(conf):

@@ -18,7 +18,7 @@ from threading import Thread
 import feedparser
 from lxml import etree
 from poca import files, history, entryinfo
-from poca.config import merge
+from poca.lxmlfuncs import merge
 from poca.outcome import Outcome
 
 

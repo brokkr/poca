@@ -14,6 +14,7 @@ from lxml import etree, objectify
 from copy import deepcopy
 
 from poca import files, output, xmlconf
+from poca.lxmlfuncs import merge
 from poca.outcome import Outcome
 
 
@@ -38,29 +39,6 @@ DEFAULT_XML = E.poca(
                      E.defaults(),
                      E.subscriptions()
                      )
-
-
-def merge(user_el, new_el, default_el, errors=[]):
-    '''Updating one lxml objectify elements with another
-       (with primitive validation)'''
-    for child in user_el.iterchildren():
-        new_child = new_el.find(child.tag)
-        default_child = default_el.find(child.tag)
-        if default_child is None:
-            new_el.append(child)
-            continue
-        if isinstance(child, objectify.ObjectifiedDataElement):
-            right_type = type(child) == type(default_child)
-            valid = child.text in default_child.attrib.values() \
-                if default_child.attrib else True
-            if all((right_type, valid)):
-                new_el.replace(new_child, child)
-            else:
-                errors.append(Outcome(False, '%s: %s. Value not valid'
-                                      % (child.tag, child.text)))
-        elif isinstance(child, objectify.ObjectifiedElement):
-            merge(child, new_child, default_child, errors=errors)
-    return errors
 
 
 class Config:
