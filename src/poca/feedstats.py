@@ -104,8 +104,11 @@ class Feedstats():
         itunes_hms = entry['itunes_duration'].split(':')
         itunes_hms.reverse()
         seconds = 0
-        for index, entry in enumerate(itunes_hms):
-            seconds += pow(60, index) * int(entry)
+        for index, number in enumerate(itunes_hms):
+            try:
+                seconds += pow(60, index) * int(number)
+            except ValueError:
+                pass
         return int(seconds)
 
     def set_rhs(self):
