@@ -24,6 +24,7 @@ def main():
 
         # setup
         args = poca.args.get_poca_args()
+        max_threads = args.threads if not args.verbose else 1
         stream_logger = poca.loggers.start_stream_logger(args)
         streamfail_logger = poca.loggers.start_after_stream_logger(args)
         conf = poca.config.Config(args, merge_default=True)
@@ -45,7 +46,7 @@ def main():
         # upgrade loop
         while len(upgrade_threads) + len(skip_subs) < len(valid_subs):
             while (len([t for t in upgrade_threads if t.is_alive()])
-                   < args.threads and not update_q.empty()):
+                   < max_threads and not update_q.empty()):
                 subdata = update_q.get()
                 if subdata.outcome.success is False:
                     poca.output.plans_error(subdata)
