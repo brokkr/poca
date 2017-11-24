@@ -53,7 +53,7 @@ Poca allows for modifying the metadata of the downloaded files by setting `overr
 id3v2version
 ^^^^^^^^^^^^
 
-``id3v2version`` accepts ``3`` or ``4`` as settings, representing id3v2.3 and id3v2.4 respectively.Historically, Windows and some hardware players have preferred v2.3 as they cannot read the UTF-8 characters used in v2.4. Default is ``4``.
+``id3v2version`` accepts ``3`` or ``4`` as settings, representing id3v2.3 and id3v2.4 respectively. Historically, Windows and some hardware players have preferred v2.3 as they cannot read the UTF-8 characters used in v2.4. Default is ``4``.
 
 id3removev1
 ^^^^^^^^^^^

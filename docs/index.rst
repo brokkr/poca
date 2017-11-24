@@ -6,6 +6,9 @@
 Poca
 ====
 
+`Poca <https://projects.brokkr.net/projects/poca>`_ is a fast, multithreaded and highly customizable command line podcast 
+client, written in Python 3. As of 1.0 all planned features have been implemented. 
+
 Installation
 ------------
 
