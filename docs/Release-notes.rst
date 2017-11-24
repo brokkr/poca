@@ -1,5 +1,5 @@
 Releases
---------
+========
 
 
 Version `1.0 <https://github.com/brokkr/poca/issues?q=is%3Aopen+is%3Aissue+milestone%3A1.0>`_
@@ -12,7 +12,7 @@ Version `1.0 <https://github.com/brokkr/poca/issues?q=is%3Aopen+is%3Aissue+miles
 * Bugfixes, quibbles and niggles aplenty
 
 Version `0.9 <https://github.com/brokkr/poca/issues?q=is%3Aclosed+is%3Aissue+milestone%3A0.9>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------------------------------------------------------------------------------------------
 
 
 * 'Artificial' track numbers (\ `issue #43 <https://github.com/brokkr/poca/issues/43>`_\ )
@@ -25,7 +25,7 @@ Version `0.9 <https://github.com/brokkr/poca/issues?q=is%3Aclosed+is%3Aissue+mil
 * New dependency: Using ``requests`` library for download due to downloading in threads (urllib says no)
 
 Version `0.8 <https://github.com/brokkr/poca/issues?q=is%3Aclosed+is%3Aissue+milestone%3A0.8>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------------------------------------------------------------------------------------------
 
 
 * Greatly simplified configuration parsing with lxml (new dependency)
@@ -33,7 +33,7 @@ Version `0.8 <https://github.com/brokkr/poca/issues?q=is%3Aclosed+is%3Aissue+mil
 * poca-subscribe is a new cli tool to manage subscriptions
 
 Version `0.7 <https://github.com/brokkr/poca/issues?q=is%3Aclosed+is%3Aissue+milestone%3A0.7>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------------------------------------------------------------------------------------------
 
 
 * Log: Terse logging (skip writing about subscription if nothing has changed) (\ `issue #32 <https://github.com/brokkr/poca/issues/32>`_\ )
@@ -44,7 +44,7 @@ Version `0.7 <https://github.com/brokkr/poca/issues?q=is%3Aclosed+is%3Aissue+mil
 * Style: Using named tuples for Outcome (https://pythontips.com/2015/06/06/why-should-you-use-namedtuple-instead-of-a-tuple/)
 
 Version `0.6 <https://github.com/brokkr/poca/issues?q=is%3Aclosed+is%3Aissue+milestone%3A0.6>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------------------------------------------------------------------------------------------
 
 
 * Limit by number of files (\ `issue #14 </brokkr/poca/issues/14>`_\ )
@@ -56,7 +56,7 @@ Version `0.6 <https://github.com/brokkr/poca/issues?q=is%3Aclosed+is%3Aissue+mil
 * Spoofed ``useragent`` introduced as fallback if urllib is denied
 
 Version 0.5
-^^^^^^^^^^^
+-----------------------------------------------------------------------------------------------------------
 
 
 * Completed port to Python 3
@@ -65,7 +65,7 @@ Version 0.5
 * New download function with proper timeouts
 
 Release 0.4
-^^^^^^^^^^^
+-----------------------------------------------------------------------------------------------------------
 
 
 * Reduced functionality port to Python3

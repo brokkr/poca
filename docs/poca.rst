@@ -1,3 +1,5 @@
+poca
+====
 
 Help
 ----
@@ -20,8 +22,3 @@ Help
                            Use alternate config directory
      -t THREADS, --threads THREADS
                            Number of concurrent downloads to allow
-
-Configuration
--------------
-
-Please see `Configuration <https://github.com/brokkr/poca/wiki/Configuration>`_ for details.

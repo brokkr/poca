@@ -1,3 +1,9 @@
+Subscriptions
+=============
+
+Subscriptions are podcast feeds you want poca to follow and (usually) download any new entries from. You create a subscription in poca by adding an xml ``subscription`` element with all the relevant settings to your ``poca.xml`` configuration file.
+
+.. contents::
 
 Structure
 ---------
@@ -196,4 +202,8 @@ Here is an example of a subscription to a news in French podcast:
            <album>Journal en français facile</album>
            <genre>podcast</genre>
        </metadata>
+       <rename>
+           <title/>
+           <date/>
+       </rename>
    </subscription>

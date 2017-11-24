@@ -5,9 +5,8 @@ The configuration file *must validate as correct XML*. If you get errors related
 
 The configuration file is created to be as self-explanatory as possible. It is divided into three main parts:
 
+* **Settings**: Contains general settings
+* **Subscriptions**: Contains a list of all the podcasts you want to subscribe to
+* **Defaults**: Options in Defaults are similar to those in Subscriptions, only they apply globally, to all subscriptions (unless overridden).
 
-* `Settings <https://github.com/brokkr/poca/wiki/Settings>`_
-* Defaults
-* `Subscriptions <https://github.com/brokkr/poca/wiki/Subscriptions>`_
-
-Settings contains general settings, while subscriptions contains a list of all the podcasts you want to subscribe to. Options in Defaults are similar to those in Subscriptions, only they apply globally, to all subscriptions (unless overridden). Please see the linked pages for more information.
+Settings contains general settings, while subscriptions contains . 

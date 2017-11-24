@@ -1,6 +1,12 @@
-.. role:: raw-html-m2r(raw)
-   :format: html
+.. role:: strike
+    :class: strike
 
+Settings
+========
+
+In poca settings are general, non-podcast specific options. For all podcast specific options, see Subscriptions.
+
+.. contents::
 
 Structure
 ---------
@@ -15,9 +21,9 @@ and the following optional settings:
 
 * ``id3v2version``
 * ``id3removev1``
-* :raw-html-m2r:`<del>\ ``id3encoding``\ </del>` (deprecated in 0.9)
+* ``id3encoding`` (deprecated in 0.9)
 * ``useragent``
-* :raw-html-m2r:`<del>\ ``audiosearch``\ </del>` (deprecated in 1.0)
+* ``audiosearch`` (deprecated in 1.0)
 * ``email``
 
 Required settings
@@ -54,8 +60,8 @@ id3removev1
 
 This allows you to remove id3v1 headers (if any exist) from the files. It has the valid values **yes** and **no**. It will only be applied in any given subscription if the subscription settings (or defaults) include id3 overrides.
 
-:raw-html-m2r:`<del>id3encoding</del>` (deprecated in 0.9)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+id3encoding (deprecated in 0.9)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 id3encoding didn't really do what it said on the tin because each frame (artist, album, title, etc.) in an id3 header is separately encoded and the encoding would only apply to new or overwritten frames. As the real distinction is between players that prefer v2.3 (using a mixture of latin1 and utf16 frames) and v2.4 (using a mixture of latin1 and utf8 frames), the setting has been depecated since 0.9
 
@@ -67,8 +73,8 @@ useragent
 
 This is a fallback option. Poca will always first attempt download with the 'honest' user agent declaration (Python's *request* library). Setting ``useragent`` allows poca to make a second attempt in case of failure due to blocking, only this time with a spoofed user agent. Enter any user agent string you want - you can find some useful ones in `this big list <https://techblog.willshouse.com/2012/01/03/most-common-user-agents/>`_ - or leave it empty/remove it if you don't want poca to use spoofing. We suggest you leave as it is and only return to it if you see lots of messages like this when you run poca: "Download failed. HTTP Error 403: Forbidden".
 
-:raw-html-m2r:`<del>audiosearch</del>` (deprecated in 1.0)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+audiosearch (deprecated in 1.0)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 As of November 28 2017 audiosear.ch will cease operations. Therefore the ``poca-subscribe search`` functionality has been removed from the 1.0 release.
 
