@@ -23,9 +23,7 @@ def get_poca_args():
                              help='No output to stdout (useful for cron jobs)')
     noise_level.add_argument('-v', '--verbose', action='store_true',
                              default=False, help='Output details on files '
-                             'being added and removed. Do not use with '
-                             'multiple concurrent downloads '
-                             '(\'-t [threads]\')')
+                             'being added and removed.')
     parser.add_argument('-l', '--logfile', action='store_true', default=False,
                         help='Output to file in poca config directory')
     parser.add_argument('-e', '--email', action='store_true', default=False,
@@ -33,7 +31,8 @@ def get_poca_args():
     parser.add_argument('-c', '--config',
                         help='Use alternate config directory')
     parser.add_argument('-t', '--threads', default=1, type=int,
-                        help='Number of concurrent downloads to allow')
+                        help='Number of concurrent downloads to allow. '
+                        '\'--verbose\' forces single thread.')
     return parser.parse_args()
 
 
