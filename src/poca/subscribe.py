@@ -111,19 +111,18 @@ def user_input_add_sub(url=None):
     sub_lst = ['title', 'url', 'max_number', 'from_the_top']
     sub_dic = dict.fromkeys(sub_lst)
     if url is None:
-        print("Press enter to skip setting (except * mandatory)")
         while not sub_dic['url']:
-            sub_dic['url'] = input("* Url of subscription? ")
+            sub_dic['url'] = input("Url of subscription: ")
     else:
         sub_dic['url'] = url
     print()
     url_stats = Feedstats(sub_dic['url'])
     url_stats.print_stats()
     print()
-    title = input("Title of subscription? (Enter to use feed title) ")
+    title = input("Title of subscription: (Enter to use feed title) ")
     sub_dic['title'] = title if title else url_stats.title
     while True:
-        max_number = input("Maximum number of files in subscription? "
+        max_number = input("Maximum number of files in subscription: "
                            "(integer/Enter to skip) ")
         if max_number:
             try:
@@ -134,10 +133,10 @@ def user_input_add_sub(url=None):
         else:
             break
     while sub_dic['from_the_top'] not in ['', 'yes', 'no']:
-        sub_dic['from_the_top'] = input("Get earliest entries first? "
+        sub_dic['from_the_top'] = input("Get earliest entries first: "
                                         "(yes/no/Enter to skip) ")
-    sub_category = input("Category for subscription? ")
-    print("To add metadata or filters settings, please edit poca.xml")
+        sub_category = input("Category for subscription: ")
+    print("To add metadata, rename or filters settings, please edit poca.xml")
     sub_dic = {key: sub_dic[key] for key in sub_dic if sub_dic[key]}
     return (sub_dic, sub_category)
 

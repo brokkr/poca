@@ -56,7 +56,8 @@ TEMPLATE = """<poca version="1.0">
     * filters: Contains one or more filters (all optional)
     * rename: Contains template for renaming audio files (optional) -->
 
-    <subscription comment="This is an example for illustration purposes">
+    <!-- This is an example for illustration purposes. Feel free to delete.
+    <subscription>
       <title>Serial</title>
       <url>http://feeds.serialpodcast.org/serialpodcast?format=xml</url>
       <max_number>3</max_number>
@@ -64,6 +65,7 @@ TEMPLATE = """<poca version="1.0">
         <genre>Podcast</genre>
       </metadata>
     </subscription>
+    -->
 
   </subscriptions>
 
@@ -73,7 +75,7 @@ TEMPLATE = """<poca version="1.0">
 
 def write_config_file(config_file_path):
     '''Writes default config xml to config file'''
-    print('No config file found. Making one at %s.' % config_file_path)
+    print("No config file found. Making one at %s." % config_file_path)
     default_base_dir = path.expanduser(path.join('~', 'poca'))
     query = input("Please enter the full path for placing media files.\n"
                   "Press Enter to use default (%s): " % default_base_dir)
@@ -86,11 +88,11 @@ def write_config_file(config_file_path):
         config_file = open(config_file_path, mode='wt', encoding='utf-8')
         config_file.write(config_xml_str)
         config_file.close()
-        msg = ('Default config succesfully written to %s.\n'
-               'Please edit for further customization or run '
-               '\'poca-subscribe\' to add subscriptions.' % config_file_path)
+        msg = ("Default config succesfully written to %s.\n"
+               "Please edit or run 'poca-subscribe' to add subscriptions."
+               % config_file_path)
         return Outcome(True, msg)
     except IOError as e:
-        msg = 'Failed writing config to %s.\nError: %s' % (config_file_path,
+        msg = "Failed writing config to %s.\nError: %s" % (config_file_path,
                                                            str(e))
         return Outcome(False, msg)
