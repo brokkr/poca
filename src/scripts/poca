@@ -23,6 +23,10 @@ def main():
     try:
 
         # setup
+        update_threads = []
+        update_q = Queue()
+        upgrade_threads = []
+        skip_subs = []
         args = poca.args.get_poca_args()
         max_threads = args.threads if not args.verbose else 1
         stream_logger = poca.loggers.start_stream_logger(args)
@@ -31,10 +35,6 @@ def main():
         valid_subs = poca.config.subs(conf)
         summary_logger = poca.loggers.start_summary_logger(args, conf.paths,
                                                            conf.xml.settings)
-        update_threads = []
-        update_q = Queue()
-        upgrade_threads = []
-        skip_subs = []
 
         # update loop
         for sub in valid_subs:
