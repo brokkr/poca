@@ -21,7 +21,7 @@ Features
 * **Override ID3/Vorbis metadata.** If you want *Savage Love* to have *Dan 
   Savage* in the artist field (rather than *The Stranger*\ ), poca will 
   automatically update the metadata upon download of each new episode. Or set
-  'genre' to be overwritten by 'Podcast' as a default.
+  genre to be overwritten by *Podcast* as a default.
 * **Filter a feed.** Only want news reports in the morning or on Wednesdays? 
   Use criteria such as filename and title, or the hour, weekday or date of 
   publishing to filter what you want from a feed.
