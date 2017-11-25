@@ -11,10 +11,8 @@
 """Functions for subscription management for poca"""
 
 
-import os
-import re
 import fcntl
-from lxml import etree, objectify
+from lxml import objectify
 from mutagen.easyid3 import EasyID3
 from argparse import Namespace
 
@@ -23,7 +21,7 @@ try:
 except ImportError:
     audiosearch = None
 
-from poca import files, output, config, outcome
+from poca import files, config, outcome
 from poca.lxmlfuncs import pretty_print
 from poca.feedstats import Feedstats
 
@@ -191,76 +189,6 @@ def list_id3_tags():
     valid_tags.sort()
     for tag in valid_tags:
         print(tag)
-
-
-def search_show(conf, args):
-    '''Search for show title on audiosear.ch'''
-    oauth_id = conf.xml.find('./settings/audiosearch/id')
-    oauth_secret = conf.xml.find('./settings/audiosearch/secret')
-    if not audiosearch:
-        msg = ("Missing audiosearch module. Please install with "
-               "'pip3 install audiosearch'")
-        output.subscribe_error(msg)
-        return(None, None)
-    if not oauth_id or not oauth_secret:
-        msg = ("Missing audiosear.ch key and/or secret. "
-               "Please get one at https://www.audiosear.ch/oauth/applications")
-        output.subscribe_error(msg)
-        return(None, None)
-    try:
-        client = audiosearch.client.Client(oauth_id, oauth_secret)
-    except Exception as e:
-        msg = "Audiosear.ch connection or authentication failed."
-        output.subscribe_error(msg)
-        return (None, None)
-    if args.list_networks:
-        networks = [network['name'].lower() for network in
-                    client.get('/networks/')]
-        networks.sort()
-        for index, network in enumerate(networks):
-            divisor, modulus = divmod(index, 20)
-            if divisor > 0 and modulus == 0:
-                print()
-                _ = input('Press Enter to continue ')
-                os.system('clear')
-            print(network)
-        return (None, None)
-    search_dic = {'q': '*'}
-    if args.keyword:
-        search_dic['q'] = args.keyword
-    if args.title:
-        search_dic['q'] = "title:%s" % args.title
-    if args.network:
-        networks = [network['name'].lower() for network in
-                    client.get('/networks/')]
-        if args.network.lower() in networks:
-            search_dic["filters[network.name]"] = args.network
-        else:
-            output.subscribe_info("Network not in audiosear.ch db. Run "
-                                  "poca-subscribe search --list-networks for "
-                                  "a list of known networks")
-            return (None, None)
-    search_query = client.search(search_dic, type='shows')
-    results = search_query['results']
-    for index, result in enumerate(results):
-        title = result['title']
-        desc_full = result['description'] if result['description'] else ''
-        desc_start = re.match('[^\.\?\!]+', desc_full)
-        desc = desc_start.group()[:77] if desc_start else ''
-        network = result['network']['name'] if result['network'] else 'Unknown'
-        print(index, title)
-        print(' ', 'From:', network)
-        print(' ', desc)
-    no_search_results = len(results)
-    if no_search_results == 0:
-        output.subscribe_info('No results from search')
-        return (None, None)
-    select = input("Choose 0-%i: " % (no_search_results-1))
-    try:
-        choice = results[int(select)]
-    except (ValueError, IndexError):
-        return (None, None)
-    return user_input_add_sub(url=choice['rss_url'])
 
 
 def update_url(args, subdata):
