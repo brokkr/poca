@@ -6,8 +6,9 @@
 Poca
 ====
 
-`Poca <https://projects.brokkr.net/projects/poca>`_ is a fast, multithreaded and highly customizable command line podcast 
-client, written in Python 3. As of 1.0 all planned features have been implemented. 
+`Poca <https://projects.brokkr.net/projects/poca>`_ is a fast, multithreaded 
+and highly customizable command line podcast client, written in Python 3. As 
+of 1.0 all planned features have been implemented. 
 
 .. contents::
    :depth: 2
@@ -115,7 +116,9 @@ Quickstart
 Configuration
 -------------
 
-The ``poca.xml`` file contains all poca's general and subscription specific configuration. To get started simply run ``poca`` once to get a basic config file placed in ``~/.poca``. 
+The ``poca.xml`` file contains all poca's general and subscription specific 
+configuration. To get started simply run ``poca`` once to get a basic config 
+file placed in ``~/.poca``. 
 
 The configuration file is divided into three main parts:
 
@@ -135,8 +138,10 @@ The configuration file is divided into three main parts:
 
 
 * **Settings**: Contains general settings
-* **Subscriptions**: Contains a list of all the podcasts you want to subscribe to
-* **Defaults**: Options in ``defaults`` are similar to those in ``subscriptions``, only they apply globally (unless overridden).
+* **Subscriptions**: Contains a list of all the podcasts you want to subscribe 
+  to
+* **Defaults**: Options in ``defaults`` are similar to those in 
+  ``subscriptions``, only they apply globally (unless overridden).
 
 .. toctree::
    :maxdepth: 2
@@ -148,7 +153,8 @@ The configuration file is divided into three main parts:
 Running
 -------
 
-Poca is run by issuing the ``poca`` command. Subscriptions can be managed by using the helper script ``poca-subscribe``.
+Poca is run by issuing the ``poca`` command. Subscriptions can be managed 
+by using the helper script ``poca-subscribe``.
 
 .. toctree::
    :maxdepth: 2
@@ -161,7 +167,7 @@ Changelog
 
 
 Version `1.0 <https://github.com/brokkr/poca/issues?q=is%3Aopen+is%3Aissue+milestone%3A1.0>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 * Added file renaming options (\ `#16 <https://github.com/brokkr/poca/issues/16>`_\ )
@@ -170,7 +176,7 @@ Version `1.0 <https://github.com/brokkr/poca/issues?q=is%3Aopen+is%3Aissue+miles
 * Bugfixes, quibbles and niggles aplenty
 
 Version `0.9 <https://github.com/brokkr/poca/issues?q=is%3Aclosed+is%3Aissue+milestone%3A0.9>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 * Artificial track numbers (\ `#43 <https://github.com/brokkr/poca/issues/43>`_\ )
@@ -183,7 +189,7 @@ Version `0.9 <https://github.com/brokkr/poca/issues?q=is%3Aclosed+is%3Aissue+mil
 * New dependency: ``requests`` for downloads due to downloading in threads
 
 Version `0.8 <https://github.com/brokkr/poca/issues?q=is%3Aclosed+is%3Aissue+milestone%3A0.8>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 * New dependency: ``lxml`` for greatly simplified configuration parsing
@@ -191,7 +197,7 @@ Version `0.8 <https://github.com/brokkr/poca/issues?q=is%3Aclosed+is%3Aissue+mil
 * New script: ``poca-subscribe``, a cli tool to manage subscriptions
 
 Version `0.7 <https://github.com/brokkr/poca/issues?q=is%3Aclosed+is%3Aissue+milestone%3A0.7>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 * Log: Terse logging (skip writing about subscription if nothing has changed) (\ `#32 <https://github.com/brokkr/poca/issues/32>`_\ )
@@ -201,7 +207,7 @@ Version `0.7 <https://github.com/brokkr/poca/issues?q=is%3Aclosed+is%3Aissue+mil
 * Bug fix: Crash on entries without enclosures (\ `#41 <https://github.com/brokkr/poca/issues/41>`_\ )
 
 Version `0.6 <https://github.com/brokkr/poca/issues?q=is%3Aclosed+is%3Aissue+milestone%3A0.6>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 * ``max_number``: Limit by number of files (\ `#14 </brokkr/poca/issues/14>`_\ )
