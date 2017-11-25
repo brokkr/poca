@@ -68,11 +68,20 @@ pip. Be mindful that poca is python 3 so use ``pip3``\ :
     pip3 install poca
 
 
+If you are upgrading from any pre-1.0 release, please see this :doc:`Upgrade`. 
 To remove Poca - having installed it using pip - simply do:
 
 .. code-block:: none
 
     pip3 uninstall poca
+
+
+Requirements
+^^^^^^^^^^^^
+
+- Python 3.4 or later
+- Third-party modules: ``requests`` ``feedparser`` ``lxml`` ``mutagen``
+- Pip will automatically install any one of these found missing
 
 
 Quickstart

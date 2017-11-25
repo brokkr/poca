@@ -72,3 +72,6 @@ To remove Poca - having installed it using pip - simply do:
  * Python 3.4 or later is required
  * The following third-party modules are required: `feedparser` `lxml` `mutagen` `requests`
  * Pip will automatically install any one of these found missing
+
+### Documentation
+For up to date documentation, please see the readthedocs [pages](http://poca.readthedocs.io).
