@@ -9,10 +9,9 @@
 
 """Basic info"""
 
-__version__ = '1.0beta11'
+__version__ = '1.0beta13'
 VERSION = __version__
 MAINTAINER = "Mads Michelsen <mail@brokkr.net>"
-DESCRIPTION = ("A fast, multithreaded and highly customizable command line "
-               "podcast client")
+DESCRIPTION = ("A fast and highly customizable command line podcast client")
 DESCRIPTION_SUB = "A subscription management tool for poca"
 URL = "https://github.com/brokkr/poca"
