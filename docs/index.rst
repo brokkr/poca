@@ -81,8 +81,8 @@ Requirements
 
 - Python 3.4 or later
 - Third-party modules: ``requests`` ``feedparser`` ``lxml`` ``mutagen``
-- A unicode capable terminal is recommended
 - Pip will automatically install any one of these found missing
+- A unicode capable terminal is recommended
 
 
 Quickstart
