@@ -15,7 +15,7 @@ from distutils.core import setup
 
 setup(
     name='poca',
-    version='1.0beta16',
+    version='1.0',
     license='GPL3',
     description='A fast and highly customizable command line podcast client',
     long_description=('A fast and highly customizable command line podcast '
@@ -23,7 +23,7 @@ setup(
     author='Mads Michelsen',
     author_email='mail@brokkr.net',
     url='https://github.com/brokkr/poca',
-    download_url='https://github.com/brokkr/poca/archive/v1.0beta16.tar.gz',
+    download_url='https://github.com/brokkr/poca/archive/v1.0',
     scripts=['src/scripts/poca', 'src/scripts/poca-subscribe'],
     packages=['poca'],
     package_dir={'poca': 'src/poca'},
@@ -34,7 +34,7 @@ setup(
     provides=['poca'],
     platforms=['POSIX'],
     keywords=['podcast', 'client', 'aggregator', 'cli'],
-    classifiers=['Development Status :: 4 - Beta',
+    classifiers=['Development Status :: 5 - Production/Stable',
                  'Environment :: Console',
                  'Intended Audience :: End Users/Desktop',
                  'License :: OSI Approved :: GNU General Public License (GPL)',
