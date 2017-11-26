@@ -1,77 +1,117 @@
-## Poca
-Poca is a fast, multithreaded and highly customizable command line podcast 
-client, written in Python 3. As of 1.0 all planned features have been 
-implemented.
+Poca
+====
 
-### Upgrade to 1.0 note
-The 1.0 database is NOT backwards compatible. If you're upgrading to 1.0 
-from any release prior to `1.0beta4` you will need to delete your media files 
-and db folder. The `db` folder can be found in the config directory 
-(`~/.poca/db` by default). The media files are in the folder designated by 
-the `base_dir` setting in poca.xml. 
+[Poca](https://projects.brokkr.net/projects/poca) is a fast, multithreaded 
+and highly customizable command line podcast client, written in Python 3. As 
+of 1.0 all planned features have been implemented.
 
-Older versions of `poca.xml` will work with 1.0 but be aware that new options
-have been added and others deprecated. See 
-[Settings](https://github.com/brokkr/poca/wiki/Settings) for 
-details.
+Features
+--------
 
-### Features
-Poca allows both for options for each individual subscription and
-global defaults that apply to every subscription.
-
- * **Maximum amount.** Specify how many episodes the subscription should get 
-   before deleting old episodes to make room for new ones.
- * **Override ID3/Vorbis metadata.** If you want _Savage Love_ to have _Dan 
-   Savage_ in the artist field (rather than _The Stranger_), poca will 
-   automatically update the metadata upon download of each new episode. Set
-   'genre' to be overwritten by 'Podcast' as a default. Or have poca add track
-   numbers to shows that have left them out.
- * **Filter a feed.** Only want news reports in the morning or on Wednesdays? 
-   Use criteria such as filename and title, or the hour, weekday or date of 
-   publishing to filter what you want from a feed.
- * **Rename files automatically.** Not all feeds have sensibly named media 
-   files. Specify a renaming template like date_title to know what you're
-   dealing with or to get alphabetical ordering to match chronology.
- * **From the top.** A latecomer to _Serial_ or other audiobook style podcasts?
-   Poca introduces a special mode that gets the oldest episodes first, rather 
-   than the latest. To move on to later episodes simply delete old ones and 
-   poca will fill up with the next in line.
- * **Keeping track.** Poca logs downloads and removals to a local file so you
-   easily see what's changed. Or configure it with an SMTP server and get
-   notified when a feed stops working.
- * **Manage your shows.** by editing an easy-to-understand xml file. Or use
-   the accompanying tool to add, delete, sort them, or get info about their
-   publishing frequency, average episode length and more.
+-   **Maximum amount.** Specify how many episodes the subscription should get 
+before deleting old episodes to make room for new ones.
+-   **Override ID3/Vorbis metadata.** If you want *Savage Love* to have *Dan 
+Savage* in the artist field (rather than *The Stranger*), poca will 
+automatically update the metadata upon download of each new episode. Or set 
+genre to be overwritten by *Podcast* as a default.
+-   **Filter a feed.** Only want news reports in the morning or on 
+Wednesdays? Use criteria such as filename and title, or the hour, weekday or 
+date of publishing to filter what you want from a feed.
+-   **Rename files automatically.** Not all feeds have sensibly named media 
+files. Specify a renaming template like date\_title to know what you're 
+dealing with or to get alphabetical ordering to match chronology.
+-   **From the top.** A latecomer to *Serial* or other audiobook style 
+podcasts? Specify `from_the_top` to get oldest episodes first, rather than 
+the latest. To move on to later episodes simply delete old ones and poca will 
+fill up with the next in line.
+-   **Keeping track.** Poca logs downloads and removals to a local file so 
+you easily see what's changed. Or configure it with an SMTP server and get 
+notified when a feed stops working.
+-   **Manage your shows** by editing an easy-to-understand xml file. Or use 
+the accompanying tool to add, delete, sort them, or get info about their 
+publishing frequency, average episode length and more.
 
 Poca also: has excellent unicode support for feeds, filenames and tags, gets 
-cover images for feeds, has the ability to spoof user agents, can pause your
-subscriptions, deals intelligently with interruptions, updates moved feeds
+cover images for feeds, has the ability to spoof user agents, can pause your 
+subscriptions, deals intelligently with interruptions, updates moved feeds 
 (HTTP 301) automatically, and more.
 
-See the [Configuration](https://github.com/brokkr/poca/wiki/Configuration) 
-section of the wiki for more details on features.
+Interface
+---------
 
-### Interface
 [![asciicast](https://asciinema.org/a/OScSRCdsKGZLntYJ9K6LYSNMT.png)](https://asciinema.org/a/OScSRCdsKGZLntYJ9K6LYSNMT)
 
 All configuration is done in a single XML-format file. For cron job 
 compatibility, Poca has a quiet mode in addition to normal and verbose.
 
-### Installing
-You can install poca from [pypi](https://pypi.python.org/pypi/poca) using
+Installation
+------------
+
+You can install poca from [pypi](https://pypi.python.org/pypi/poca) using 
 pip. Be mindful that poca is python 3 so use `pip3`:
 
-    pip3 install poca
+``` sourceCode
+pip3 install poca
+```
 
-To remove Poca - having installed it using pip - simply do:
+If you are upgrading from any pre-1.0 release, please see this 
+[upgrade notice](https://poca.readthedocs.io/en/latest/Upgrade.html). To 
+remove Poca simply do:
 
-    pip3 uninstall poca
+``` sourceCode
+pip3 uninstall poca
+```
+
+### Requirements
+
+-   Python 3.4 or later
+-   Third-party modules: `requests` `feedparser` `lxml` `mutagen`
+-   A unicode capable terminal is recommended
+-   Pip will automatically install any one of these found missing
+
+Quickstart
+----------
+
+``` sourceCode
+[ ~ ] poca
+No config file found. Making one at /home/user/.poca/poca.xml.
+Please enter the full path for placing media files.
+Press Enter to use default (/home/user/poca): /tmp/poca
+ ⚠ Default config succesfully written to /home/user/.poca/poca.xml.
+Please edit or run 'poca-subscribe' to add subscriptions.
+
+[ ~ ] poca-subscribe add
+Url of subscription: http://crateandcrowbar.com/feed/
+
+Author: The Crate and Crowbar                            PUBLISHED / 5 WEEKS
+Title:  The Crate and Crowbar
+
+Last episode: Episode 216: Videocrates Crowdog                       ▮
+Published:    24 Nov 2017                                            ▮
+                                                                     ▮     ▮
+Avg. size of episode:   52 Mb                            ▮  ▮     ▮  ▮  ▮  ▮
+Avg. length of episode: 1h 52m                           M  T  W  T  F  S  S
+
+Title of subscription: (Enter to use feed title)
+Maximum number of files in subscription: (integer/Enter to skip) 5
+Get earliest entries first: (yes/no/Enter to skip) no
+Category for subscription (Enter to skip): gaming
+To add metadata, rename or filters settings, please edit poca.xml
+
+[ ~ ] poca --verbose
+THE CRATE AND CROWBAR. 5 ➕
+ ⇵ CCEp214.mp3  [56 Mb]
+ ⇵ LGCEp004.mp3  [35 Mb]
+ ⇵ CCEp215.mp3  [61 Mb]
+ ...
+```
 
 
-### Dependencies
- * Python 3.4 or later is required
- * The following third-party modules are required: `feedparser` `lxml` `mutagen` `requests`
- * Pip will automatically install any one of these found missing
+Links
+-----
 
-### Documentation
-For up to date documentation, please see the readthedocs [pages](http://poca.readthedocs.io).
+-   Homepage: <https://projects.brokkr.net/projects/poca>
+-   Source code: <https://github.com/brokkr/poca>
+-   Python Package Index (pypi): <https://pypi.python.org/pypi/poca>
+-   Documentation: <https://poca.readthedocs.io/en/latest/>
+
