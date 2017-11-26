@@ -69,7 +69,7 @@ pip. Be mindful that poca is python 3 so use ``pip3``\ :
 
 
 If you are upgrading from any pre-1.0 release, please see this :doc:`Upgrade`. 
-To remove Poca - having installed it using pip - simply do:
+To remove Poca simply do:
 
 .. code-block:: none
 
@@ -81,6 +81,7 @@ Requirements
 
 - Python 3.4 or later
 - Third-party modules: ``requests`` ``feedparser`` ``lxml`` ``mutagen``
+- A unicode capable terminal is recommended
 - Pip will automatically install any one of these found missing
 
 
@@ -242,3 +243,13 @@ Version 0.4
 
 
 * Reduced functionality port to Python3
+
+
+Links
+-----
+
+
+* Homepage: https://projects.brokkr.net/projects/poca
+* Source code: https://github.com/brokkr/poca
+* Python Package Index (pypi): https://pypi.python.org/pypi/poca
+* Documentation: https://poca.readthedocs.io/en/latest/
