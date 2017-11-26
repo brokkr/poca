@@ -2,7 +2,7 @@
 .SH NAME
 poca-subscribe \- a subscription management tool for poca
 .SH SYNOPSIS
-\fBpoca [-h] [-c CONFIG_DIR] {add,delete,list,toggle}
+\fBpoca [-h] [-c CONFIG_DIR] {add,list,tags,delete,toggle,stats}
 \f1
 .SH DESCRIPTION
 \fIPoca-subscribe\f1 is a tool to make small adjustments to poca.xml, the main configuration file for poca.
@@ -18,16 +18,26 @@ Use alternative configuration directory. Default is ~/.poca.
 \fBadd\f1
 Add a subscription by way of a setup assistant
 .TP
-\fBdelete\f1
-Go through subscriptions one at time to delete or keep. Use [-t TITLE] or [-u URL] to narrow matching.
-.TP
 \fBlist\f1
 List all subscriptions. Grouped by subscriptions' category attribute if any.
 .TP
+\fBtags\f1
+Print a list of available id3 tags for use in the <metadata> settings.
+.TP
+\fBdelete\f1
+Go through subscriptions one at time to delete or keep. Use [-t TITLE] or [-u URL] to narrow matching.
+.TP
 \fBtoggle\f1
 Go through subscriptions one at time to set state (active or inactive). Use [-t TITLE] or [-u URL] to narrow matching.
+.TP
+\fBstats\f1
+Get feed stats for current subscriptions. Use [-t TITLE] or [-u URL] to narrow matching.
+
+.SH DOCUMENTATION
+For in-depth information please go to \fBhttps://http://poca.readthedocs.io/en/latest/\f1.
+
 .SH AUTHOR
-\fIPoca-subscribe\f1 was written by Mads Michelsen <mail@brokkr.net>. For more information go to \fBhttps://github.com/brokkr/poca\f1
+\fIPoca-subscribe\f1 was written by Mads Michelsen <mail@brokkr.net>. For more information on the code go to \fBhttps://github.com/brokkr/poca\f1
 .SH COPYRIGHT
 Copyright 2010-2017 Mads Michelsen
 
