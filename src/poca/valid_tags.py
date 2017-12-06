@@ -11,6 +11,8 @@
 
 import mutagen
 
+from poca.outcome import Outcome
+
 
 mp3_list = list(mutagen.easyid3.EasyID3.valid_keys.keys())
 mp4_list = ['title', 'album', 'artist', 'albumartist', 'date', 'comment',
