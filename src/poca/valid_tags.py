@@ -16,22 +16,26 @@ mp3_list = list(mutagen.easyid3.EasyID3.valid_keys.keys())
 mp4_list = ['title', 'album', 'artist', 'albumartist', 'date', 'comment',
             'description', 'grouping', 'genre', 'copyright', 'albumsort',
             'albumartistsort', 'artistsort', 'titlesort', 'composersort']
+
 def mp3_keys(key): yield key if key in mp3_list else None
 def mp4_keys(key): yield key if key in mp4_list else None
-def vorbis_keys(key): yield key
+def any_keys(key): yield key
+
 type_dic = {mutagen.mp3.EasyMP3: mp3_keys,
             mutagen.easymp4.EasyMP4: mp4_keys,
-            mutagen.oggvorbis.OggVorbis: vorbis_keys,
-            mutagen.oggopus.OggOpus: vorbis_keys,
-            mutagen.flac.FLAC: vorbis_keys}
+            mutagen.oggvorbis.OggVorbis: any_keys,
+            mutagen.oggopus.OggOpus: any_keys,
+            mutagen.flac.FLAC: any_keys}
 
 def validate_keys(audio_type, frames):
     '''Returns a tuple with valid overrides and a list of invalid keys'''
     valid_keys = type_dic.get(audio_type, None)
     if valid_keys is None:
-        return (Outcome(False, 'Unsupported file type for tagging'), [], [])
+        outcome = Outcome(False, 'Unsupported file type for tagging')
+        return (outcome, [], [])
     overrides = [(override.tag, override.text) for override in frames
                  if override.tag in valid_keys(override.tag)]
     invalid_keys = [override.tag for override in frames if override.tag
-                    not in valid_keys)
-    return (Outcome(True, 'Valid audio type'), overrides, invalid_keys)
+                    not in valid_keys(override.tag))
+    outcome = Outcome(True, 'Supported file type for tagging')
+    return (outcome, overrides, invalid_keys)
