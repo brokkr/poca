@@ -63,9 +63,9 @@ def tag_audio_file(settings, sub, jar, entry):
         track_no += 1
         jar.track_no = track_no
         jar.save()
-    if isinstance(audio, (mutagen.mp3.EasyMP3, mutagen.oggvorbis.OggVorbis,
-                          mutagen.oggopus.OggOpus, mutagen.flac.FLAC)):
-        audio['tracknumber'] = str(track_no)
+        if isinstance(audio, (mutagen.mp3.EasyMP3, mutagen.oggvorbis.OggVorbis,
+                              mutagen.oggopus.OggOpus, mutagen.flac.FLAC)):
+            audio['tracknumber'] = str(track_no)
     if isinstance(audio, mutagen.mp3.EasyMP3):
         audio.save(v1=id3v1, v2_version=id3v2)
     else:
