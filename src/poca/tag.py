@@ -11,12 +11,8 @@
 
 import mutagen
 
+from poca.valid_tags import validate_keys
 from poca.outcome import Outcome
-
-
-easymp4_keys = ['title', 'album', 'artist', 'albumartist', 'date', 'comment',
-                'description', 'grouping', 'genre', 'copyright', 'albumsort',
-                'albumartistsort', 'artistsort', 'titlesort', 'composersort']
 
 
 def tag_audio_file(settings, sub, jar, entry):
@@ -27,6 +23,7 @@ def tag_audio_file(settings, sub, jar, entry):
     tracks = sub.find('./track_numbering')
     tracks = tracks.text if tracks else 'no'
     frames = sub.xpath('./metadata/*')
+    invalid_keys = []
     if not frames and tracks == 'no':
         return Outcome(True, 'Tagging skipped')
     try:
@@ -42,6 +39,7 @@ def tag_audio_file(settings, sub, jar, entry):
                        entry['poca_abspath'])
     if audio.tags is None:
         audio.add_tags()
+    # easify
     if isinstance(audio, mutagen.mp3.MP3):
         if id3v2 == 3:
             audio.tags.update_to_v23()
@@ -51,14 +49,12 @@ def tag_audio_file(settings, sub, jar, entry):
         audio = mutagen.File(entry['poca_abspath'], easy=True)
     if isinstance(audio, mutagen.mp4.MP4):
         audio = mutagen.File(entry['poca_abspath'], easy=True)
-    if isinstance(audio, mutagen.mp3.EasyMP3):
-        overrides, invalid_keys = validate_keys(frames,
-                                                audio.tags.valid_keys.keys())
-    if isinstance(audio, mutagen.easymp4.EasyMP4):
-        overrides, invalid_keys = validate_keys(frames, easymp4_keys)
-    # recognise specific mutagen types. if not recognised don't attempt tag.
-    else:
-        overrides = [(override.tag, override.text) for override in frames]
+    # validate
+    audio_type = type(audio)
+    outcome, overrides, invalid_keys = validate_keys(frames, audio_type)
+    # deal with bad outcomes and bad invalid_keys
+    print(outcome.success, overrides, invalid_keys)
+    # deal with bad outcomes and bad invalid_keys
     for override in overrides:
         audio[override[0]] = override[1]
     if tracks == 'yes' or (tracks == 'if missing' and 'tracknumber' not in
@@ -67,19 +63,11 @@ def tag_audio_file(settings, sub, jar, entry):
         track_no += 1
         jar.track_no = track_no
         jar.save()
+    if isinstance(audio, (mutagen.mp3.EasyMP3, mutagen.oggvorbis.OggVorbis,
+                          mutagen.oggopus.OggOpus, mutagen.flac.FLAC)):
         audio['tracknumber'] = str(track_no)
     if isinstance(audio, mutagen.mp3.EasyMP3):
         audio.save(v1=id3v1, v2_version=id3v2)
     else:
         audio.save()
     return Outcome(True, 'Metadata successfully updated')
-
-
-def validate_keys(frames, valid_keys):
-    '''Returns a tuple with valid overrides and a list of invalid keys'''
-    overrides = [(override.tag, override.text) for override in frames
-                 if override.tag in valid_keys]
-    invalid_keys = [override.tag for override in frames if override.tag
-                    not in valid_keys)
-    return (overrides, invalid_keys)
-
