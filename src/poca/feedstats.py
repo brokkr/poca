@@ -42,8 +42,8 @@ class Feedstats():
         self.set_lhs()
         self.set_rhs()
         if not UNICODE:
-            self.lhs_lst = [asciify(line) for line in self.lhs_lst]
-            self.rhs_lst = [asciify(line) for line in self.lhs_rst]
+            self.lhs_lst = [self.asciify(line) for line in self.lhs_lst]
+            self.rhs_lst = [self.asciify(line) for line in self.lhs_rst]
         for index in range(8):
             print(self.lhs_lst[index] + self.rhs_lst[index])
 
