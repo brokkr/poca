@@ -53,11 +53,9 @@ def tag_audio_file(settings, sub, jar, entry):
     # validate the fields and file type
     audio_type = type(audio)
     outcome, overrides, invalid_keys = validate_keys(audio_type, frames)
-    # deal with bad outcomes and bad invalid_keys
     if outcome.success is False:
         return outcome
-    print(outcome.success, overrides, invalid_keys)
-    # deal with bad outcomes and bad invalid_keys
+    # run overrides
     for override in overrides:
         audio[override[0]] = override[1]
     if tracks == 'yes' or (tracks == 'if missing' and 'tracknumber' not in
@@ -70,6 +68,7 @@ def tag_audio_file(settings, sub, jar, entry):
                               mutagen.oggopus.OggOpus, mutagen.flac.FLAC)):
             audio['tracknumber'] = str(track_no)
         # else?
+    # save and finish
     if isinstance(audio, mutagen.mp3.EasyMP3):
         audio.save(v1=id3v1, v2_version=id3v2)
     else:
