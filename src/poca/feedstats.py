@@ -16,7 +16,8 @@ import time
 import feedparser
 
 
-empty_entry = {'title': 'n/a', 'published_parsed': None}
+EMPTY_ENTRY = {'title': 'n/a', 'published_parsed': None}
+UNICODE = True if sys.stdout.encoding == 'UTF-8' else False
 
 
 class Feedstats():
@@ -40,6 +41,9 @@ class Feedstats():
         '''Output the lef hand and right hand side of the matrix'''
         self.set_lhs()
         self.set_rhs()
+        if not UNICODE:
+            self.lhs_lst = [asciify(line) for line in self.lsh_lst]
+            self.rhs_lst = [asciify(line) for line in self.lsh_rst]
         for index in range(8):
             print(self.lhs_lst[index] + self.rhs_lst[index])
 
@@ -50,7 +54,7 @@ class Feedstats():
             else 'Unknown'
         lhs['title'] = self.doc.feed.title if 'title' in self.doc.feed else \
             'Unknown'
-        last = self.doc.entries[0] if self.doc.entries else empty_entry
+        last = self.doc.entries[0] if self.doc.entries else EMPTY_ENTRY
         try:
             lhs['last_date'] = time.strftime('%d %b %Y',
                                              last['published_parsed'])
@@ -114,8 +118,7 @@ class Feedstats():
 
     def set_rhs(self):
         '''Collect feedinfo and arrange the rhs'''
-        unicode = True if sys.stdout.encoding == 'UTF-8' else False
-        block = '\u25ae' if unicode else 'X'
+        block = '\u25ae' if UNICODE else 'X'
         wdays = [x['published_parsed'].tm_wday for x in self.entries]
         wday_count = {x: 0 for x in range(7)}
         wday_count.update({x: wdays.count(x) for x in set(wdays)})
@@ -124,3 +127,8 @@ class Feedstats():
             line = [block if wday_count[x] > i else ' ' for x in range(7)]
             self.rhs_lst.append('  '.join(line))
         self.rhs_lst.append('M  T  W  T  F  S  S')
+
+    def asciify(self, line):
+        line = line.encode(encoding='ascii', errors='ignore')
+        line = line.decode()
+        return line
