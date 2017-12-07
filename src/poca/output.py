@@ -18,12 +18,14 @@ STREAM = logging.getLogger('POCA_STREAM')
 AFTER_STREAM = logging.getLogger('POCA_AFTER_STREAM')
 SUMMARY = logging.getLogger('POCA_SUMMARY')
 
-WARNING_SIGN = '\u26a0'
-CROSS_MARK = '\u274c'
-CIRCLE_X = '\u29bb'
-HEAVY_MINUS_SIGN = '\u2796'
-HEAVY_PLUS_SIGN = '\u2795'
-UP_DOWN_ARROW = '\u21f5'
+unicode = True if sys.stdout.encoding == 'UTF-8' else False
+
+WARNING_SIGN = '\u26a0' if unicode else '!'
+CROSS_MARK = '\u274c' if unicode else 'X'
+CIRCLE_X = '\u29bb' if unicode else '%'
+HEAVY_MINUS_SIGN = '\u2796' if unicode else '-'
+HEAVY_PLUS_SIGN = '\u2795' if unicode else '+'
+UP_DOWN_ARROW = '\u21f5' if unicode else '>'
 
 
 # ####################################### #

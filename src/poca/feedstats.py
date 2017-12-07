@@ -11,6 +11,7 @@
 """Feed stats"""
 
 
+import sys
 import time
 import feedparser
 
@@ -113,11 +114,13 @@ class Feedstats():
 
     def set_rhs(self):
         '''Collect feedinfo and arrange the rhs'''
+        unicode = True if sys.stdout.encoding == 'UTF-8' else False
+        block = '\u25ae' if unicode else 'X'
         wdays = [x['published_parsed'].tm_wday for x in self.entries]
         wday_count = {x: 0 for x in range(7)}
         wday_count.update({x: wdays.count(x) for x in set(wdays)})
         self.rhs_lst = ["PUBLISHED / 5 WEEKS", "".ljust(19)]
         for i in reversed(range(5)):
-            line = ['▮' if wday_count[x] > i else ' ' for x in range(7)]
+            line = [block if wday_count[x] > i else ' ' for x in range(7)]
             self.rhs_lst.append('  '.join(line))
         self.rhs_lst.append('M  T  W  T  F  S  S')
