@@ -9,6 +9,7 @@
 
 """Get more information on a single feed entry"""
 
+import sys
 import time
 from os import path
 import urllib.request
@@ -47,6 +48,10 @@ def expand(entry, sub, sub_dir):
     entry['poca_ext'] = _ext[1:]
     if hasattr(sub, 'rename'):
         entry = rename(entry, sub)
+    unicode = True if sys.stdout.encoding == 'UTF-8' else False
+    if not unicode:
+        entry['poca_basename'] = entry['poca_basename'].encode(
+            encoding='ascii', errors='ignore')
     entry['poca_filename'] = '.'.join((entry['poca_basename'],
                                       entry['poca_ext']))
     entry['poca_abspath'] = path.join(sub_dir, entry['poca_filename'])
