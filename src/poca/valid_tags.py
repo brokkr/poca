@@ -10,6 +10,7 @@
 """Lists of valid tagging keys for reference"""
 
 import mutagen
+from mutagen import easyid3, mp3, easymp4, oggvorbis, oggopus, flac
 
 from poca.outcome import Outcome
 
@@ -38,6 +39,6 @@ def validate_keys(audio_type, frames):
     overrides = [(override.tag, override.text) for override in frames
                  if override.tag in valid_keys(override.tag)]
     invalid_keys = [override.tag for override in frames if override.tag
-                    not in valid_keys(override.tag))
+                    not in valid_keys(override.tag)]
     outcome = Outcome(True, 'Supported file type for tagging')
     return (outcome, overrides, invalid_keys)

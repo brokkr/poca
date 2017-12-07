@@ -26,6 +26,7 @@ def tag_audio_file(settings, sub, jar, entry):
     invalid_keys = []
     if not frames and tracks == 'no':
         return Outcome(True, 'Tagging skipped')
+    # get access to metadata
     try:
         audio = mutagen.File(entry['poca_abspath'])
     except mutagen.MutagenError:
@@ -49,10 +50,12 @@ def tag_audio_file(settings, sub, jar, entry):
         audio = mutagen.File(entry['poca_abspath'], easy=True)
     if isinstance(audio, mutagen.mp4.MP4):
         audio = mutagen.File(entry['poca_abspath'], easy=True)
-    # validate
+    # validate the fields and file type
     audio_type = type(audio)
-    outcome, overrides, invalid_keys = validate_keys(frames, audio_type)
+    outcome, overrides, invalid_keys = validate_keys(audio_type, frames)
     # deal with bad outcomes and bad invalid_keys
+    if outcome.success is False:
+        return outcome
     print(outcome.success, overrides, invalid_keys)
     # deal with bad outcomes and bad invalid_keys
     for override in overrides:
@@ -66,8 +69,13 @@ def tag_audio_file(settings, sub, jar, entry):
         if isinstance(audio, (mutagen.mp3.EasyMP3, mutagen.oggvorbis.OggVorbis,
                               mutagen.oggopus.OggOpus, mutagen.flac.FLAC)):
             audio['tracknumber'] = str(track_no)
+        # else?
     if isinstance(audio, mutagen.mp3.EasyMP3):
         audio.save(v1=id3v1, v2_version=id3v2)
     else:
         audio.save()
-    return Outcome(True, 'Metadata successfully updated')
+    if not invalid_keys:
+        return Outcome(True, 'Metadata successfully updated')
+    else:
+        return Outcome(False, '%s is set to add invalid tags: %s' %
+                       (sub.title.text, ', '.join(invalid_keys)))
