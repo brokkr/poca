@@ -52,6 +52,7 @@ def expand(entry, sub, sub_dir):
     if not unicode:
         entry['poca_basename'] = entry['poca_basename'].encode(
             encoding='ascii', errors='ignore')
+        entry['poca_basename'] = entry['poca_basename'].decode()
     entry['poca_filename'] = '.'.join((entry['poca_basename'],
                                       entry['poca_ext']))
     entry['poca_abspath'] = path.join(sub_dir, entry['poca_filename'])
