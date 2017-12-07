@@ -13,15 +13,9 @@
 
 import fcntl
 from lxml import objectify
-from mutagen.easyid3 import EasyID3
 from argparse import Namespace
 
-try:
-    import audiosearch
-except ImportError:
-    audiosearch = None
-
-from poca import files, config, outcome
+from poca import files, config, outcome, valid_tags
 from poca.lxmlfuncs import pretty_print
 from poca.feedstats import Feedstats
 
@@ -183,12 +177,12 @@ def list_subs(conf):
         print()
 
 
-def list_id3_tags():
-    '''list valid id3 tags to use in metadata overrides'''
-    valid_tags = list(EasyID3.valid_keys.keys())
-    valid_tags.sort()
-    for tag in valid_tags:
-        print(tag)
+def list_valid_tags(args):
+    '''list valid tags to use in metadata overrides'''
+    valid_keys = valid_tags.mp4_list if args.mp4 else valid_tags.mp3_list
+    valid_keys.sort()
+    for key in valid_keys:
+        print(key)
 
 
 def update_url(args, subdata):

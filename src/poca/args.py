@@ -50,7 +50,12 @@ def get_poca_subscribe_args():
     list_parser = subparsers.add_parser('list',
                                         help='List current subscriptions')
     tags_parser = subparsers.add_parser('tags',
-                                        help='List available id3 tags')
+                                        help='List available metadata tags')
+    tags_parser_group = tags_parser.add_mutually_exclusive_group(required=True)
+    tags_parser_group.add_argument('-3', '--mp3', help='Valid tags for mp3s',
+                                   action='store_true', default=True)
+    tags_parser_group.add_argument('-4', '--mp4', help='Valid tags for mp4s',
+                                   action='store_true', default=False)
     del_parser = subparsers.add_parser('delete', help='Remove subscription, '
                                                       'delete files')
     del_parser.add_argument('-t', '--title',

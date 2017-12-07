@@ -32,7 +32,7 @@ def main():
     elif args.cmd_name == 'stats':
         poca.subscribe.stats(conf, args)
     elif args.cmd_name == 'tags':
-        poca.subscribe.list_id3_tags()
+        poca.subscribe.list_valid_tags(args)
 
 
 if __name__ == '__main__':
