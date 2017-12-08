@@ -46,8 +46,9 @@ def expand(entry, sub, sub_dir):
         entry['poca_mb'] = None
     entry['poca_basename'], _ext = path.splitext(entry['filename'])
     entry['poca_ext'] = _ext[1:]
+    entry['user_vars'] = get_user_vars(entry, sub)
     if hasattr(sub, 'rename'):
-        entry = rename(entry, sub)
+        entry = rename(entry, sub, entry['user_vars'])
     unicode = True if sys.stdout.encoding == 'UTF-8' else False
     if not unicode:
         entry['poca_basename'] = entry['poca_basename'].encode(
@@ -59,9 +60,7 @@ def expand(entry, sub, sub_dir):
     entry['expanded'] = True
     return entry
 
-
-def rename(entry, sub):
-    forbidden = ['/', '\\', ':', '\'', '\"', ',', ';', '.']
+def get_user_vars(entry, sub):
     try:
         date = time.strftime('%Y-%m-%d', entry['published_parsed'])
     except (KeyError, TypeError):
@@ -70,13 +69,19 @@ def rename(entry, sub):
     uid = ''.join([x for x in uid if x not in forbidden])
     episode_title = str(entry['title']) if 'title' in entry else \
         'missing_title'
-    rename_dic = {'org_name': entry['poca_basename'],
-                  'title': sub.title.text,
-                  'episode_title': episode_title,
-                  'uid': uid,
-                  'date': date}
-    rename_lst = [rename_dic[el.tag] for el in sub.rename.iterchildren() if
-                  el.tag in rename_dic]
+    user_vars = {'original_filename': entry['poca_basename'],
+                 'subscription_title': sub.title.text,
+                 'episode_title': episode_title,
+                 'uid': uid,
+                 'date': date,
+                 'org_name': entry['poca_basename'],
+                 'title': sub.title.text}
+    return user_vars
+
+def rename(entry, sub, user_vars):
+    forbidden = ['/', '\\', ':', '\'', '\"', ',', ';', '.']
+    rename_lst = [user_vars[el.tag] for el in sub.rename.iterchildren() if
+                  el.tag in user_vars]
     divider = sub.rename.get('divider') or ' '
     space = sub.rename.get('space') or ' '
     if rename_lst:
