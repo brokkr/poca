@@ -82,7 +82,8 @@ class Feedstats():
         links = [entry['links'] for entry in self.doc.entries]
         lengths = [enc['length'] for sublist in links for enc in sublist
                    if 'length' in enc]
-        lengths = [int(x) for x in lengths if int(x) > 0]
+        lengths = [self.get_length(x) for x in lengths]
+        lengths = [x for x in lengths if x != 0]
         if not lengths:
             return "n/a"
         avg_bytes = sum(lengths)/len(lengths)
@@ -103,6 +104,13 @@ class Feedstats():
         avg_duration = "%sh " % h if h > 0 else ""
         avg_duration += "%sm" % m
         return avg_duration
+
+    def get_length(self, length_str):
+        '''Helper function to convert 'length' to seconds integer length'''
+        try:
+            return int(length_str)
+        except (TypeError, ValueError):
+            return 0
 
     def itunes2seconds(self, entry):
         '''Transform itunes_duration string to duration in seconds'''
