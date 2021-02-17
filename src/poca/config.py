@@ -90,14 +90,17 @@ class Paths:
         return _path
 
     def test_paths(self):
-        '''Checks for presence of ~/.poca and ~/.poca/poca.xml'''
-        for check_dir in [self.config_dir, self.db_dir]:
-            outcome = files.check_path(check_dir)
-            if not outcome.success:
-                output.config_fatal(outcome.msg)
+        '''Checks for presence of ~/.poca/poca.xml. If that doesn't exist, try
+        to create it. Also, check for existance of the db directory.'''
         if not path.isfile(self.config_file):
-            outcome = xmlconf.write_config_file(self.config_file)
-            output.config_fatal(outcome.msg)
+            config_dir_outcome = files.check_path(self.config_dir)
+            if not config_dir_outcome.success:
+                output.config_fatal(config_dir_outcome.msg)
+            config_file_outcome = xmlconf.write_config_file(self.config_file)
+            output.config_fatal(config_file_outcome.msg)
+        db_dir_outcome = files.check_path(self.db_dir)
+        if not db_dir_outcome.success:
+            output.config_fatal(db_dir_outcome.msg)
 
 
 def subs(conf):
