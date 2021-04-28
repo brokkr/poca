@@ -107,7 +107,7 @@ def check_path(check_dir):
     try:
         os.makedirs(check_dir)
         return Outcome(True, '%s was successfully created' % check_dir)
-    except OSError:
+    except (FileExistsError, OSError) as e:
         return Outcome(False, 'Could not create %s' % check_dir)
 
 def check_file_write(check_file):
@@ -121,7 +121,6 @@ def check_file_write(check_file):
         return Outcome(False, '%s is a directory, not a file' % check_file)
     outcome = check_path(os.path.dirname(check_file))
     return outcome
-
 
 def delete_sub(conf, title, reset=False):
     '''Delete subscription files (optionally including history)'''
