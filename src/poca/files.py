@@ -113,7 +113,7 @@ def check_path(check_dir):
 def check_file_write(check_file):
     '''Check to see if file is writable/can be created'''
     if os.path.isfile(check_file):
-        if os.access(check_file, os.W_OK)
+        if os.access(check_file, os.W_OK):
             return Outcome(True, '%s exists and is writable' % check_file)
         else:
             return Outcome(False, '%s exists but is not writable' % check_file)

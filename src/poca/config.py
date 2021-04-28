@@ -101,10 +101,14 @@ class Paths:
         db_dir_outcome = files.check_path(self.db_dir)
         if not db_dir_outcome.success:
             output.config_fatal(db_dir_outcome.msg)
-        if args.logfile:
-            logfile_outcome = files.check_file_write(self.log_file)
-            if not logfile_outcome.success:
-                output.config_fatal(logfile_outcome.msg)
+        try:
+            if args.logfile:
+                logfile_outcome = files.check_file_write(self.log_file)
+                if not logfile_outcome.success:
+                    output.config_fatal(logfile_outcome.msg)
+        # poca-subscribe does not have logfile as argument option
+        except AttributeError:
+            pass
 
 
 def subs(conf):

@@ -61,6 +61,7 @@ def expand(entry, sub, sub_dir):
     return entry
 
 def get_user_vars(entry, sub):
+    forbidden = ['/', '\\', ':', '\'', '\"', ',', ';', '.']
     try:
         date = time.strftime('%Y-%m-%d', entry['published_parsed'])
     except (KeyError, TypeError):
