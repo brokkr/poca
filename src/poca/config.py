@@ -81,7 +81,7 @@ class Paths:
         self.config_file = path.join(self.config_dir, 'poca.xml')
         self.db_dir = path.join(self.config_dir, 'db')
         self.log_file = path.join(self.config_dir, 'poca.log')
-        self.test_paths()
+        self.test_paths(args)
 
     def expandall(self, _path):
         '''turn var into full absolute path'''
@@ -89,7 +89,7 @@ class Paths:
         _path = path.abspath(_path)
         return _path
 
-    def test_paths(self):
+    def test_paths(self, args):
         '''Checks for presence of ~/.poca/poca.xml. If that doesn't exist, try
         to create it. Also, check for existance of the db directory.'''
         if not path.isfile(self.config_file):
@@ -101,6 +101,10 @@ class Paths:
         db_dir_outcome = files.check_path(self.db_dir)
         if not db_dir_outcome.success:
             output.config_fatal(db_dir_outcome.msg)
+        if args.logfile:
+            logfile_outcome = files.check_file_write(self.log_file)
+            if not logfile_outcome.success:
+                output.config_fatal(logfile_outcome.msg)
 
 
 def subs(conf):
