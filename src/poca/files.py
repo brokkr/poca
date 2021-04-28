@@ -98,7 +98,7 @@ def verify_file(entry):
 
 
 def check_path(check_dir):
-    '''Create a directory'''
+    '''Check directory exists and is writable; if not create directory'''
     if os.path.isdir(check_dir):
         if os.access(check_dir, os.W_OK):
             return Outcome(True, '%s exists already' % check_dir)
@@ -107,9 +107,20 @@ def check_path(check_dir):
     try:
         os.makedirs(check_dir)
         return Outcome(True, '%s was successfully created' % check_dir)
-    except OSError:
+    except (FileExistsError, OSError) as e:
         return Outcome(False, 'Could not create %s' % check_dir)
 
+def check_file_write(check_file):
+    '''Check to see if file is writable/can be created'''
+    if os.path.isfile(check_file):
+        if os.access(check_file, os.W_OK):
+            return Outcome(True, '%s exists and is writable' % check_file)
+        else:
+            return Outcome(False, '%s exists but is not writable' % check_file)
+    if os.path.isdir(check_file):
+        return Outcome(False, '%s is a directory, not a file' % check_file)
+    outcome = check_path(os.path.dirname(check_file))
+    return outcome
 
 def delete_sub(conf, title, reset=False):
     '''Delete subscription files (optionally including history)'''

@@ -81,7 +81,7 @@ class Paths:
         self.config_file = path.join(self.config_dir, 'poca.xml')
         self.db_dir = path.join(self.config_dir, 'db')
         self.log_file = path.join(self.config_dir, 'poca.log')
-        self.test_paths()
+        self.test_paths(args)
 
     def expandall(self, _path):
         '''turn var into full absolute path'''
@@ -89,15 +89,26 @@ class Paths:
         _path = path.abspath(_path)
         return _path
 
-    def test_paths(self):
-        '''Checks for presence of ~/.poca and ~/.poca/poca.xml'''
-        for check_dir in [self.config_dir, self.db_dir]:
-            outcome = files.check_path(check_dir)
-            if not outcome.success:
-                output.config_fatal(outcome.msg)
+    def test_paths(self, args):
+        '''Checks for presence of ~/.poca/poca.xml. If that doesn't exist, try
+        to create it. Also, check for existance of the db directory.'''
         if not path.isfile(self.config_file):
-            outcome = xmlconf.write_config_file(self.config_file)
-            output.config_fatal(outcome.msg)
+            config_dir_outcome = files.check_path(self.config_dir)
+            if not config_dir_outcome.success:
+                output.config_fatal(config_dir_outcome.msg)
+            config_file_outcome = xmlconf.write_config_file(self.config_file)
+            output.config_fatal(config_file_outcome.msg)
+        db_dir_outcome = files.check_path(self.db_dir)
+        if not db_dir_outcome.success:
+            output.config_fatal(db_dir_outcome.msg)
+        try:
+            if args.logfile:
+                logfile_outcome = files.check_file_write(self.log_file)
+                if not logfile_outcome.success:
+                    output.config_fatal(logfile_outcome.msg)
+        # poca-subscribe does not have logfile as argument option
+        except AttributeError:
+            pass
 
 
 def subs(conf):
