@@ -61,13 +61,13 @@ def expand(entry, sub, sub_dir):
     return entry
 
 def get_user_vars(entry, sub):
-    forbidden = ['/', '\\', ':', '\'', '\"', ',', ';', '.']
+    '''make available the elements that the user can use in renaming'''
     try:
         date = time.strftime('%Y-%m-%d', entry['published_parsed'])
     except (KeyError, TypeError):
         date = 'missing_pub_date'
     uid = str(entry['id']) if 'id' in entry else 'missing_uid'
-    uid = ''.join([x for x in uid if x not in forbidden])
+    uid = scrub_string(uid)
     episode_title = str(entry['title']) if 'title' in entry else \
         'missing_title'
     user_vars = {'original_filename': entry['poca_basename'],
@@ -80,13 +80,16 @@ def get_user_vars(entry, sub):
     return user_vars
 
 def rename(entry, sub, user_vars):
-    forbidden = ['/', '\\', ':', '\'', '\"', ',', ';', '.']
     rename_lst = [user_vars[el.tag] for el in sub.rename.iterchildren() if
                   el.tag in user_vars]
     divider = sub.rename.get('divider') or ' '
     space = sub.rename.get('space') or ' '
     if rename_lst:
         basename = divider.join(rename_lst).replace(' ', space)
-        entry['poca_basename'] = ''.join([x for x in basename if x not in
-                                          forbidden])
+        entry['poca_basename'] = scrub_string(basename)
     return entry
+
+def scrub_string(unscrubbed_str):
+    forbidden = ['/', '\\', ':', '\'', '\"', ',', ';', '.']
+    scrubbed_str = ''.join([x for x in unscrubbed_str if x not in forbidden])
+    return scrubbed_str
