@@ -49,7 +49,7 @@ def expand(entry, sub, sub_dir):
     entry['user_vars'] = get_user_vars(entry, sub)
     if hasattr(sub, 'rename'):
         entry = rename(entry, sub, entry['user_vars'])
-    unicode = True if sys.stdout.encoding == 'UTF-8' else False
+    unicode = True if str.lower(sys.stdout.encoding) == 'utf-8' else False
     if not unicode:
         entry['poca_basename'] = entry['poca_basename'].encode(
             encoding='ascii', errors='ignore')

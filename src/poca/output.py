@@ -18,7 +18,7 @@ STREAM = logging.getLogger('POCA_STREAM')
 AFTER_STREAM = logging.getLogger('POCA_AFTER_STREAM')
 SUMMARY = logging.getLogger('POCA_SUMMARY')
 
-UNICODE = True if sys.stdout.encoding == 'UTF-8' else False
+UNICODE = True if str.lower(sys.stdout.encoding) == 'utf-8' else False
 
 WARNING_SIGN = '\u26a0' if UNICODE else '!'
 CROSS_MARK = '\u274c' if UNICODE else 'X'

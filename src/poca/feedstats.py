@@ -17,7 +17,7 @@ import feedparser
 
 
 EMPTY_ENTRY = {'title': 'n/a', 'published_parsed': None}
-UNICODE = True if sys.stdout.encoding == 'UTF-8' else False
+UNICODE = True if str.lower(sys.stdout.encoding) == 'utf-8' else False
 
 
 class Feedstats():
