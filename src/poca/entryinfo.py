@@ -19,23 +19,26 @@ import urllib.parse
 
 def validate(entry):
     '''Validates entry if it contains an enclosure'''
-    entry['expanded'] = False
+    entry['expanded'], entry['valid'] = False
     try:
         entry['poca_url'] = entry.enclosures[0]['href']
         entry['valid'] = True
     except (KeyError, IndexError, AttributeError):
-        entry['valid'] = False
-        return entry
+        pass
+    return entry
+
+def info_filename(entry, sub_dir):
+    '''expand with info about filename'''
     parsed_url = urllib.parse.urlparse(entry['poca_url'])
     parsed_path = urllib.parse.unquote(parsed_url.path)
     entry['filename'] = path.basename(parsed_path)
+    entry['poca_basename'], _ext = path.splitext(entry['filename'])
+    entry['poca_ext'] = _ext[1:]
+    entry['sub_dir'] = sub_dir
     return entry
 
-
-def expand(entry, sub, sub_dir):
-    '''Expands entry with url, paths and size'''
-    if entry['expanded'] is True:
-        return entry
+def info_stats(entry):
+    '''expand with info about length and size stats'''
     try:
         entry['poca_size'] = int(entry.enclosures[0]['length'])
         if entry['poca_size'] == 0:
@@ -44,50 +47,55 @@ def expand(entry, sub, sub_dir):
     except (KeyError, ValueError, TypeError):
         entry['poca_size'] = None
         entry['poca_mb'] = None
-    entry['poca_basename'], _ext = path.splitext(entry['filename'])
-    entry['poca_ext'] = _ext[1:]
-    entry['user_vars'] = get_user_vars(entry, sub)
-    if hasattr(sub, 'rename'):
-        entry = rename(entry, sub, entry['user_vars'])
-    unicode = True if str.lower(sys.stdout.encoding) == 'utf-8' else False
-    if not unicode:
-        entry['poca_basename'] = entry['poca_basename'].encode(
-            encoding='ascii', errors='ignore')
-        entry['poca_basename'] = entry['poca_basename'].decode()
-    entry['poca_filename'] = '.'.join((entry['poca_basename'],
-                                      entry['poca_ext']))
-    entry['poca_abspath'] = path.join(sub_dir, entry['poca_filename'])
-    entry['expanded'] = True
     return entry
 
-def get_user_vars(entry, sub):
-    '''make available the elements that the user can use in renaming'''
+def info_user_vars(entry, sub):
+    '''expand with info that the user can use in renaming'''
+    # check with rss specs and feedparser to see what can be relied on
     try:
         date = time.strftime('%Y-%m-%d', entry['published_parsed'])
     except (KeyError, TypeError):
         date = 'missing_pub_date'
-    uid = str(entry['id']) if 'id' in entry else 'missing_uid'
-    uid = scrub_string(uid)
-    episode_title = str(entry['title']) if 'title' in entry else \
-        'missing_title'
     user_vars = {'original_filename': entry['poca_basename'],
                  'subscription_title': sub.title.text,
-                 'episode_title': episode_title,
-                 'uid': uid,
+                 'episode_title': str(entry['title']),
+                 'uid': entry['id'],
                  'date': date,
                  'org_name': entry['poca_basename'],
                  'title': sub.title.text}
-    return user_vars
-
-def rename(entry, sub, user_vars):
-    rename_lst = [user_vars[el.tag] for el in sub.rename.iterchildren() if
-                  el.tag in user_vars]
-    divider = sub.rename.get('divider') or ' '
-    space = sub.rename.get('space') or ' '
-    if rename_lst:
-        basename = divider.join(rename_lst).replace(' ', space)
-        entry['poca_basename'] = scrub_string(basename)
+    entry['user_vars'] = user_vars
     return entry
+
+def expand(entry, sub, sub_dir):
+    '''Expands entry with url, paths and size'''
+    if entry['expanded'] is True:
+        return entry
+    entry = info_filename(entry, sub_dir)
+    entry = info_stats(entry)
+    entry = info_user_vars(entry, sub)
+    entry['rename'] = sub.rename if hasattr(sub, 'rename') else None
+    entry['names'] = names(entry)
+    entry['expanded'] = True
+    return entry
+
+def names(entry):
+    user_vars = entry['user_vars']
+    if entry['rename']:
+        name_children = [el for el in entry['rename'].iterchildren()]
+        name_tags = [el.tag for el in name_children if el.tag in user_vars]
+        name_lst = [user_vars[tag] for tag in name_tags]
+    else:
+        name_lst = [user_vars['org_name']]
+    divider = ['entry']rename.get('divider') or ' '
+    space = ['entry']rename.get('space') or ' '
+    name_base = divider.join(name_lst).replace(' ', space)
+    name_dic = {}
+    name_dic['base'] = name_base
+    name_dic['permissive'] = 'function'
+    name_dic['ntfs'] = 'function'
+    name_dic['restrictive'] = 'function'
+    name_dic['fallback'] = 'function'
+    return name_dic
 
 def scrub_string(unscrubbed_str):
     forbidden = ['/', '\\', ':', '\'', '\"', ',', ';', '.']
