@@ -136,22 +136,11 @@ class Feed:
 
     def set_entries(self, doc, sub):
         '''Extract entries from the feed xml'''
-        try:
-            self.lst = [entry.id for entry in doc.entries]
-            self.dic = {entry.id: entry for entry in doc.entries}
-        except (KeyError, AttributeError):
-            try:
-                # why not use uuid.uuid4() instead? as long as it's the same
-                # uuid in both lst and dic, it doesn't matter, right?
-                # it would also supply a surefire fallback filename
-                self.lst = [entry.enclosures[0]['href']
-                            for entry in doc.entries]
-                self.dic = {entry.enclosures[0]['href']: entry
-                            for entry in doc.entries}
-            except (KeyError, AttributeError):
-                self.outcome = Outcome(False, 'Cant find entries in feed.')
-                # should we set an artificial status here? Or does feedparser?
-                # return
+        self.lst, self.dic = list(), dict()
+        for entry in doc.entries:
+            entry = entryinfo.validate(entry)
+            self.lst.append(entry['uuid'])
+            self.dic[entry['uuid']] = entry
         from_the_top = sub.find('from_the_top') or 'no'
         if from_the_top == 'yes':
             self.lst.reverse()

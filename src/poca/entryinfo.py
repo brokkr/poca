@@ -11,6 +11,7 @@
 
 import sys
 import time
+import uuid
 from os import path
 import urllib.request
 import urllib.error
@@ -19,19 +20,13 @@ import urllib.parse
 
 def validate(entry):
     '''Validates entry if it contains an enclosure'''
-    entry['expanded'] = False
+    entry['expanded'], entry['valid'] = False, False
     try:
         entry['poca_url'] = entry.enclosures[0]['href']
+        entry['uuid'] = uuid.uuid5(uuid.NAMESPACE_URL, entry['poca_url'])
         entry['valid'] = True
     except (KeyError, IndexError, AttributeError):
-        entry['valid'] = False
-        return entry
-    #if the purpose of validate is to check if there is a url why are we continuing?
-    # this stuff just seem like it belongs in expanded?
-    # hfupdate
-    parsed_url = urllib.parse.urlparse(entry['poca_url'])
-    parsed_path = urllib.parse.unquote(parsed_url.path)
-    entry['filename'] = path.basename(parsed_path)
+        pass
     return entry
 
 
@@ -39,6 +34,11 @@ def expand(entry, sub, sub_dir):
     '''Expands entry with url, paths and size'''
     if entry['expanded'] is True:
         return entry
+    #####
+    parsed_url = urllib.parse.urlparse(entry['poca_url'])
+    parsed_path = urllib.parse.unquote(parsed_url.path)
+    entry['filename'] = path.basename(parsed_path)
+    #####
     try:
         entry['poca_size'] = int(entry.enclosures[0]['length'])
         if entry['poca_size'] == 0:
@@ -72,14 +72,12 @@ def get_user_vars(entry, sub):
     # if we use uuid when setting entries in Feed, we would always
     # have an id. also if all entries are missing id, they all end
     # up having the same "missing_uid" id.
-    uid = str(entry['id']) if 'id' in entry else 'missing_uid'
-    uid = scrub_string(uid)
     episode_title = str(entry['title']) if 'title' in entry else \
         'missing_title'
     user_vars = {'original_filename': entry['poca_basename'],
                  'subscription_title': sub.title.text,
                  'episode_title': episode_title,
-                 'uid': uid,
+                 'uid': entry['uuid'],
                  'date': date,
                  'org_name': entry['poca_basename'],
                  'title': sub.title.text}
