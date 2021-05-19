@@ -47,6 +47,7 @@ class SubUpgrade():
             entry = subdata.jar.dic[uid]
             self.remove(uid, entry, subdata)
 
+        # loop through lacking to get
         for uid in subdata.lacking:
             entry = subdata.wanted.dic[uid]
             self.acquire(uid, entry, subdata)

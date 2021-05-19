@@ -26,6 +26,9 @@ def validate(entry):
     except (KeyError, IndexError, AttributeError):
         entry['valid'] = False
         return entry
+    #if the purpose of validate is to check if there is a url why are we continuing?
+    # this stuff just seem like it belongs in expanded?
+    # hfupdate
     parsed_url = urllib.parse.urlparse(entry['poca_url'])
     parsed_path = urllib.parse.unquote(parsed_url.path)
     entry['filename'] = path.basename(parsed_path)
@@ -66,6 +69,9 @@ def get_user_vars(entry, sub):
         date = time.strftime('%Y-%m-%d', entry['published_parsed'])
     except (KeyError, TypeError):
         date = 'missing_pub_date'
+    # if we use uuid when setting entries in Feed, we would always
+    # have an id. also if all entries are missing id, they all end
+    # up having the same "missing_uid" id.
     uid = str(entry['id']) if 'id' in entry else 'missing_uid'
     uid = scrub_string(uid)
     episode_title = str(entry['title']) if 'title' in entry else \

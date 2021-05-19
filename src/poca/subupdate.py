@@ -44,11 +44,13 @@ class SubUpdate():
         self.conf = conf
         self.sub = sub
         self.status = 0
+        # SANITIZE: What if there are problem characters in sub.title?
         self.sub_dir = os.path.join(self.conf.xml.settings.base_dir.text,
                                     self.sub.title.text)
         self.outcome = files.check_path(self.sub_dir)
         if not self.outcome.success:
             return
+        # SANITIZE: What if there are problem characters in sub.title?
 
         # merge sub settings and defaults
         defaults = deepcopy(self.conf.xml.defaults)
@@ -139,6 +141,9 @@ class Feed:
             self.dic = {entry.id: entry for entry in doc.entries}
         except (KeyError, AttributeError):
             try:
+                # why not use uuid.uuid4() instead? as long as it's the same
+                # uuid in both lst and dic, it doesn't matter, right?
+                # it would also supply a surefire fallback filename
                 self.lst = [entry.enclosures[0]['href']
                             for entry in doc.entries]
                 self.dic = {entry.enclosures[0]['href']: entry
@@ -185,6 +190,8 @@ class Wanted():
             self.limit(sub)
         self.dic = {uid: entryinfo.expand(combo.dic[uid], sub, sub_dir)
                     for uid in self.lst}
+        # checking for filename collisions is going to be harder once we have
+        # three possible names to choose from...
         filename_set = {self.dic[uid]['poca_filename'] for uid in self.lst}
         if len(filename_set) < len(self.lst):
             self.outcome = Outcome(False, "Filename used more than once. "
