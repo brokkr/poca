@@ -19,7 +19,7 @@ from threading import current_thread
 from poca.outcome import Outcome
 
 
-def download_file(url, file_path, settings):
+def download_file(entry, settings):
     '''Download function with block time outs'''
     my_thread = current_thread()
     headers = requests.utils.default_headers()
@@ -37,6 +37,8 @@ def download_file(url, file_path, settings):
         return Outcome(False, 'Download of %s timed out' % url)
     if r.status_code >= 400:
         return Outcome(False, 'Download of %s failed' % url)
+    # run this bit for key in ['permissive', 'ntfs', 'restrictive', 'fallback']
+    # until one suceeds?
     with open(file_path, 'wb') as f:
         try:
             for chunk in r.iter_content(chunk_size=1024):
@@ -55,6 +57,7 @@ def download_file(url, file_path, settings):
             _outcome = delete_file(f.name)
             return Outcome(False, 'Download of %s timed out' % url)
     r.close()
+    # end of bit
     return Outcome(True, '')
 
 

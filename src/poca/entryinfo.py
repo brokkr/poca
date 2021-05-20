@@ -9,8 +9,10 @@
 
 """Get more information on a single feed entry"""
 
+import re
 import sys
 import time
+import uuid
 from os import path
 import urllib.request
 import urllib.error
@@ -78,26 +80,47 @@ def expand(entry, sub, sub_dir):
     entry['expanded'] = True
     return entry
 
+def filename_permissive(name_base):
+    '''produces filenames that are allowed on most linux filesystems'''
+    # no null, no forward slash
+    forbidden = '[\x00\x2f]'
+    re_permissive = re.compile(forbidden)
+    permissive = re_permissive.sub('', name_base)
+    return permissive
+
+def filename_ntfs(name_base):
+    '''produces filenames that are allowed on ntfs/vfat filesystems'''
+    #forbidden chars: " * / : < > ? \ |
+    forbidden = '[\x22\x2a\x2f\x3a\x3c\x3e\x3f\x5c\x7c]'
+    re_ntfs = re.compile(forbidden)
+    ntfs = re_ntfs.sub('', name_base)
+    # no control characters
+    ntfs = ''.join(x for x in ntfs if unicodedata.category(x)[0] != 'C')
+    return ntfs
+
+def filename_restrictive(name_base):
+    '''produces filenames that should not fall foul of any current protocols'''
+    # only alphanumerical, hyphens and underscores allowed
+    forbidden = '[^a-zA-Z0-9\x5f\x2d]'
+    re_restrictive = re.compile(forbidden)
+    restrictive = re_restrictive.sub('', name_base)
+    return restrictive
+
 def names(entry):
     user_vars = entry['user_vars']
     if entry['rename']:
         name_children = [el for el in entry['rename'].iterchildren()]
         name_tags = [el.tag for el in name_children if el.tag in user_vars]
         name_lst = [user_vars[tag] for tag in name_tags]
+        divider = ['entry']rename.get('divider') or ' '
+        space = ['entry']rename.get('space') or ' '
+        name_base = divider.join(name_lst).replace(' ', space)
     else:
-        name_lst = [user_vars['org_name']]
-    divider = ['entry']rename.get('divider') or ' '
-    space = ['entry']rename.get('space') or ' '
-    name_base = divider.join(name_lst).replace(' ', space)
+        name_base = user_vars['org_name']
     name_dic = {}
     name_dic['base'] = name_base
-    name_dic['permissive'] = 'function'
-    name_dic['ntfs'] = 'function'
-    name_dic['restrictive'] = 'function'
-    name_dic['fallback'] = 'function'
+    name_dic['permissive'] = filename_permissive(name_base)
+    name_dic['ntfs'] = filename_ntfs(name_base)
+    name_dic['restrictive'] = filename_restrive(name_base)
+    name_dic['fallback'] = uuid.uuid4().hex[:8]
     return name_dic
-
-def scrub_string(unscrubbed_str):
-    forbidden = ['/', '\\', ':', '\'', '\"', ',', ';', '.']
-    scrubbed_str = ''.join([x for x in unscrubbed_str if x not in forbidden])
-    return scrubbed_str
