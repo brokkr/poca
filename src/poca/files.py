@@ -40,7 +40,7 @@ def download_file(entry, settings):
         return Outcome(False, 'Download of %s failed' % url)
     filename_keys = ('permissive', 'ntfs', 'restrictive', 'fallback')
     for key in filename_keys:
-        print('%s : %s' % (key, entry['names']['key']))
+        print('%s : %s' % (key, entry['names'][key]))
     for key in filename_keys:
         file_path = os.path.join(entry['directory'], entry['names'][key])
         print(file_path)
