@@ -39,6 +39,8 @@ def download_file(entry, settings):
     if r.status_code >= 400:
         return Outcome(False, 'Download of %s failed' % url)
     # run this bit for key in ['permissive', 'ntfs', 'restrictive', 'fallback']
+    file_path = os.path.join(entry['directory'], entry['names']['permissive'])
+    print(file_path)
     # until one suceeds?
     with open(file_path, 'wb') as f:
         try:
