@@ -39,11 +39,12 @@ def validate(entry):
 # EXPANSION                               #
 # ####################################### #
 
-def expand(entry, sub):
+def expand(entry, sub, sub_dir):
     '''expands entry with url, paths and size'''
     if entry['expanded'] is True:
         return entry
-    entry['directory'] = sub.title.text
+    entry['sub_title'] = sub.title.text
+    entry['directory'] = sub_dir
     entry = info_org_filename(entry)
     entry['megabytes'] = info_megabytes(entry)
     entry['metadata'] = "Coming soon"
@@ -79,7 +80,7 @@ def info_user_vars(entry):
     except (KeyError, TypeError):
         date = '1970-01-01'
     user_vars = {}
-    user_vars['title']: entry['directory']
+    user_vars['title']: entry['sub_title']
     user_vars['episode_title'] = str(entry['title'])
     user_vars['uid'] = entry['id']
     user_vars['date'] = date
