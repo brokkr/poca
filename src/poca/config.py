@@ -117,7 +117,7 @@ class Paths:
         # test base_dir is writable
         self.base_dir = base_dir
         base_dir_outcome = files.check_path(self.base_dir)
-        if not db_dir_outcome.success:
+        if not base_dir_outcome.success:
             output.config_fatal(db_dir_outcome.msg)
 
 def subs(conf):
