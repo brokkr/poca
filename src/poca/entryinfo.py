@@ -13,6 +13,7 @@ import re
 import sys
 import time
 import uuid
+import unicodedata
 from os import path
 import urllib.request
 import urllib.error
