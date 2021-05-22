@@ -25,7 +25,7 @@ import urllib.parse
 
 def validate(entry):
     '''validates entry if it contains an enclosure'''
-    entry['expanded'], entry['valid'] = False
+    entry['expanded'], entry['valid'] = False, False
     try:
         entry['poca_url'] = entry.enclosures[0]['href']
         entry['valid'] = True
