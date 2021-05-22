@@ -39,11 +39,12 @@ def download_file(entry, settings):
     if r.status_code >= 400:
         return Outcome(False, 'Download of %s failed' % url)
     filename_keys = ('permissive', 'ntfs', 'restrictive', 'fallback')
+    # testing
     for key in filename_keys:
         print('%s : %s' % (key, entry['names'][key]))
+    # testing
     for key in filename_keys:
         file_path = os.path.join(entry['directory'], entry['names'][key])
-        print(file_path)
         try:
             with open(file_path, 'wb') as f:
                 try:
@@ -65,8 +66,10 @@ def download_file(entry, settings):
                     _outcome = delete_file(f.name)
                     return Outcome(False, 'Download of %s timed out' % url)
         except OSError:
+            # testing
             print('%s did not work, trying another...' % file_path)
-
+    # this should never happen
+    return Outcome(False, 'Somehow none of the filenames we tried worked')
 
 def download_img_file(url, sub_dir, settings):
     '''Download an image file'''

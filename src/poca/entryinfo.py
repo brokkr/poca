@@ -95,7 +95,7 @@ def info_user_vars(entry):
 def names(entry):
     '''generates a dictionary of file names of decreasing permissiveness'''
     user_vars = entry['user_vars']
-    if entry['rename']:
+    if entry['rename'] is not None:
         name_children = [el for el in entry['rename'].iterchildren()]
         name_tags = [el.tag for el in name_children if el.tag in user_vars]
         name_lst = [user_vars[tag] for tag in name_tags]
