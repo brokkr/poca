@@ -44,7 +44,7 @@ class SubUpdate():
         self.conf = conf
         self.sub = sub
         self.status = 0
-        self.sub_dir = os.path.join(self.conf.xml.settings.base_dir.text,
+        self.sub_dir = os.path.join(self.conf.paths.base_dir,\
                                     self.sub.title.text)
         self.outcome = files.check_path(self.sub_dir)
         if not self.outcome.success:

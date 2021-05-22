@@ -55,6 +55,8 @@ class Config:
                 output.config_fatal(outcome.msg)
         else:
             self.xml = self.get_xml()
+        base_dir = self.xml.settings.base_dir.text
+        self.paths.test_base_dir(base_dir)
 
     def get_xml(self):
         '''Returns the XML tree root harvested from the users poca.xml file.'''
@@ -98,6 +100,7 @@ class Paths:
                 output.config_fatal(config_dir_outcome.msg)
             config_file_outcome = xmlconf.write_config_file(self.config_file)
             output.config_fatal(config_file_outcome.msg)
+        # test db_dir is writable
         db_dir_outcome = files.check_path(self.db_dir)
         if not db_dir_outcome.success:
             output.config_fatal(db_dir_outcome.msg)
@@ -110,6 +113,12 @@ class Paths:
         except AttributeError:
             pass
 
+    def test_base_dir(self, base_dir):
+        # test base_dir is writable
+        self.base_dir = base_dir
+        base_dir_outcome = files.check_path(self.base_dir)
+        if not db_dir_outcome.success:
+            output.config_fatal(db_dir_outcome.msg)
 
 def subs(conf):
     xp_str = './subscription[not(@state="inactive")][title][url]'
