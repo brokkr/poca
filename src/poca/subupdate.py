@@ -185,7 +185,7 @@ class Wanted():
             self.limit(sub)
         self.dic = {uid: entryinfo.expand(combo.dic[uid], sub)
                     for uid in self.lst}
-        filename_set = {self.dic[uid]['poca_filename'] for uid in self.lst}
+        filename_set = {self.dic[uid]['filename'] for uid in self.lst}
         if len(filename_set) < len(self.lst):
             self.outcome = Outcome(False, "Filename used more than once. "
                                    "Use rename tag to fix.")
