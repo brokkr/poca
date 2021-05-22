@@ -38,30 +38,31 @@ def download_file(entry, settings):
         return Outcome(False, 'Download of %s timed out' % url)
     if r.status_code >= 400:
         return Outcome(False, 'Download of %s failed' % url)
-    # run this bit for key in ['permissive', 'ntfs', 'restrictive', 'fallback']
-    file_path = os.path.join(entry['directory'], entry['names']['permissive'])
-    print(file_path)
-    # until one suceeds?
-    with open(file_path, 'wb') as f:
-        try:
-            for chunk in r.iter_content(chunk_size=1024):
-                if getattr(my_thread, "kill", False):
-                    r.close()
-                    _outcome = delete_file(f.name)
-                    return Outcome(None, 'Download cancelled by user')
-                if chunk:
-                    f.write(chunk)
-        except requests.exceptions.ConnectionError as e:
-            r.close()
-            _outcome = delete_file(f.name)
-            return Outcome(False, 'Download of %s broke off' % url)
-        except requests.exceptions.Timeout:
-            r.close()
-            _outcome = delete_file(f.name)
-            return Outcome(False, 'Download of %s timed out' % url)
-    r.close()
-    # end of bit
-    return Outcome(True, '')
+    filename_keys = ('permissive', 'ntfs', 'restrictive', 'fallback')
+    for key in filename_keys:
+        file_path = os.path.join(entry['directory'], entry['names'][key])
+        print(file_path)
+        with open(file_path, 'wb') as f:
+            try:
+                for chunk in r.iter_content(chunk_size=1024):
+                    if getattr(my_thread, "kill", False):
+                        r.close()
+                        _outcome = delete_file(f.name)
+                        return Outcome(None, 'Download cancelled by user')
+                    if chunk:
+                        f.write(chunk)
+                r.close()
+                return Outcome(True, file_path)
+            except requests.exceptions.ConnectionError as e:
+                r.close()
+                _outcome = delete_file(f.name)
+                return Outcome(False, 'Download of %s broke off' % url)
+            except requests.exceptions.Timeout:
+                r.close()
+                _outcome = delete_file(f.name)
+                return Outcome(False, 'Download of %s timed out' % url)
+            except OSError:
+                print('%s did not work, trying another...' % file_path)
 
 
 def download_img_file(url, sub_dir, settings):
