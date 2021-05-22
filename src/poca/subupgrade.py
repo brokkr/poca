@@ -78,8 +78,7 @@ class SubUpgrade():
         output.processing_download(entry)
         wantedindex = subdata.wanted.lst.index(uid) - len(self.failed)
         # see https://github.com/brokkr/poca/wiki/__Developer-notes__
-        entry['abs_path'], self.outcome = \
-            files.download_file(entry, subdata.conf.xml.settings)
+        self.outcome = files.download_file(entry, subdata.conf.xml.settings)
         if self.outcome.success is False:
             self.fail_flag = True
             output.fail_download(subdata.sub.title.text, self.outcome)
@@ -87,6 +86,7 @@ class SubUpgrade():
             return
         if self.outcome.success is None:
             return
+        entry['poca_abspath'] = self.outcome.msg
         subdata.jar.lst.insert(wantedindex, uid)
         subdata.jar.dic[uid] = entry
         _outcome = subdata.jar.save()
