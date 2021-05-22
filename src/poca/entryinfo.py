@@ -97,8 +97,8 @@ def names(entry):
         name_children = [el for el in entry['rename'].iterchildren()]
         name_tags = [el.tag for el in name_children if el.tag in user_vars]
         name_lst = [user_vars[tag] for tag in name_tags]
-        divider = ['entry']rename.get('divider') or ' '
-        space = ['entry']rename.get('space') or ' '
+        divider = entry['rename'].get('divider') or ' '
+        space = entry['rename'].get('space') or ' '
         name_base = divider.join(name_lst).replace(' ', space)
     else:
         name_base = user_vars['org_name']
