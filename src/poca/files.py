@@ -44,7 +44,7 @@ def download_file(entry, settings):
         print('%s : %s' % (key, entry['names'][key]))
     # testing
     for key in filename_keys:
-        filename = '.'join(entry['names'][key], entry['extension'])
+        filename = '.'.join(entry['names'][key], entry['extension'])
         file_path = os.path.join(entry['directory'], filename)
         try:
             with open(file_path, 'wb') as f:
