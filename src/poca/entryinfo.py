@@ -82,7 +82,7 @@ def info_user_vars(entry):
     user_vars['episode_title'] = str(entry['title'])
     user_vars['uid'] = entry['id']
     user_vars['date'] = date
-    user_vars['org_name'] = entry['poca_basename']
+    user_vars['org_name'] = entry['basename']
     return user_vars
 
 
