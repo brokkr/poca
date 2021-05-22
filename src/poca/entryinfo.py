@@ -107,7 +107,7 @@ def names(entry):
     name_dic['base'] = name_base
     name_dic['permissive'] = filename_permissive(name_base)
     name_dic['ntfs'] = filename_ntfs(name_base)
-    name_dic['restrictive'] = filename_restrive(name_base)
+    name_dic['restrictive'] = filename_restrictive(name_base)
     name_dic['fallback'] = uuid.uuid4().hex[:8]
     return name_dic
 
