@@ -23,6 +23,7 @@ def download_file(entry, settings):
     '''Download function with block time outs'''
     my_thread = current_thread()
     headers = requests.utils.default_headers()
+    url = entry['poca_url']
     if settings.useragent.text:
         useragent = {'User-Agent': settings.useragent.text}
         headers.update(useragent)
