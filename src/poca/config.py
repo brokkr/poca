@@ -118,7 +118,7 @@ class Paths:
         self.base_dir = base_dir
         base_dir_outcome = files.check_path(self.base_dir)
         if not base_dir_outcome.success:
-            output.config_fatal(db_dir_outcome.msg)
+            output.config_fatal(base_dir_outcome.msg)
 
 def subs(conf):
     xp_str = './subscription[not(@state="inactive")][title][url]'
