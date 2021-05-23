@@ -120,7 +120,7 @@ def processing_removal(entry):
     '''One line per entry telling user of episodes being deleted by poca'''
     size = entry['poca_mb']
     size_str = ' [%s Mb]' % str(round(size)) if size else ' [Unknown]'
-    msg = ' %s %s %s' % (CROSS_MARK, entry['org_filename'], size_str)
+    msg = ' %s %s %s' % (CROSS_MARK, entry['filename'], size_str)
     STREAM.debug(msg)
 
 
