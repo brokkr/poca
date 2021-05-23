@@ -190,9 +190,9 @@ class Wanted():
         for uid in self.lst:
             count = filenames.count(self.dic[uid]['poca_filename'])
             if count > 1:
-                entry['unique_filename'] = False
+                self.dic[uid]['unique_filename'] = False
             else:
-                entry['unique_filename'] = True
+                self.dic[uid]['unique_filename'] = True
         self.feed_etag = feed.etag
         self.feed_modified = feed.modified
         self.feed_image = feed.image
