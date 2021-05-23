@@ -109,11 +109,11 @@ your subscription to leave the track number as is.
 metadata
 ^^^^^^^^
 
-With 0.9 tagging now works for vorbis comments (ogg, opus, flac amongst 
-others) as well as id3 tags.
+With 1.1 tagging now works for m4a files as well as vorbis comments (ogg, 
+opus, flac amongst others) and id3 tags.
 
-Each element under **metadata** is a field in the id3/vorbis comment header 
-that should be overwritten or added (if there is no such field in the 
+Each element under **metadata** is a field in the id3/m4a/vorbis comment 
+header that should be overwritten or added (if there is no such field in the 
 original metadata). If you do not wish to touch the vorbis comment/id3 
 headers simply leave out the **metadata** element altogether. 
 
@@ -126,9 +126,10 @@ headers simply leave out the **metadata** element altogether.
   inserting a ``<genre>podcast</genre>`` element either in each individual 
   subscription or in the ``defaults``. 
 
-A list of all the field names that poca recognises for id3 headers can be 
-printed by running 
-`poca-subscribe tags <https://github.com/brokkr/poca/wiki/poca-subscribe#tags>`_. 
+A list of all the field names that poca recognises for id3 and m4a headers can
+be printed by running ``poca-subscribe tags`` using either the ``--mp3`` or
+the ``--mp4`` flag.
+
 They are generally the obvious ones, ``title`` for track title, ``artist`` 
 for artist, etc. Vorbis comment tags are not restricted in what keys can be 
 used but this `Xiph.org list <https://xiph.org/vorbis/doc/v-comment.html>`_ 
@@ -173,9 +174,7 @@ file name. Alternatively you can set the ``divider`` attribute and give it
 the desired divider value. Spaces in the filename originating from using a 
 title or similar can be replaced by using the ``space`` attribute. Spaces 
 will be replaced with the value of the attribute. Do note that the resulting 
-filenames are sanitized, so any backslah, forward slash, quote (single or 
-double), colon, comma, dot and semi-colon (\ ``\/'":,.;``\ ) will be removed 
-before writing out the file name 
+filenames are sanitized. See the *filenames* section in **Settings**.
 
 Example
 ~~~~~~~
@@ -213,8 +212,9 @@ is perfectly possible to use simple strings and ignore the regex aspect. The
 filename matches is the original filename, not those resulting from using 
 ``rename`` (see above). Example: 
 
-``<filename>\.mp3$</filename>`` excludes the videos from Ricky Gervais' 
-podcast.
+``<filename>^episode</filename>`` will only include regular Judge John Hodgman
+episodes and not the special cheese shows, *shootin' the bries* that have
+filenames starting with "shootin'".
 
 title
 ~~~~~

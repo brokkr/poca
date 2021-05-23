@@ -22,9 +22,8 @@ and the following optional settings:
 
 * ``id3v2version``
 * ``id3removev1``
-* ``id3encoding`` (deprecated in 0.9)
+* ``filenames``
 * ``useragent``
-* ``audiosearch`` (deprecated in 1.0)
 * ``email``
 
 Required settings
@@ -71,16 +70,6 @@ This allows you to remove id3v1 headers (if any exist) from the files. It
 has the valid values **yes** and **no**. It will only be applied in any given 
 subscription if the subscription settings (or defaults) include id3 overrides.
 
-id3encoding (deprecated in 0.9)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-id3encoding didn't really do what it said on the tin because each frame 
-(artist, album, title, etc.) in an id3 header is separately encoded and the 
-encoding would only apply to new or overwritten frames. As the real 
-distinction is between players that prefer v2.3 (using a mixture of latin1 
-and utf16 frames) and v2.4 (using a mixture of latin1 and utf8 frames), the 
-setting has been depecated since 0.9
-
 Optional settings (other)
 -------------------------
 
@@ -97,26 +86,54 @@ leave it empty/remove it if you don't want poca to use spoofing. We suggest
 you leave as it is and only return to it if you see lots of messages like 
 this when you run poca: "Download failed. HTTP Error 403: Forbidden".
 
-audiosearch (deprecated in 1.0)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+filenames (new in 1.1)
+^^^^^^^^^^^^^^^^^^^^^^
 
-As of November 28 2017 audiosear.ch will cease operations. Therefore the 
-``poca-subscribe search`` functionality has been removed from the 1.0 release.
+The filenames setting allows the user to set an upper level of filename
+character permissiveness. Some filesystems allow for more characters in 
+filenames than others. Poca handles this by trying four different filenaming
+restriction settings, one after the other, in order of decreasing
+'permissiveness'. In other words: The more attempts, the more characters are
+removed from the filename of the file being written. This system mostly comes
+into effect when using feed data to generate a filename using the rename
+scheme. The four levels are:
 
-Application oauth id and secret required for using the Audiosear.ch API with 
-``poca-subscribe search``. For more on the functionality see the wiki on 
-`poca-subscribe search <https://github.com/brokkr/poca/wiki/poca-subscribe#search>`_. 
-To register your application and get your own id/secret, please go to 
-`https://www.audiosear.ch/oauth/applications <https://www.audiosear.ch/oauth/applications>`_.
+* ``permissive``: Only ``/`` and ``␀ `` (the null character) are removed from
+  the filename. These are the only characters that are outright forbidden on
+  linux file systems, like ext4 and others.
+* ``ntfs``: Any characters that are not acceptable on NTFS and FAT filesystems
+  (mounted using VFAT, the restrictions are the same for FAT as for NTFS) are 
+  removed from the filename. That includes all control characters, slashes
+  (backward and forward), colons, asterisks, question marks etc.
+* ``restrictive``: Unlike permissive and ntfs, restrictive is defined by the
+  characters included, not by those removed. Accepted characters are
+  alphanumerical, hyphens, and underscores. In regex terms: [a-zA-Z0-9_\-].
+  Spaces are converted to underscores, rather than removed.
+* ``fallback``: This option is defined as the publishing date of the entry in 
+  the feed in the format YYYY-MM-DD, followed by 9 random hexadecimal digits.
 
-Example:
+``permissive`` and ``ntfs`` both retain all (non-excluded) unicode characters. 
+The filenames setting does not fix the scheme, poca will use. It allows the
+user to set a 'lower' starting point than would otherwise be used. The default
+starting point is the ``permissive`` setting. 
 
-.. code-block:: xml
+Ordinarily, poca will attempt the schemes in the order listed. Filesystem
+failures will cause it to move on to the next scheme. If the files are to be
+shared using a protocol, less tolerant of filename characters than the
+filesystem used, it might be preferable to have poca apply more restrictions
+from the start rather than having to rename them later. E.g. ext4 filesystem
+but the files are made accessible via SAMBA/CIFS.
 
-   <audiosearch>
-       <id>t7h9as6fnojimcyr53eqcrykpcrnbjb77en70sqtsqbamelh54q6enkil1u8edvb</id>
-       <secret>6uh70n1noucy201qaddgwhmwnhmc9cuilgcix9n4wg7pk3smmqjdcmrjuhbhfbvs</secret>
-   </audiosearch>
+The setting applies regardless of whether a subscription uses the default, 
+original filenames or a rename scheme. It is applied only to the basename, 
+and after a possible ``rename`` operation.
+
+Note that the ``fallback`` setting will also be applied regardless of user
+settings, if poca detects that multiple entries to be downloaded will have the
+same filename if the configuration is followed to the letter. E.g. if no rename
+scheme is in effect with a subscription from acast.com (which names every file
+media.mp3) or if the user has chosen [subscription title].mp3 as the rename
+scheme.
 
 email
 ^^^^^
