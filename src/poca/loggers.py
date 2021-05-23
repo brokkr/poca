@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright 2010-2021 Mads Michelsen (mail@brokkr.net)
 # This file is part of Poca.
 # Poca is free software: you can redistribute it and/or modify it

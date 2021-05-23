@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-# Copyright 2010-2017 Mads Michelsen (mail@brokkr.net)
+# Copyright 2010-2021 Mads Michelsen (mail@brokkr.net)
 # This file is part of Poca.
 # Poca is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -15,11 +14,10 @@ from distutils.core import setup
 
 setup(
     name='poca',
-    version='1.1alpha',
+    version='1.1alpha1',
     license='GPL3',
-    description='A fast and highly customizable command line podcast client',
-    long_description=('A fast and highly customizable command line podcast '
-                      'client'),
+    description='A fast and customizable command line podcast client',
+    long_description=('A fast and customizable command line podcast client'),
     author='Mads Michelsen',
     author_email='mail@brokkr.net',
     url='https://github.com/brokkr/poca',
