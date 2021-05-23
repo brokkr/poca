@@ -47,7 +47,7 @@ def expand(entry, sub, sub_dir):
     entry['directory'] = sub_dir
     entry['org_filename'], entry['basename'], entry['extension'] \
         = info_org_filename(entry)
-    entry['megabytes'] = info_megabytes(entry)
+    entry['poca_mb'] = info_megabytes(entry)
     #entry['metadata'] = "Coming soon"
     entry['user_vars'] = info_user_vars(entry)
     entry['rename'] = sub.rename if hasattr(sub, 'rename') else None
