@@ -39,9 +39,9 @@ def download_file(entry, settings):
     if r.status_code >= 400:
         return Outcome(False, 'Download of %s failed' % url)
     filename_keys = ['permissive', 'ntfs', 'restrictive', 'fallback']
-    #start_at = settings.filenames.text or 'permissive'
-    #if start_at in filename_keys:
-    #    filename_keys = filename_keys[filename_key.index[start_at]:]
+    start_at = settings.filenames.text or 'permissive'
+    if start_at in filename_keys:
+        filename_keys = filename_keys[filename_key.index[start_at]:]
     if not entry['unique_filename']:
         filename_keys = ['fallback']
     # testing
