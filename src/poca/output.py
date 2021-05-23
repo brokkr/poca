@@ -113,7 +113,7 @@ def plans_upgrade(subdata):
 def processing_user_deleted(entry):
     '''One line per entry telling user of episodes deleted by user'''
     episode = entry['title'] or entry['poca_filename']
-    msg = ' %s %s deleted by user' % (CIRCLE_X, episode])
+    msg = ' %s %s deleted by user' % (CIRCLE_X, episode)
     STREAM.debug(msg)
 
 
