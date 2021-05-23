@@ -52,6 +52,11 @@ def expand(entry, sub, sub_dir):
     entry['user_vars'] = info_user_vars(entry)
     entry['rename'] = sub.rename if hasattr(sub, 'rename') else None
     entry['names'] = names(entry)
+    # NOTE: 'poca_filename' used to be the filename to be written to.
+    #       Now it just serves as a way to check if multiple entries stand
+    #       to get the same filename. Actual filename is chosen from
+    #       candidates in entry['names'] at time of download.
+    entry['poca_filename'] = '.'.join((entry['names']['base'], entry['extension']))
     entry['expanded'] = True
     return entry
 
