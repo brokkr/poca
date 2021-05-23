@@ -142,6 +142,8 @@ def filename_restrictive(name_base):
     '''produces filenames that should not fall foul of any current protocols'''
     # only alphanumerical, hyphens and underscores allowed
     forbidden = '[^a-zA-Z0-9\x5f\x2d]'
+    re_whitespace = re.compile('\s')
     re_restrictive = re.compile(forbidden)
-    restrictive = re_restrictive.sub('', name_base)
+    restrictive = re_whitespace.sub('_', name_base)
+    restrictive = re_restrictive.sub('', restrictive)
     return restrictive
