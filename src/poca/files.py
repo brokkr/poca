@@ -84,6 +84,7 @@ def download_img_file(url, sub_dir, settings):
     except requests.exceptions.RequestException:
         return Outcome(False, 'Download of %s failed' % url)
     content_type = r.headers['content-type'].lower()
+    print(content_type)
     mime_dic = {'image/bmp': '.bmp',
                 'image/gif': '.gif',
                 'image/jpeg': '.jpg',
