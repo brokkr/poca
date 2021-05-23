@@ -17,17 +17,19 @@ from poca.outcome import Outcome
 from poca.lxmlfuncs import pretty_print
 
 
-TEMPLATE = """<poca version="1.0">
+TEMPLATE = """<poca version="1.1">
 
   <!-- Please see detailed settings documentation online:
-  https://github.com/brokkr/poca/wiki/Settings. The available
+  https://poca.readthedocs.io/en/latest/Settings.html. The available
   options are briefly as follows:
   * base_dir: Directory containing the individual subscription folders
+  * filenames: Level of permissiveness regarding characters in filenames
   * id3v2version: 3 for id3v2.3, 4 for id3v2.4 (default)
   * id3removev1: Should we remove id3v1, only keeping v2 (yes or no) -->
 
   <settings>
     <base_dir>/tmp/poca</base_dir>
+    <filenames>permissive</filenames>
     <id3v2version>4</id3v2version>
     <id3removev1>yes</id3removev1>
   </settings>
@@ -44,7 +46,7 @@ TEMPLATE = """<poca version="1.0">
   <subscriptions>
 
     <!-- Use 'poca-subscribe add' to quickly add new subscriptions.
-    See https://github.com/brokkr/poca/wiki/Subscriptions for a
+    See https://poca.readthedocs.io/en/latest/Subscriptions.html for a
     full explanation of options. The meaning of the subscription
     options are briefly as follows:
     * title: Name used for the folder of the subscription (required)

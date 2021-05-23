@@ -22,6 +22,7 @@ E = objectify.ElementMaker(annotate=False)
 DEFAULT_XML = E.poca(
                      E.settings(
                                 E.base_dir('/tmp/poca'),
+                                E.filenames('permissive'),
                                 E.id3v2version(4, {'v0': 3, 'v1': 4}),
                                 E.id3removev1('yes', {'v0': 'yes',
                                                       'v1': 'no'}),
