@@ -185,10 +185,10 @@ class Wanted():
             self.limit(sub)
         self.dic = {uid: entryinfo.expand(combo.dic[uid], sub, sub_dir)
                     for uid in self.lst}
-        filename_set = {self.dic[uid]['org_filename'] for uid in self.lst}
-        if len(filename_set) < len(self.lst):
-            self.outcome = Outcome(False, "Filename used more than once. "
-                                   "Use rename tag to fix.")
+        #filename_set = {self.dic[uid]['org_filename'] for uid in self.lst}
+        #if len(filename_set) < len(self.lst):
+        #    self.outcome = Outcome(False, "Filename used more than once. "
+        #                           "Use rename tag to fix.")
         self.feed_etag = feed.etag
         self.feed_modified = feed.modified
         self.feed_image = feed.image
