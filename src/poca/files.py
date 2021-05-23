@@ -45,8 +45,8 @@ def download_file(entry, settings):
     if not entry['unique_filename']:
         filename_keys = ['fallback']
     # testing
-    for key in filename_keys:
-        print('%s : %s' % (key, entry['names'][key]))
+    #for key in filename_keys:
+    #    print('%s : %s' % (key, entry['names'][key]))
     # testing
     for key in filename_keys:
         filename = '.'.join((entry['names'][key], entry['extension']))
