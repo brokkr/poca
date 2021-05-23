@@ -57,7 +57,7 @@ def download_file(entry, settings):
                         if chunk:
                             f.write(chunk)
                     r.close()
-                    return Outcome(True, file_path)
+                    return Outcome(True, (filename, file_path))
                 except requests.exceptions.ConnectionError as e:
                     r.close()
                     _outcome = delete_file(f.name)
@@ -69,7 +69,7 @@ def download_file(entry, settings):
         except OSError:
             # testing
             print('%s did not work, trying another...' % file_path)
-    # this should never happen
+    # this should really never happen
     return Outcome(False, 'Somehow none of the filenames we tried worked')
 
 def download_img_file(url, sub_dir, settings):

@@ -45,9 +45,10 @@ def expand(entry, sub, sub_dir):
         return entry
     entry['sub_title'] = sub.title.text
     entry['directory'] = sub_dir
-    entry = info_org_filename(entry)
+    entry['org_filename'], entry['basename'], entry['extension'] \
+        = info_org_filename(entry)
     entry['megabytes'] = info_megabytes(entry)
-    entry['metadata'] = "Coming soon"
+    #entry['metadata'] = "Coming soon"
     entry['user_vars'] = info_user_vars(entry)
     entry['rename'] = sub.rename if hasattr(sub, 'rename') else None
     entry['names'] = names(entry)
@@ -58,10 +59,10 @@ def info_org_filename(entry):
     '''expand with info about filename'''
     parsed_url = urllib.parse.urlparse(entry['poca_url'])
     parsed_path = urllib.parse.unquote(parsed_url.path)
-    entry['filename'] = path.basename(parsed_path)
-    entry['basename'], extension = path.splitext(entry['filename'])
-    entry['extension'] = extension[1:]
-    return entry
+    org_filename = path.basename(parsed_path)
+    basename, extension = path.splitext(org_filename)
+    extension = extension[1:]
+    return (org_filename, basename, extension)
 
 def info_megabytes(entry):
     '''expand with info about length and size stats'''
@@ -75,15 +76,17 @@ def info_megabytes(entry):
 def info_user_vars(entry):
     '''expand with info that the user can use in renaming'''
     # check with rss specs and feedparser to see what can be relied on
+    user_vars = {}
     try:
         date = time.strftime('%Y-%m-%d', entry['published_parsed'])
     except (KeyError, TypeError):
         date = '1970-01-01'
-    user_vars = {}
+    user_vars['date'] = date
     user_vars['title']: entry['sub_title']
+    # title and id are both optional elements of at least rss spec :/
     user_vars['episode_title'] = str(entry['title'])
     user_vars['uid'] = entry['id']
-    user_vars['date'] = date
+    # is it foolish to assume they are always there?
     user_vars['org_name'] = entry['basename']
     return user_vars
 

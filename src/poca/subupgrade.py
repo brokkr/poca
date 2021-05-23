@@ -86,7 +86,8 @@ class SubUpgrade():
             return
         if self.outcome.success is None:
             return
-        entry['poca_abspath'] = self.outcome.msg
+        # some inconsistency in key naming here - needed for backwards compat
+        entry['filename'], entry['poca_abspath'] = self.outcome.msg
         subdata.jar.lst.insert(wantedindex, uid)
         subdata.jar.dic[uid] = entry
         _outcome = subdata.jar.save()
