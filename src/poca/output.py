@@ -112,23 +112,26 @@ def plans_upgrade(subdata):
 
 def processing_user_deleted(entry):
     '''One line per entry telling user of episodes deleted by user'''
-    msg = ' %s %s deleted by user' % (CIRCLE_X, entry['poca_filename'])
+    episode = entry['title'] or entry['poca_filename']
+    msg = ' %s %s deleted by user' % (CIRCLE_X, episode])
     STREAM.debug(msg)
 
 
 def processing_removal(entry):
     '''One line per entry telling user of episodes being deleted by poca'''
+    episode = entry['title'] or entry['poca_filename']
     size = entry['poca_mb']
     size_str = ' [%s Mb]' % str(round(size)) if size else ' [Unknown]'
-    msg = ' %s %s %s' % (CROSS_MARK, entry['poca_filename'], size_str)
+    msg = ' %s %s %s' % (CROSS_MARK, episode, size_str)
     STREAM.debug(msg)
 
 
 def processing_download(entry):
     '''One line per entry telling user of episodes being downloaded by poca'''
+    episode = entry['title'] or entry['poca_filename']
     size = entry['poca_mb']
     size_str = ' [%s Mb]' % str(round(size)) if size else ' [Unknown]'
-    msg = ' %s %s %s' % (UP_DOWN_ARROW, entry['poca_filename'], size_str)
+    msg = ' %s %s %s' % (UP_DOWN_ARROW, episode, size_str)
     STREAM.debug(msg)
 
 
