@@ -189,6 +189,8 @@ class Wanted():
         #if len(filename_set) < len(self.lst):
         #    self.outcome = Outcome(False, "Filename used more than once. "
         #                           "Use rename tag to fix.")
+        filenames = [self.dic[uid]['poca_filename'] if 'poca_filename' in self.dic[uid] else '.'.join((self.dic[uid]['names']['base'], self.dic[uid]['extension'])) for uid in self.lst]
+        print(filenames)
         self.feed_etag = feed.etag
         self.feed_modified = feed.modified
         self.feed_image = feed.image
