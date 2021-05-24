@@ -26,6 +26,7 @@ class Feedstats():
         now = time.localtime()
         self.entries = [entry for entry in self.doc.entries if
                         self.age(now, entry['published_parsed']) < 35]
+        self.bozo = self.doc['bozo']
 
     def age(self, now, date):
         try:

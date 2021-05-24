@@ -113,6 +113,9 @@ def user_input_add_sub(url=None):
         sub_dic['url'] = url
     print()
     url_stats = Feedstats(sub_dic['url'])
+    if url_stats.bozo:
+        print('Did not find valid feed at %s' % sub_dic['url'])
+        return (None, None)
     url_stats.print_stats()
     print()
     title = input("Title of subscription: (Enter to use feed title) ")
