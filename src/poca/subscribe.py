@@ -8,6 +8,7 @@
 """Functions for subscription management for poca"""
 
 
+import os
 import fcntl
 from lxml import objectify
 from argparse import Namespace
@@ -37,20 +38,19 @@ def search(xml, args):
 def write(conf):
     '''Writes the resulting conf file back to poca.xml'''
     root_str = pretty_print(conf.xml)
-    try:
-        with open(conf.paths.config_file, 'r+') as f:
-            try:
-                fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                f.seek(0)
-                f.truncate()
-                f.write(root_str)
-                fcntl.flock(f, fcntl.LOCK_UN)
-                return Outcome('Config file updated')
-            except BlockingIOError:
-                return Outcome('Config file blocked')
-    except PermissionError:
-        return Outcome('Lacking permissions to update config file')
-
+    conf_file = conf.paths.config_file
+    if not os.access(conf_file, os.R_OK) and os.access(conf_file, os.W_OK):
+        return Outcome(False, 'Lacking permissions to update config file')
+    with open(conf.paths.config_file, 'r+') as f:
+        try:
+            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            f.seek(0)
+            f.truncate()
+            f.write(root_str)
+            fcntl.flock(f, fcntl.LOCK_UN)
+            return Outcome(True, 'Config file updated')
+        except BlockingIOError:
+            return Outcome(False, 'Config file blocked')
 
 
 def delete(conf, args):
