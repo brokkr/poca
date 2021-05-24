@@ -78,7 +78,9 @@ class SubUpgrade():
         # see https://github.com/brokkr/poca/wiki/__Developer-notes__
         self.outcome = files.download_file(entry, subdata.conf.xml.settings)
         if self.outcome.success is False:
+            entry['filename'], entry['poca_abspath'] = ('', '')
             self.fail_flag = True
+            # can prob get title from entry
             output.fail_download(subdata.sub.title.text, self.outcome)
             self.failed.append(entry)
             return

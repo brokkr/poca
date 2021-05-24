@@ -195,7 +195,7 @@ def file_summary(subdata, removed, downed, failed):
         downed_files = [x['filename'] for x in downed]
         SUMMARY.info(title + '. Downloaded: ' + ', '.join(downed_files))
     if failed:
-        failed_files = [x['filename'] for x in failed]
+        failed_files = [x['title'] for x in failed]
         SUMMARY.error(title + '. Failed: ' + ', '.join(failed_files))
 
 
