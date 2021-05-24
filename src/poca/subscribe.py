@@ -12,9 +12,10 @@ import fcntl
 from lxml import objectify
 from argparse import Namespace
 
-from poca import files, config, outcome, valid_tags
+from poca import files, config, valid_tags
 from poca.lxmlfuncs import pretty_print
 from poca.feedstats import Feedstats
+from poca.outcome import Outcome
 
 
 def search(xml, args):
@@ -36,16 +37,20 @@ def search(xml, args):
 def write(conf):
     '''Writes the resulting conf file back to poca.xml'''
     root_str = pretty_print(conf.xml)
-    with open(conf.paths.config_file, 'r+') as f:
-        try:
-            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            f.seek(0)
-            f.truncate()
-            f.write(root_str)
-            fcntl.flock(f, fcntl.LOCK_UN)
-            return outcome.Outcome(True, 'Config file updated')
-        except BlockingIOError:
-            return outcome.Outcome(False, 'Config file blocked')
+    try:
+        with open(conf.paths.config_file, 'r+') as f:
+            try:
+                fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                f.seek(0)
+                f.truncate()
+                f.write(root_str)
+                fcntl.flock(f, fcntl.LOCK_UN)
+                return Outcome('Config file updated')
+            except BlockingIOError:
+                return Outcome('Config file blocked')
+    except PermissionError:
+        return Outcome('Lacking permissions to update config file')
+
 
 
 def delete(conf, args):
@@ -139,7 +144,9 @@ def add_sub(conf, sub_category, sub_dic):
         new_sub.set('category', sub_category)
     for key in sub_dic:
         setattr(new_sub, key, sub_dic[key])
-    write(conf)
+    outcome = write(conf)
+    if not outcome.succes:
+        print(outcome.msg)
 
 
 def list_subs(conf):
@@ -189,7 +196,8 @@ def update_url(args, subdata):
     sub = search(conf.xml, pseudo_args)[0]
     sub.url = subdata.new_url
     _outcome = write(conf)
-    if _outcome.success is True:
-        _outcome = outcome.Outcome(True, 'Have updated feed url to %s' %
-                                   subdata.new_url)
-    return _outcome
+    move = 'Feed moved to %s. ' % subdata.new_url
+    msg = move + 'Successfully update config file' if _outcome.success \
+          else move + 'Failed to update config file. ' + \
+          'Check permissions or update manually.'
+    return Outcome(_outcome.success, msg)
