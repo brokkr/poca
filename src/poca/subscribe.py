@@ -39,7 +39,7 @@ def write(conf):
     '''Writes the resulting conf file back to poca.xml'''
     root_str = pretty_print(conf.xml)
     conf_file = conf.paths.config_file
-    test = os.access(conf_file, os.R_OK) and os.access(conf_file, os.W_OK):
+    test = os.access(conf_file, os.R_OK) and os.access(conf_file, os.W_OK)
     print(test)
     if not test:
         return Outcome(False, 'Lacking permissions to update config file')
