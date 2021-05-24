@@ -14,7 +14,7 @@ from distutils.core import setup
 
 setup(
     name='poca',
-    version='1.1alpha1',
+    version='1.02',
     license='GPL3',
     description='A fast and customizable command line podcast client',
     long_description=('A fast and customizable command line podcast client'),
