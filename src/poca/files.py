@@ -125,8 +125,12 @@ def check_path(check_dir):
     try:
         os.makedirs(check_dir)
         return Outcome(True, '%s was successfully created' % check_dir)
-    except (FileExistsError, OSError) as e:
-        return Outcome(False, 'Could not create %s' % check_dir)
+    except FileExistsError:
+        return Outcome(False, 'Could not create %s. File already exists?' \
+                       % check_dir)
+    except OSError:
+        return Outcome(False, 'Could not create %s. Illegal characters for \
+                       filesystem in directory name?' % check_dir)
 
 def check_file_write(check_file):
     '''Check to see if file is writable/can be created'''
