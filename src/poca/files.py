@@ -129,8 +129,8 @@ def check_path(check_dir):
         return Outcome(False, 'Could not create %s. File already exists?' \
                        % check_dir)
     except OSError:
-        return Outcome(False, 'Could not create %s. Illegal characters for \
-                       filesystem in directory name?' % check_dir)
+        return Outcome(False, 'Could not create %s. Illegal characters for ' \
+                       'filesystem in directory name?' % check_dir)
 
 def check_file_write(check_file):
     '''Check to see if file is writable/can be created'''
