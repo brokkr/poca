@@ -30,10 +30,12 @@ def download_file(entry, settings):
         r = requests.get(url, stream=True, timeout=60, headers=headers)
     except (requests.exceptions.ConnectionError,
             requests.exceptions.HTTPError) as e:
+        print(e)
         return Outcome(False, 'Download of %s failed' % url)
     except requests.exceptions.Timeout:
         return Outcome(False, 'Download of %s timed out' % url)
     if r.status_code >= 400:
+        print(r.status_code)
         return Outcome(False, 'Download of %s failed' % url)
     filename_keys = ['permissive', 'ntfs', 'restrictive', 'fallback']
     start_at = settings.filenames.text or 'permissive'
