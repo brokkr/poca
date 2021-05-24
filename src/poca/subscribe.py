@@ -147,7 +147,7 @@ def add_sub(conf, sub_category, sub_dic):
     for key in sub_dic:
         setattr(new_sub, key, sub_dic[key])
     outcome = write(conf)
-    if not outcome.succes:
+    if not outcome.success:
         print(outcome.msg)
 
 
