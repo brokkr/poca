@@ -9,6 +9,34 @@ specific options, see :doc:`Subscriptions`.
 
 .. contents::
 
+XML
+---
+
+When entering text values into poca.xml settings elements, as in
+
+.. code-block:: xml
+
+       <setting>text_value</setting>
+
+you can use any unicode character directly without resorting to escapes or code
+point values. I.e. this is valid:
+
+.. code-block:: xml
+
+       <setting>🍿 and 🎞️</setting>
+
+The only exceptions to this rule are
+
+* ``<`` or less than - to insert, use the code ``&lt;``
+* ``&`` or ampersand - to insert, use the code ``&amp;``
+
+E.g. to enter the value *me & my*, use
+
+.. code-block:: xml
+
+       <setting>me &amp; my</setting>
+
+
 Structure
 ---------
 
@@ -45,6 +73,11 @@ will create a subdirectory for each subscription:
            |--- my_other_podcast
            |         |--- ...
        etc.
+
+At startup poca tests if ``base_dir`` exists and the user has write permissions
+to it. If it does not, poca tries to create it. Failure at this stage causes
+poca to quit with a failure message. Remember that base_dir must be a legal
+path on the filesystem used.
 
 Optional settings (id3)
 -----------------------

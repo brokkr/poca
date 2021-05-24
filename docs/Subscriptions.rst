@@ -57,6 +57,12 @@ title
 Title of show/subscription. Used only to name the subscription subdirectory 
 under the **base_dir**\ , not to insert into ID3 headers. 
 
+Before attempting to download files for a subscription, poca checks to see if
+the subscription subdirectory exists and the user has permission to write to
+it. If not, poca attemps creation of the subdirectory. Failure at this stage
+causes poca to skip the subscription. Remember that the title must be a legal
+directory name on the filesystem used.
+
 url
 ^^^
 
