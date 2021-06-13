@@ -14,7 +14,7 @@ from poca.outcome import Outcome
 
 
 def tag_audio_file(settings, sub, jar, entry):
-    '''Metdata tagging using mutagen'''
+    '''Metadata tagging using mutagen'''
     id3v1_dic = {'yes': 0, 'no': 2}
     id3v1 = id3v1_dic[settings.id3removev1.text]
     id3v2 = int(settings.id3v2version)

@@ -13,6 +13,7 @@ from mutagen import easyid3, mp3, easymp4, oggvorbis, oggopus, flac
 from poca.outcome import Outcome
 
 
+mutagen.easyid3.EasyID3.RegisterTextKey('comment', 'COMM')
 mp3_list = list(mutagen.easyid3.EasyID3.valid_keys.keys())
 mp4_list = ['title', 'album', 'artist', 'albumartist', 'date', 'comment',
             'description', 'grouping', 'genre', 'copyright', 'albumsort',
