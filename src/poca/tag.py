@@ -21,7 +21,6 @@ def tag_audio_file(settings, sub, jar, entry):
     tracks = sub.find('./track_numbering')
     tracks = tracks.text if tracks else 'no'
     frames = sub.xpath('./metadata/*')
-    print(frames)
     invalid_keys = []
     if not frames and tracks == 'no':
         return Outcome(True, 'Tagging skipped')
@@ -45,6 +44,8 @@ def tag_audio_file(settings, sub, jar, entry):
             audio.tags.update_to_v23()
         elif id3v2 == 4:
             audio.tags.update_to_v24()
+        if 'comment' in [override.tag for override in frames]:
+            audio.tags.delall('COMM')
         audio.save(v1=id3v1, v2_version=id3v2)
         audio = mutagen.File(entry['poca_abspath'], easy=True)
     if isinstance(audio, mutagen.mp4.MP4):
