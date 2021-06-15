@@ -21,6 +21,7 @@ def tag_audio_file(settings, sub, jar, entry):
     tracks = sub.find('./track_numbering')
     tracks = tracks.text if tracks else 'no'
     frames = sub.xpath('./metadata/*')
+    print(frames)
     invalid_keys = []
     if not frames and tracks == 'no':
         return Outcome(True, 'Tagging skipped')
