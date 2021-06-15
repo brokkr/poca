@@ -21,7 +21,7 @@ def tag_audio_file(settings, sub, jar, entry):
     tracks = sub.find('./track_numbering')
     tracks = tracks.text if tracks else 'no'
     frames = sub.xpath('./metadata/*')
-    invalid_keys = []
+    tags = [override.tag for override in frames]
     if not frames and tracks == 'no':
         return Outcome(True, 'Tagging skipped')
     # get access to metadata
@@ -44,8 +44,11 @@ def tag_audio_file(settings, sub, jar, entry):
             audio.tags.update_to_v23()
         elif id3v2 == 4:
             audio.tags.update_to_v24()
-        if 'comment' in [override.tag for override in frames]:
+        if 'comment' in tags:
             audio.tags.delall('COMM')
+        if 'toc' in tags:
+            audio.tags.delall('CTOC')
+            audio.tags.delall('CHAP')
         audio.save(v1=id3v1, v2_version=id3v2)
         audio = mutagen.File(entry['poca_abspath'], easy=True)
     if isinstance(audio, mutagen.mp4.MP4):
@@ -57,6 +60,18 @@ def tag_audio_file(settings, sub, jar, entry):
         return outcome
     # run overrides
     for override in overrides:
+        # this where we should distinguish between empty strings and not
+        # if opverride[1] then write, else delete/skip
+        # question is: can we remove frames using easyid3
+        # seems answer is no
+        # so do we go back to reloading as straight ID3?
+        # could be useful for collecting all non-easy tasks incl. comment
+        # easy takes care of registered easy keys, leaving the rest to ID3
+        # we pop instead of loop: this way it's easy (NPI) to see what's left
+        # easy function adds recognised tags with empty strings to special list
+        # that gets added back unto overrides át finish
+        # challenge: we would need a translation of easy keys back to ID3 keys.
+        # sure it's in there somewhere, right?
         audio[override[0]] = override[1]
     if tracks == 'yes' or (tracks == 'if missing' and 'tracknumber' not in
                            audio):

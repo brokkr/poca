@@ -18,6 +18,7 @@ mp3_list = list(mutagen.easyid3.EasyID3.valid_keys.keys())
 mp4_list = ['title', 'album', 'artist', 'albumartist', 'date', 'comment',
             'description', 'grouping', 'genre', 'copyright', 'albumsort',
             'albumartistsort', 'artistsort', 'titlesort', 'composersort']
+special_tags = ['toc']
 
 def mp3_keys(key): yield key if key in mp3_list else None
 def mp4_keys(key): yield key if key in mp4_list else None
@@ -39,5 +40,6 @@ def validate_keys(audio_type, frames):
                  if override.tag in valid_keys(override.tag)]
     invalid_keys = [override.tag for override in frames if override.tag
                     not in valid_keys(override.tag)]
+    invalid_keys = [tag for tag in invalid_keys if tag not in special_tags]
     outcome = Outcome(True, 'Supported file type for tagging')
     return (outcome, overrides, invalid_keys)
