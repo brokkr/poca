@@ -26,6 +26,7 @@ def tag_audio_file(settings, sub, jar, entry):
     frames = sub.xpath('./metadata/*')
     overrides = [(override.tag, override.text) for override in frames]
     key_errors = {}
+    remove_frames = []
     # track numbering
     tracks = sub.find('./track_numbering')
     tracks = tracks.text if tracks else 'no'
@@ -56,6 +57,8 @@ def tag_audio_file(settings, sub, jar, entry):
     # run overrides
     while overrides:
         tag, text = overrides.pop()
+        # test if text is empty string
+        # if so: add tag to remove_frames
         try:
             audio[tag] = override[text]
         except (EasyID3KeyError, EasyMP4KeyError, ValueError) as e:
@@ -83,6 +86,9 @@ def tag_audio_file(settings, sub, jar, entry):
             audio.tags.delall('CTOC')
             audio.tags.delall('CHAP')
         audio.save(v1=id3v1, v2_version=id3v2)
+    # remove_frames bit
+    # remember to add to invalid_keys if fail
+    # also: we need non-easy access, I think?
     # invalid keys
     invalid_keys = list(key_errors.keys())
     if not invalid_keys:
