@@ -17,7 +17,8 @@ mutagen.easyid3.EasyID3.RegisterTextKey('comment', 'COMM')
 mp3_list = list(mutagen.easyid3.EasyID3.valid_keys.keys())
 mp4_list = ['title', 'album', 'artist', 'albumartist', 'date', 'comment',
             'description', 'grouping', 'genre', 'copyright', 'albumsort',
-            'albumartistsort', 'artistsort', 'titlesort', 'composersort']
+            'albumartistsort', 'artistsort', 'titlesort', 'composersort',
+            'tracknumber']
 special_tags = ['toc']
 
 def mp3_keys(key): yield key if key in mp3_list else None
