@@ -60,7 +60,7 @@ def tag_audio_file(settings, sub, jar, entry):
             _text = audio.pop(tag)
             continue
         try:
-            audio[tag] = override[text]
+            audio[tag] = text
         except (easyid3.EasyID3KeyError, easymp4.EasyMP4KeyError, \
                 ValueError) as e:
             key_errors[tag] = text
