@@ -22,4 +22,3 @@ from . import subscribe
 from . import xmlconf
 from . import lxmlfuncs
 from . import tag
-from . import valid_tags

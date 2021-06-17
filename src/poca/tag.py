@@ -9,7 +9,6 @@
 
 import mutagen
 
-from poca.valid_tags import validate_keys
 from poca.outcome import Outcome
 
 
@@ -46,8 +45,7 @@ def tag_audio_file(settings, sub, jar, entry):
         return Outcome(False, '%s not found or invalid file type for tagging'
                        % entry['poca_abspath'])
     except mutagen.mp3.HeaderNotFoundError:
-        return Outcome(False, '%s bad mp3'
-                       % entry['poca_abspath'])
+        return Outcome(False, '%s is a bad mp3' % entry['poca_abspath'])
     if audio is None:
         return Outcome(False, '%s is invalid file type for tagging' %
                        entry['poca_abspath'])

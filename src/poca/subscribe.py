@@ -14,7 +14,7 @@ from lxml import objectify
 from argparse import Namespace
 from mutagen.easyid3 import EasyID3
 
-from poca import files, config, valid_tags
+from poca import files, config
 from poca.lxmlfuncs import pretty_print
 from poca.feedstats import Feedstats
 from poca.outcome import Outcome
