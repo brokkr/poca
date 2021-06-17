@@ -69,7 +69,7 @@ def tag_audio_file(settings, sub, jar, entry):
         audio = mutagen.File(entry['poca_abspath'], easy=False)
         if 'comment' in key_errors:
             audio.tags.delall('COMM')
-            comm_txt = key_errors.pop('comment').strip()
+            comm_txt = key_errors.pop('comment')
             if comm_txt:
                 comm = id3.COMM(encoding=id3encoding, lang='eng', \
                                 desc='desc', text=comm_txt)
