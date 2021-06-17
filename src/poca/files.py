@@ -82,7 +82,6 @@ def download_img_file(url, sub_dir, settings):
     except requests.exceptions.RequestException:
         return Outcome(False, 'Download of %s failed' % url)
     content_type = r.headers['content-type'].lower()
-    print(content_type)
     mime_dic = {'image/bmp': '.bmp',
                 'image/gif': '.gif',
                 'image/jpeg': '.jpg',
@@ -91,14 +90,15 @@ def download_img_file(url, sub_dir, settings):
                 'image/webp': '.webp'}
     extension = mime_dic.get(content_type, None)
     if extension is None:
-        return Outcome(False, 'Download of image %s failed. Unknown MIME type.'
-                       % url)
-    else:
-        file_path = os.path.join(sub_dir, 'cover' + extension)
-        with open(file_path, 'wb') as f:
-            f.write(r.content)
-    return Outcome(True, '')
-
+        return Outcome(False, 'Download of image failed. Unknown MIME type.')
+    file_path = os.path.join(sub_dir, 'cover' + extension)
+    if os.path.isfile(file_path):
+        file_size = os.path.getsize(file_path)
+        if str(file_size) == r.headers['Content-Length']:
+            return Outcome(True, 'Same image file already downloaded')
+    with open(file_path, 'wb') as f:
+        f.write(r.content)
+    return Outcome(True, 'Image file downloaded')
 
 def delete_file(file_path):
     '''Deletes a file'''
