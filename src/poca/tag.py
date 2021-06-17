@@ -26,7 +26,6 @@ def tag_audio_file(settings, sub, jar, entry):
     frames = sub.xpath('./metadata/*')
     overrides = [(override.tag, override.text) for override in frames]
     key_errors = {}
-    remove_frames = []
     # track numbering
     tracks = sub.find('./track_numbering')
     tracks = tracks.text if tracks else 'no'
@@ -53,7 +52,7 @@ def tag_audio_file(settings, sub, jar, entry):
     # add_tags is undocumented for easy but seems to work
     if audio.tags is None:
         audio.add_tags()
-    # run overrides
+    # run overrides and save
     while overrides:
         tag, text = overrides.pop()
         if not text and tag in audio:
@@ -64,17 +63,9 @@ def tag_audio_file(settings, sub, jar, entry):
         except (easyid3.EasyID3KeyError, easymp4.EasyMP4KeyError, \
                 ValueError) as e:
             key_errors[tag] = text
-    # save
+    audio.save()
+    # ONLY for ID3
     if isinstance(audio, mutagen.mp3.EasyMP3):
-        if id3v2 == 3:
-            audio.tags.update_to_v23()
-        elif id3v2 == 4:
-            audio.tags.update_to_v24()
-        audio.save(v1=id3v1, v2_version=id3v2)
-    else:
-        audio.save()
-    # key_errors (COMM and CHAP)
-    if isinstance(audio, mutagen.mp3.EasyMP3) and key_errors:
         audio = mutagen.File(entry['poca_abspath'], easy=False)
         if 'comment' in key_errors:
             audio.tags.delall('COMM')
@@ -87,6 +78,10 @@ def tag_audio_file(settings, sub, jar, entry):
             _toc = key_errors.pop('chapters')
             audio.tags.delall('CTOC')
             audio.tags.delall('CHAP')
+        if id3v2 == 3:
+            audio.tags.update_to_v23()
+        elif id3v2 == 4:
+            audio.tags.update_to_v24()
         audio.save(v1=id3v1, v2_version=id3v2)
     # invalid keys
     invalid_keys = list(key_errors.keys())
