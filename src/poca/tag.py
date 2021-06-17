@@ -9,6 +9,7 @@
 
 import mutagen
 
+from mutagen import id3
 from poca.outcome import Outcome
 
 
