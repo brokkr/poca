@@ -73,7 +73,7 @@ def tag_audio_file(settings, sub, jar, entry):
             if comm_txt:
                 comm = id3.COMM(encoding=id3encoding, lang='eng', \
                                 desc='desc', text=comm_txt)
-                audio.add(comm)
+                audio.tags.add(comm)
         if 'chapters' in key_errors:
             _toc = key_errors.pop('chapters')
             audio.tags.delall('CTOC')
