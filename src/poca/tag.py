@@ -57,8 +57,9 @@ def tag_audio_file(settings, sub, jar, entry):
     # run overrides
     while overrides:
         tag, text = overrides.pop()
-        # test if text is empty string
-        # if so: add tag to remove_frames
+        if not text.strip() and tag in audio:
+            _text = audio.pop(tag)
+            continue
         try:
             audio[tag] = override[text]
         except (EasyID3KeyError, EasyMP4KeyError, ValueError) as e:
@@ -77,18 +78,16 @@ def tag_audio_file(settings, sub, jar, entry):
         audio = mutagen.File(entry['poca_abspath'], easy=False)
         if 'comment' in key_errors:
             audio.tags.delall('COMM')
-            comm_txt = key_errors.pop('comment')
-            comm = mutagen.id3.COMM(encoding=id3encoding, lang='eng', \
-                                    desc='desc', text=comm_txt)
-            audio.add(comm)
+            comm_txt = key_errors.pop('comment').strip()
+            if comm_txt:
+                comm = mutagen.id3.COMM(encoding=id3encoding, lang='eng', \
+                                        desc='desc', text=comm_txt)
+                audio.add(comm)
         if 'chapters' in key_errors:
             _toc = key_errors.pop('chapters')
             audio.tags.delall('CTOC')
             audio.tags.delall('CHAP')
         audio.save(v1=id3v1, v2_version=id3v2)
-    # remove_frames bit
-    # remember to add to invalid_keys if fail
-    # also: we need non-easy access, I think?
     # invalid keys
     invalid_keys = list(key_errors.keys())
     if not invalid_keys:
