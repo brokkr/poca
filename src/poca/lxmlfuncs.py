@@ -8,6 +8,7 @@
 
 from lxml import etree, objectify
 
+from poca.outcome import Outcome
 
 def merge(user_el, new_el, default_el, errors=[]):
     '''Updating one lxml objectify elements with another
