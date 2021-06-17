@@ -56,7 +56,7 @@ def tag_audio_file(settings, sub, jar, entry):
     # run overrides
     while overrides:
         tag, text = overrides.pop()
-        if not text.strip() and tag in audio:
+        if not text and tag in audio:
             _text = audio.pop(tag)
             continue
         try:
