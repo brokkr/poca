@@ -9,11 +9,11 @@
 
 import mutagen
 
-from mutagen import id3
+from mutagen import id3, easyid3, easymp4
 from poca.outcome import Outcome
 
 
-encodings = {3: mutagen.id3.Encoding.UTF16, 4: mutagen.id3.Encoding.UTF8}
+encodings = {3: id3.Encoding.UTF16, 4: id3.Encoding.UTF8}
 id3v1_dic = {'yes': 0, 'no': 2}
 
 def tag_audio_file(settings, sub, jar, entry):
@@ -61,7 +61,8 @@ def tag_audio_file(settings, sub, jar, entry):
             continue
         try:
             audio[tag] = override[text]
-        except (EasyID3KeyError, EasyMP4KeyError, ValueError) as e:
+        except (easyid3.EasyID3KeyError, easymp4.EasyMP4KeyError, \
+                ValueError) as e:
             key_errors[tag] = text
     # save
     if isinstance(audio, mutagen.mp3.EasyMP3):
@@ -79,8 +80,8 @@ def tag_audio_file(settings, sub, jar, entry):
             audio.tags.delall('COMM')
             comm_txt = key_errors.pop('comment').strip()
             if comm_txt:
-                comm = mutagen.id3.COMM(encoding=id3encoding, lang='eng', \
-                                        desc='desc', text=comm_txt)
+                comm = id3.COMM(encoding=id3encoding, lang='eng', \
+                                desc='desc', text=comm_txt)
                 audio.add(comm)
         if 'chapters' in key_errors:
             _toc = key_errors.pop('chapters')
