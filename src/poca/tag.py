@@ -31,13 +31,6 @@ def tag_audio_file(settings, sub, jar, entry):
     tracks = tracks.text if tracks else 'no'
     if not overrides and tracks == 'no':
         return Outcome(True, 'Tagging skipped')
-    if tracks == 'yes' or (tracks == 'if missing' and 'tracknumber' not in
-                           audio):
-        track_no = jar.track_no if hasattr(jar, 'track_no') else 0
-        track_no += 1
-        overrides.append(('tracknumber', str(track_no)))
-        jar.track_no = track_no
-        jar.save()
     # get 'easy' access to metadata
     try:
         audio = mutagen.File(entry['poca_abspath'], easy=True)
@@ -52,6 +45,14 @@ def tag_audio_file(settings, sub, jar, entry):
     # add_tags is undocumented for easy but seems to work
     if audio.tags is None:
         audio.add_tags()
+    # tracks
+    if tracks == 'yes' or (tracks == 'if missing' and 'tracknumber' not in
+                           audio):
+        track_no = jar.track_no if hasattr(jar, 'track_no') else 0
+        track_no += 1
+        overrides.append(('tracknumber', str(track_no)))
+        jar.track_no = track_no
+        jar.save()
     # run overrides and save
     while overrides:
         tag, text = overrides.pop()
