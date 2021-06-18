@@ -241,10 +241,10 @@ class Wanted():
                 self.outcome = Outcome(True, 'Filters applied successfully')
             except KeyError as e:
                 self.outcome = Outcome(False, 'Entry is missing info: %s' % e)
-                print(outcome.msg)
+                print(self.outcome.msg)
             except (ValueError, TypeError, SyntaxError) as e:
                 self.outcome = Outcome(False, 'Bad filter setting: %s' % e)
-                print(outcome.msg)
+                print(self.outcome.msg)
 
     def limit(self, sub):
         '''Limit the number of episodes to that set in max_number'''
