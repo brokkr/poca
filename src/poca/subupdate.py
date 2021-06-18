@@ -236,13 +236,15 @@ class Wanted():
         print(valid_filters)
         for key in valid_filters:
             try:
-                func_dic[key](combo.dic, sub.filters[key].text)
                 print((func_dic[key], sub.filters[key].text))
+                func_dic[key](combo.dic, sub.filters[key].text)
                 self.outcome = Outcome(True, 'Filters applied successfully')
             except KeyError as e:
                 self.outcome = Outcome(False, 'Entry is missing info: %s' % e)
+                print(outcome.msg)
             except (ValueError, TypeError, SyntaxError) as e:
-                self.outcome = Outcome(False, 'Bad filter setting')
+                self.outcome = Outcome(False, 'Bad filter setting: %s' % e)
+                print(outcome.msg)
 
     def limit(self, sub):
         '''Limit the number of episodes to that set in max_number'''
