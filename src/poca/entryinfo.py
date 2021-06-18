@@ -27,6 +27,12 @@ def validate(entry):
     entry['expanded'], entry['valid'] = False, False
     try:
         entry['poca_url'] = entry.enclosures[0]['href']
+        parsed_url = urllib.parse.urlparse(entry['poca_url'])
+        parsed_path = urllib.parse.unquote(parsed_url.path)
+        entry['org_filename'] = path.basename(parsed_path)
+        basename, dotextension = path.splitext(entry['org_filename'])
+        entry['basename'] = basename
+        entry['extension'] = dotextension[1:]
         entry['valid'] = True
     except (KeyError, IndexError, AttributeError):
         pass
@@ -43,8 +49,6 @@ def expand(entry, sub, sub_dir):
         return entry
     entry['sub_title'] = sub.title.text
     entry['directory'] = sub_dir
-    entry['org_filename'], entry['basename'], entry['extension'] \
-        = info_org_filename(entry)
     entry['poca_mb'] = info_megabytes(entry)
     #entry['metadata'] = "Coming soon"
     entry['user_vars'] = info_user_vars(entry)
@@ -57,15 +61,6 @@ def expand(entry, sub, sub_dir):
     entry['poca_filename'] = '.'.join((entry['names']['base'], entry['extension']))
     entry['expanded'] = True
     return entry
-
-def info_org_filename(entry):
-    '''expand with info about filename'''
-    parsed_url = urllib.parse.urlparse(entry['poca_url'])
-    parsed_path = urllib.parse.unquote(parsed_url.path)
-    org_filename = path.basename(parsed_path)
-    basename, extension = path.splitext(org_filename)
-    extension = extension[1:]
-    return (org_filename, basename, extension)
 
 def info_megabytes(entry):
     '''expand with info about length and size stats'''

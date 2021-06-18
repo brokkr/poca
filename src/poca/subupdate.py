@@ -231,7 +231,6 @@ class Wanted():
                     'weekdays': self.match_weekdays}
         filters = {node.tag for node in sub.filters.iterchildren()}
         valid_filters = filters & set(func_dic.keys())
-        print(valid_filters)
         for key in valid_filters:
             try:
                 #print((func_dic[key], sub.filters[key].text))
@@ -239,10 +238,10 @@ class Wanted():
                 self.outcome = Outcome(True, 'Filters applied successfully')
             except KeyError as e:
                 self.outcome = Outcome(False, 'Entry is missing info: %s' % e)
-                example = list(combo.dic.keys())[0]
-                print(example)
-                print(combo.dic[example])
-                print(combo.dic[example].keys())
+                #example = list(combo.dic.keys())[0]
+                #print(example)
+                #print(combo.dic[example])
+                #print(combo.dic[example].keys())
                 print(self.outcome.msg)
             except (ValueError, TypeError, SyntaxError) as e:
                 self.outcome = Outcome(False, 'Bad filter setting: %s' % e)
