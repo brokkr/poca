@@ -252,6 +252,8 @@ class Wanted():
         '''Limit the number of episodes to that set in max_number'''
         try:
             self.lst = self.lst[:int(sub.max_number)]
-            self.outcome = Outcome(True, 'Number limited successfully')
+            # don't overwrite filter failure
+            if self.outcome.success:
+                self.outcome = Outcome(True, 'Number limited successfully')
         except ValueError:
             self.outcome = Outcome(False, 'Bad max_number setting')
