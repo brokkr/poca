@@ -179,9 +179,9 @@ class Wanted():
         self.lst = list(filter(lambda x: combo.dic[x]['valid'], self.lst))
         if hasattr(sub, 'filters'):
             self.apply_filters(sub, combo)
+        print(self.outcome)
         if hasattr(sub, 'max_number'):
             self.limit(sub)
-        print(self.outcome)
         self.dic = {uid: entryinfo.expand(combo.dic[uid], sub, sub_dir)
                     for uid in self.lst}
         filenames = [self.dic[uid]['poca_filename'] for uid in self.lst]
