@@ -199,8 +199,6 @@ class Wanted():
         '''The episode filename must match a regex/string'''
         self.lst = [x for x in self.lst if
                     bool(re.search(filter_text, dic[x]['org_filename']))]
-        print(self.lst)
-        print(len(self.lst))
 
     def match_title(self, dic, filter_text):
         '''The episode title must match a regex/string'''
@@ -236,11 +234,12 @@ class Wanted():
         print(valid_filters)
         for key in valid_filters:
             try:
-                print((func_dic[key], sub.filters[key].text))
+                #print((func_dic[key], sub.filters[key].text))
                 func_dic[key](combo.dic, sub.filters[key].text)
                 self.outcome = Outcome(True, 'Filters applied successfully')
             except KeyError as e:
                 self.outcome = Outcome(False, 'Entry is missing info: %s' % e)
+                print(combo.dic)
                 print(self.outcome.msg)
             except (ValueError, TypeError, SyntaxError) as e:
                 self.outcome = Outcome(False, 'Bad filter setting: %s' % e)
