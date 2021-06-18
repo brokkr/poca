@@ -199,6 +199,8 @@ class Wanted():
         '''The episode filename must match a regex/string'''
         self.lst = [x for x in self.lst if
                     bool(re.search(filter_text, dic[x]['org_filename']))]
+        print(self.lst)
+        print(len(self.lst))
 
     def match_title(self, dic, filter_text):
         '''The episode title must match a regex/string'''
