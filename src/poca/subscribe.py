@@ -191,7 +191,7 @@ def list_subs(conf):
 def list_valid_tags(args):
     '''list valid tags to use in metadata overrides'''
     mp3_list = copy.copy(list(EasyID3.valid_keys.keys()))
-    #mp3_list = mp3_list.extend(['comment', 'chapters'])
+    mp3_list.extend(['comment', 'chapters'])
     mp4_list = ['title', 'album', 'artist', 'albumartist', 'date', 'comment',
                 'description', 'grouping', 'genre', 'copyright', 'albumsort',
                 'albumartistsort', 'artistsort', 'titlesort', 'composersort',
