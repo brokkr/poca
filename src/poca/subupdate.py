@@ -181,6 +181,7 @@ class Wanted():
             self.apply_filters(sub, combo)
         if hasattr(sub, 'max_number'):
             self.limit(sub)
+        print(self.outcome)
         self.dic = {uid: entryinfo.expand(combo.dic[uid], sub, sub_dir)
                     for uid in self.lst}
         filenames = [self.dic[uid]['poca_filename'] for uid in self.lst]
