@@ -34,7 +34,7 @@ def validate(entry):
         entry['basename'] = basename
         entry['extension'] = dotextension[1:]
         entry['valid'] = True
-        entry.pop('org_filename')
+        #entry.pop('org_filename')
     except (KeyError, IndexError, AttributeError):
         pass
     return entry

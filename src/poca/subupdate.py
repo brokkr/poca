@@ -179,13 +179,11 @@ class Wanted():
         self.lst = list(filter(lambda x: combo.dic[x]['valid'], self.lst))
         if hasattr(sub, 'filters'):
             self.apply_filters(sub, combo)
-        print(self.outcome)
         if hasattr(sub, 'max_number'):
             self.limit(sub)
         self.dic = {uid: entryinfo.expand(combo.dic[uid], sub, sub_dir)
                     for uid in self.lst}
         filenames = [self.dic[uid]['poca_filename'] for uid in self.lst]
-        #print(filenames)
         for uid in self.lst:
             count = filenames.count(self.dic[uid]['poca_filename'])
             if count > 1:
@@ -234,19 +232,12 @@ class Wanted():
         valid_filters = filters & set(func_dic.keys())
         for key in valid_filters:
             try:
-                #print((func_dic[key], sub.filters[key].text))
                 func_dic[key](combo.dic, sub.filters[key].text)
                 self.outcome = Outcome(True, 'Filters applied successfully')
             except KeyError as e:
                 self.outcome = Outcome(False, 'Entry is missing info: %s' % e)
-                #example = list(combo.dic.keys())[0]
-                #print(example)
-                #print(combo.dic[example])
-                #print(combo.dic[example].keys())
-                print(self.outcome.msg)
             except (ValueError, TypeError, SyntaxError) as e:
                 self.outcome = Outcome(False, 'Bad filter setting: %s' % e)
-                print(self.outcome.msg)
 
     def limit(self, sub):
         '''Limit the number of episodes to that set in max_number'''
