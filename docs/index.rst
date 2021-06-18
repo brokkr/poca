@@ -6,9 +6,8 @@
 Poca
 ====
 
-`Poca <https://projects.brokkr.net/projects/poca>`_ is a fast, multithreaded 
-and highly customizable command line podcast client, written in Python 3. As 
-of 1.0 all planned features have been implemented. 
+Poca is a fast, multithreaded and highly customizable command line podcast 
+client, written in Python 3.
 
 .. contents::
    :depth: 2
@@ -176,6 +175,31 @@ Changelog
 ---------
 
 
+Version `1.1 <https://github.com/brokkr/poca/issues?q=is%3Aopen+is%3Aissue+milestone%3A1.1>`_
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+Features
+""""""""
+
+* Filenames: Auto-detect and fix filename collisions (e.g. if all files are named media.mp3)
+* Metadata: Tagging now extends to mp4 files (as well as mp3 and files using vorbis comments for metadata)
+* Metadata: Can now use 'comment' field to overwrite comments on ID3 tags (all existing comment frames are deleted) 
+* Metadata: Empty values in metadata elements (e.g. ``<album></album>`` or ``<album/>``) can now be used remove the frame entirely. 
+* Metadata: ``<chapters></chapters>`` is a special case of that. Adding the chapters element can be used to remove the table of contents and chapters frames (CTOC and CHAP). It will disregard any text value inserted. 
+
+Fixes
+"""""
+
+* Filenames: Filesystem safe names. poca will automatically adapt the default or chosen filename to create legal filenames on the filesystem used for the podcast files (e.g. remove question marks from filenames on NTFS). It will not by default 'degrade' the filename more than needed for any given file system (see below). 
+* Filenames: New setting to manually set filename permissiveness: Override the default behaviour by ordering poca to start at a lower level of filename character permissiveness.
+* Config: File permissions check is more granular. Checks out as long as user has read permission to poca.xml and write permission to db and media folder. Note: A read-only config file prevents poca from updating the url if status == 301.
+* Filters: Filename filtering has been fixed
+* Filters: Filtering errors are now reported
+* Download: Cover images are downloaded once, and only downloaded again if there is a new one, rather than with each update.
+* Improved unicode support (better testing for support and fallbacks)
+
+
 Version `1.0 <https://github.com/brokkr/poca/issues?q=is%3Aopen+is%3Aissue+milestone%3A1.0>`_
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -221,7 +245,7 @@ Version `0.6 <https://github.com/brokkr/poca/issues?q=is%3Aclosed+is%3Aissue+mil
 
 
 * ``max_number``: Limit by number of files (\ `#14 </brokkr/poca/issues/14>`_\ )
-* ``max_mb`` has been deprecated in favour of ``max_number``
+* ``max_mb`` has been dropped in favour of ``max_number``
 * ``filters``: Filter entries by filename, date, ... (\ `#29 </brokkr/poca/issues/29>`_\ )
 * ``from_the_top``: Option to start podcast from the beginning (\ `#28 </brokkr/poca/issues/28>`_\ )
 * Download cover image from feed (\ `#25 </brokkr/poca/issues/25>`_\ )

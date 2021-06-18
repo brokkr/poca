@@ -23,7 +23,7 @@ point values. I.e. this is valid:
 
 .. code-block:: xml
 
-       <setting>🍿 and 🎞️</setting>
+       <setting>🎞️ and 🍿</setting>
 
 The only exceptions to this rule are
 
@@ -34,7 +34,7 @@ E.g. to enter the value *me & my*, use
 
 .. code-block:: xml
 
-       <setting>me &amp; my</setting>
+       <setting>🎞️ &amp; 🍿</setting>
 
 
 Structure
@@ -93,8 +93,8 @@ id3v2version
 
 ``id3v2version`` accepts ``3`` or ``4`` as settings, representing id3v2.3 
 and id3v2.4 respectively. Historically, Windows and some hardware players 
-have preferred v2.3 as they cannot read the UTF-8 characters used in v2.4. 
-Default is ``4``.
+have preferred v2.3 as they cannot read the UTF-8 encoded characters used 
+in v2.4. Default is ``4``.
 
 id3removev1
 ^^^^^^^^^^^
@@ -131,7 +131,7 @@ removed from the filename of the file being written. This system mostly comes
 into effect when using feed data to generate a filename using the rename
 scheme. The four levels are:
 
-* ``permissive``: Only ``/`` and ``␀ `` (the null character) are removed from
+* ``permissive``: Only ``/`` and ␀ (the null character) are removed from
   the filename. These are the only characters that are outright forbidden on
   linux file systems, like ext4 and others.
 * ``ntfs``: Any characters that are not acceptable on NTFS and FAT filesystems
@@ -146,9 +146,9 @@ scheme. The four levels are:
   the feed in the format YYYY-MM-DD, followed by 9 random hexadecimal digits.
 
 ``permissive`` and ``ntfs`` both retain all (non-excluded) unicode characters. 
-The filenames setting does not fix the scheme, poca will use. It allows the
-user to set a 'lower' starting point than would otherwise be used. The default
-starting point is the ``permissive`` setting. 
+The filenames setting does not definitively determine the scheme, poca will 
+use. It allows the user to set a 'lower' starting point than would otherwise 
+be used. The default starting point is the ``permissive`` setting.
 
 Ordinarily, poca will attempt the schemes in the order listed. Filesystem
 failures will cause it to move on to the next scheme. If the files are to be

@@ -99,7 +99,10 @@ any are present.
 tags
 ^^^^
 
-Prints out all useable id3 tags (use grep/less). Poca uses Mutagen's 
+Prints out all useable tags (use grep/less) for either mp3 or mp4 (use -3/-4
+flags to get the relevant list).
+
+Poca uses Mutagen's 
 `EasyID3 <http://mutagen.readthedocs.io/en/latest/user/id3.html#easy-id3>`_ 
 editor so it understands sensible tag names, i.e. 
 

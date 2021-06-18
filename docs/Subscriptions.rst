@@ -61,12 +61,13 @@ Before attempting to download files for a subscription, poca checks to see if
 the subscription subdirectory exists and the user has permission to write to
 it. If not, poca attemps creation of the subdirectory. Failure at this stage
 causes poca to skip the subscription. Remember that the title must be a legal
-directory name on the filesystem used.
+directory name on the filesystem used (linux filesystems have almost no
+restrictions, NTFS and FAT have a few).
 
 url
 ^^^
 
-The address of the RSS feed of the podcast. 
+The address of the RSS feed of the podcast.
 
 That's all. If the number of optional settings are a bit overwhelming, you 
 can simply leave it at that. ``max_number`` would probably be the only truly 
@@ -76,13 +77,13 @@ Optional elements
 -----------------
 
 Note that all optional elements in a subscription can also be added to the 
-``<defaults>`` section to be aplied globally.
+``<defaults>`` section to be applied globally.
 
 max_number
 ^^^^^^^^^^
 
 The maximum number of episodes (integer) for the subscription to have at any 
-one time. Only the [max_number] most recent episodes will be downloaded. If 
+one time. Only the ``max_number`` most recent episodes will be downloaded. If 
 this is not set poca will - unless otherwise restricted - download all files 
 in the feed. This setting replaces the ``max_mb`` setting in versions of poca 
 prior to 0.6.
@@ -108,9 +109,14 @@ you want to ensure that the episodes have track numbers set to ``yes`` which
 will overwrite the episodes track number with an artificial track number that 
 starts at 1 with the first episode poca downloads (so if you start 
 subscribing at episode 247, this will get tracknumber 1 etc.) Set to 
-``if missing`` to only insert track numbers when they are absent. This can be 
-a useful setting in ``<defaults>``. Set to ``no`` or leave the option out of 
-your subscription to leave the track number as is.
+``if missing`` to only insert track numbers when they are absent. 
+
+This can be a useful setting in ``<defaults>``. Set to ``no`` or leave the 
+option out of your subscription to leave the track number as is.
+
+Note that track numbers can also be overwritten using the ``tracknumber``
+element in metadata (see below). That, however only sets track numbers to a
+static value - or if no value is entered removes the track numbers entirely.
 
 metadata
 ^^^^^^^^
@@ -136,10 +142,24 @@ A list of all the field names that poca recognises for id3 and m4a headers can
 be printed by running ``poca-subscribe tags`` using either the ``--mp3`` or
 the ``--mp4`` flag.
 
-They are generally the obvious ones, ``title`` for track title, ``artist`` 
-for artist, etc. Vorbis comment tags are not restricted in what keys can be 
-used but this `Xiph.org list <https://xiph.org/vorbis/doc/v-comment.html>`_ 
-can be used as a reference for tag names convention.
+Relying on mutagen's "easy" modules, poca allows you to use ``title`` for 
+track title, ``artist`` for artist, etc. Vorbis comment tags are not restricted 
+in what keys can be used (though all vorbis comment keys must be ascii) but this 
+`Xiph.org list <https://xiph.org/vorbis/doc/v-comment.html>`_ can be used as a 
+reference for tag names convention.
+
+Any empty value, i.e.::
+
+    <album></album>
+
+or::
+
+    <album/>
+
+will cause the frame to be removed rather than overwritten. This especially
+true for the ``<chapters/>`` element, as that can only be used to remove. poca will
+disregard any text value associated with it and will only use it to remove CTOC
+and CHAP frames from id3 tags in the subscription.
 
 rename
 ^^^^^^
@@ -183,7 +203,7 @@ will be replaced with the value of the attribute. Do note that the resulting
 filenames are sanitized. See the *filenames* section in **Settings**.
 
 Example
-~~~~~~~
+"""""""
 
 .. code-block:: xml
 
@@ -205,7 +225,7 @@ filters
 
 The filters element should contains one or more of the following tags that 
 filter the entries in the feed based on various criteria. All filters are 
-positive in the sense that the entry must meet the criterion to be INCLUDED. 
+positive in the sense that the entry must meet the criterion to be included. 
 Each filter can only be used once per subscription.
 
 filename
@@ -215,7 +235,7 @@ The filename of the entry must match this string in order to be included.
 Note that the value is interpreted as a regex, so certain characters should 
 be escaped (e.g. a literal point should be written '\.') Apart from this it 
 is perfectly possible to use simple strings and ignore the regex aspect. The 
-filename matches is the original filename, not those resulting from using 
+filename matched is the original filename, not those resulting from using 
 ``rename`` (see above). Example: 
 
 ``<filename>^episode</filename>`` will only include regular Judge John Hodgman
