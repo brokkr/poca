@@ -173,7 +173,7 @@ class Combo:
 class Wanted():
     '''Filters the combo entries and decides which ones to go for'''
     def __init__(self, sub, feed, combo, del_lst, sub_dir):
-        self.outcome = Outcome(True, 'Wanted entries assembled')
+        self.outcome = Outcome(True, 'Default true')
         self.lst = combo.lst
         self.lst = list(filter(lambda x: x not in del_lst, self.lst))
         self.lst = list(filter(lambda x: combo.dic[x]['valid'], self.lst))
