@@ -231,6 +231,7 @@ class Wanted():
                     'weekdays': self.match_weekdays}
         filters = {node.tag for node in sub.filters.iterchildren()}
         valid_filters = filters & set(func_dic.keys())
+        print(valid_filters)
         for key in valid_filters:
             try:
                 func_dic[key](combo.dic, sub.filters[key].text)
