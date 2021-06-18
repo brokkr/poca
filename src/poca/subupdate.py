@@ -237,6 +237,7 @@ class Wanted():
         for key in valid_filters:
             try:
                 func_dic[key](combo.dic, sub.filters[key].text)
+                print((func_dic[key], sub.filters[key].text))
                 self.outcome = Outcome(True, 'Filters applied successfully')
             except KeyError as e:
                 self.outcome = Outcome(False, 'Entry is missing info: %s' % e)
