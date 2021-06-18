@@ -242,6 +242,7 @@ class Wanted():
                 example = list(combo.dic.keys())[0]
                 print(example)
                 print(combo.dic[example])
+                print(combo.dic[example].keys())
                 print(self.outcome.msg)
             except (ValueError, TypeError, SyntaxError) as e:
                 self.outcome = Outcome(False, 'Bad filter setting: %s' % e)
