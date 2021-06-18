@@ -68,7 +68,7 @@ def plans_error(subdata):
 
 
 def plans_moved(subdata, _outcome):
-    '''Sub has moved (http status 301) - succes/failure in updating congig'''
+    '''Sub has moved (http status 301) - succes/failure in updating config'''
     stream_msg = '%s. %s' % (subdata.sub.title.text.upper(), _outcome.msg)
     after_stream_msg = 'SUB MOVE (301) (%s): %s' % (subdata.sub.title.text,
                                                     _outcome.msg)
