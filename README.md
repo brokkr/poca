@@ -1,19 +1,18 @@
 Poca
 ====
 
-[Poca](https://projects.brokkr.net/projects/poca) is a fast, multithreaded 
-and highly customizable command line podcast client, written in Python 3. As 
-of 1.0 all planned features have been implemented.
+Poca is a fast, multithreaded and highly customizable command line podcast 
+client, written in Python 3.
 
 Features
 --------
 
 -   **Maximum amount.** Specify how many episodes the subscription should get 
 before deleting old episodes to make room for new ones.
--   **Override ID3/Vorbis metadata.** If you want *Savage Love* to have *Dan 
-Savage* in the artist field (rather than *The Stranger*), poca will 
-automatically update the metadata upon download of each new episode. Or set 
-genre to be overwritten by *Podcast* as a default.
+-   **Override ID3/MP4/Vorbis metadata.** If you want *Savage Love* to have 
+   *Dan Savage* in the artist field (rather than *The Stranger*), poca will 
+   automatically update the metadata upon download of each new episode. Or set 
+   genre to be overwritten by *Podcast* as a default.
 -   **Filter a feed.** Only want news reports in the morning or on 
 Wednesdays? Use criteria such as filename and title, or the hour, weekday or 
 date of publishing to filter what you want from a feed.
@@ -47,8 +46,7 @@ compatibility, Poca has a quiet mode in addition to normal and verbose.
 Installation
 ------------
 
-You can install poca from [pypi](https://pypi.python.org/pypi/poca) using 
-pip. Be mindful that poca is python 3 so use `pip3`:
+You can install poca from [pypi](https://pypi.python.org/pypi/poca) using pip.
 
 ``` sourceCode
 pip3 install poca
@@ -67,7 +65,7 @@ pip3 uninstall poca
 -   Python 3.4 or later
 -   Third-party modules: `requests` `feedparser` `lxml` `mutagen`
 -   Pip will automatically install any one of these found missing
--   A unicode capable terminal is recommended
+-   A unicode capable terminal is recommended but not required
 
 Quickstart
 ----------
