@@ -7,7 +7,7 @@
 
 """Basic info"""
 
-__version__ = '1.02'
+__version__ = '1.1'
 VERSION = __version__
 MAINTAINER = "Mads Michelsen <mail@brokkr.net>"
 DESCRIPTION = ("A fast and highly customizable command line podcast client")
