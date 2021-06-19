@@ -16,8 +16,6 @@ STREAM = logging.getLogger('POCA_STREAM')
 AFTER_STREAM = logging.getLogger('POCA_AFTER_STREAM')
 SUMMARY = logging.getLogger('POCA_SUMMARY')
 
-UNICODE = True if str.lower(sys.stdout.encoding) == 'utf-8' else False
-
 ERROR_DIC = {'default': '\u203c', 'ascii': '!', 'wsl': '\u203c', \
              'emoji': '\U0001f6a8'}
 AUTODEL_DIC = {'default': '\u2717', 'ascii': 'X', 'wsl': '\u2717', \
