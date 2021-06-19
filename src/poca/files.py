@@ -34,7 +34,6 @@ def download_file(entry, settings):
     except requests.exceptions.Timeout:
         return Outcome(False, 'Download of %s timed out' % url)
     if r.status_code >= 400:
-        #print(r.status_code)
         return Outcome(False, 'Download of %s failed' % url)
     filename_keys = ['permissive', 'ntfs', 'restrictive', 'fallback']
     start_at = settings.filenames.text or 'permissive'
@@ -42,10 +41,6 @@ def download_file(entry, settings):
         filename_keys = filename_keys[filename_keys.index(start_at):]
     if not entry['unique_filename']:
         filename_keys = ['fallback']
-    # testing
-    #for key in filename_keys:
-    #    print('%s : %s' % (key, entry['names'][key]))
-    # testing
     for key in filename_keys:
         filename = '.'.join((entry['names'][key], entry['extension']))
         file_path = os.path.join(entry['directory'], filename)
@@ -70,8 +65,9 @@ def download_file(entry, settings):
                     _outcome = delete_file(f.name)
                     return Outcome(False, 'Download of %s timed out' % url)
         except OSError:
+            pass
             # testing
-            print('%s did not work, trying another...' % file_path)
+            #Oprint('%s did not work, trying another...' % file_path)
     # this should really never happen
     return Outcome(False, 'Somehow none of the filenames we tried worked')
 
