@@ -88,8 +88,7 @@ def plans_moved(subdata, _outcome):
 def plans_nochanges(subdata):
     '''No changes made, just output title'''
     msg = subdata.sub.title.text.upper()
-    STREAM.info(STREAM.glyphs)
-    #STREAM.info(msg)
+    STREAM.info(msg)
 
 
 def plans_upgrade(subdata):
@@ -129,7 +128,8 @@ def processing_removal(entry):
     episode = entry['title'] or entry['poca_filename']
     size = entry['poca_mb']
     size_str = ' [%s Mb]' % str(round(size)) if size else ' [Unknown]'
-    msg = ' %s %s %s' % (CROSS_MARK, episode, size_str)
+    msg = ' %s %s %s' % (STREAM.glyphs, episode, size_str)
+    #msg = ' %s %s %s' % (CROSS_MARK, episode, size_str)
     STREAM.debug(msg)
 
 
