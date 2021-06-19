@@ -87,6 +87,7 @@ def info_user_vars(entry):
     user_vars['uid'] = entry['id']
     # is it foolish to assume they are always there?
     user_vars['org_name'] = entry['basename']
+    print(user_vars)
     return user_vars
 
 
