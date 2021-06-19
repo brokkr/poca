@@ -30,7 +30,7 @@ The only exceptions to this rule are
 * ``<`` or less than - to insert, use the code ``&lt;``
 * ``&`` or ampersand - to insert, use the code ``&amp;``
 
-E.g. to enter the value *me & my*, use
+E.g. to use an ampersand instead of *and* in the above example, do
 
 .. code-block:: xml
 
@@ -150,12 +150,10 @@ The filenames setting does not definitively determine the scheme, poca will
 use. It allows the user to set a 'lower' starting point than would otherwise 
 be used. The default starting point is the ``permissive`` setting.
 
-Ordinarily, poca will attempt the schemes in the order listed. Filesystem
-failures will cause it to move on to the next scheme. If the files are to be
-shared using a protocol, less tolerant of filename characters than the
-filesystem used, it might be preferable to have poca apply more restrictions
-from the start rather than having to rename them later. E.g. ext4 filesystem
-but the files are made accessible via SAMBA/CIFS.
+If the files are to be shared using a protocol, less tolerant of filename 
+characters than the filesystem used, it might be preferable to have poca 
+apply more restrictions from the start rather than having to rename files
+later. E.g. ext4 filesystem but the files are made accessible via SAMBA/CIFS.
 
 The setting applies regardless of whether a subscription uses the default, 
 original filenames or a rename scheme. It is applied only to the basename, 
@@ -188,7 +186,7 @@ The following settings are used:
 * **only_errors**\ : If set to ``yes``\ , only errors will be logged to 
   email. This does not affect file logging. If set to ``no`` all the 
   notifications you find in the file log will go into the log emails as well 
-  (episodes downloaded, removed, user deleted etc.). *Default is ``no``.*
+  (episodes downloaded, removed, user deleted etc.). Default is ``no``.
 * **threshold**\ : The number of entries required before an email is sent. At 
   the end of the run the number of logged entries is compared to the 
   ``threshold`` value and if it is equal to or greater than that number, the 
@@ -201,10 +199,10 @@ The following settings are used:
   with **only_errors**. By setting a threshold of say 20 or 30, you will get 
   notified when your subscriptions consistently produce errors (e.g. a feed 
   is not working anymore) but not (instantly) when a server is merely offline 
-  for an hour or a single request gets lost. *Default is ``1``.*
-* **fromaddr**\ : The sender address for the log emails. *No default*
-* **toaddr**\ : The recipient address for the log emails. *No default*
-* **host**\ : The email server's name/address. *Default is ``localhost``.*
+  for an hour or a single request gets lost. Default is ``1``.
+* **fromaddr**\ : The sender address for the log emails. No default.
+* **toaddr**\ : The recipient address for the log emails. No default.
+* **host**\ : The email server's name/address. Default is ``localhost``.
 * **starttls**\ : To keep things simple Poca only accepts two kinds of setup: 
   Either you relay without authentication on port 25 (probably only local 
   servers) or you do submission with STARTTLS on port 587. Enter ``yes`` for 
@@ -249,7 +247,4 @@ The full STARTTLS setup overriding defaults. It will only inform us of errors
 and when at least 20 have been logged, either in a single run or over 
 multiple runs. It will authenticate over STARTTLS (the standard 
 login/password way of authenticating when using any email client) and send 
-your password over an encrypted channel to gmail.com. Do note that even 
-though the password is only transmitted over encrypted channels, it is 
-plaintext on your machine, so think about what account you use for this 
-purpose.
+your password over an encrypted channel to gmail.com.

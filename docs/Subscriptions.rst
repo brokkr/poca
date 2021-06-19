@@ -199,11 +199,10 @@ By default the components are divided by underscores when assembling the full
 file name. Alternatively you can set the ``divider`` attribute and give it 
 the desired divider value. Spaces in the filename originating from using a 
 title or similar can be replaced by using the ``space`` attribute. Spaces 
-will be replaced with the value of the attribute. Do note that the resulting 
-filenames are sanitized. See the *filenames* section in **Settings**.
+will be replaced with the value of the attribute. Note that the resulting 
+filenames are sanitized, see the *filenames* section in **Settings**.
 
-Example
-"""""""
+Example:
 
 .. code-block:: xml
 
@@ -228,6 +227,7 @@ filter the entries in the feed based on various criteria. All filters are
 positive in the sense that the entry must meet the criterion to be included. 
 Each filter can only be used once per subscription.
 
+
 filename
 ~~~~~~~~
 
@@ -242,6 +242,7 @@ filename matched is the original filename, not those resulting from using
 episodes and not the special cheese shows, *shootin' the bries* that have
 filenames starting with "shootin'".
 
+
 title
 ~~~~~
 
@@ -251,6 +252,7 @@ file's metadata). Example:
 ``<title>Wires</title>`` only gets the 'Within the Wires' episodes from the 
 Welcome to Nightvale feed.
 
+
 hour
 ~~~~
 
@@ -258,6 +260,7 @@ The hour (24h-format) at which the entry was published. This is useful for
 podcasts that put out more episodes a day than you need, e.g. news broadcasts. Example:
 
 ``<hour>21</hour>`` only gives you the evening edition of BBC's Newshour.
+
 
 weekdays
 ~~~~~~~~
@@ -267,6 +270,7 @@ to be included is written as a single digit where Monday is 0, Tuesday is 1,
 etc, up to 6 for Sunday. Example
 
 ``<weekdays>024</weekdays>`` to get Monday, Wednesday, and Friday episodes.
+
 
 after_date
 ~~~~~~~~~~
@@ -279,10 +283,12 @@ back catalogue. Example:
 ``<after_date>2016-08-23</after_date>`` will ignore all episodes published 
 before August 23rd 2016.
 
+
 Optional attributes
 -------------------
 
 Each subscription tag can have two optional attributes:
+
 
 category
 ^^^^^^^^^^^^^^^
