@@ -81,7 +81,7 @@ def info_user_vars(entry):
     except (KeyError, TypeError):
         date = '1970-01-01'
     user_vars['date'] = date
-    user_vars['title']: entry['sub_title']
+    user_vars['title'] = entry['sub_title']
     # title and id are both optional elements of at least rss spec :/
     user_vars['episode_title'] = str(entry['title'])
     user_vars['uid'] = entry['id']
