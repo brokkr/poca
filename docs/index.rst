@@ -48,8 +48,8 @@ Interface
 ---------
 
 
-.. image:: https://asciinema.org/a/OScSRCdsKGZLntYJ9K6LYSNMT.png
-   :target: https://asciinema.org/a/OScSRCdsKGZLntYJ9K6LYSNMT
+.. image:: https://asciinema.org/a/rhntenkCKcn7zkmfQRdgjre1S.svg
+   :target: https://asciinema.org/a/rhntenkCKcn7zkmfQRdgjre1S
    :alt: asciicast
 
 
