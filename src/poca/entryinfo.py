@@ -87,7 +87,7 @@ def info_user_vars(entry):
     user_vars['uid'] = entry['id']
     # is it foolish to assume they are always there?
     user_vars['org_name'] = entry['basename']
-    print(user_vars)
+    #print(user_vars)
     return user_vars
 
 
@@ -113,7 +113,7 @@ def names(entry):
     name_dic['ntfs'] = filename_ntfs(name_base)
     name_dic['restrictive'] = filename_restrictive(name_base)
     name_dic['fallback'] = '-'.join((user_vars['date'], uuid.uuid4().hex[:9]))
-    print(name_dic)
+    #print(name_dic)
     return name_dic
 
 def filename_permissive(name_base):

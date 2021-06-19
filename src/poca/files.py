@@ -65,7 +65,7 @@ def download_file(entry, settings):
                     _outcome = delete_file(f.name)
                     return Outcome(False, 'Download of %s timed out' % url)
         except OSError:
-            print('%s did not work, trying another...' % file_path)
+            #print('%s did not work, trying another...' % file_path)
             pass
             # testing
     # this should really never happen
