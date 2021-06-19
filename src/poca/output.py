@@ -31,19 +31,19 @@ PLANREM_DIC = {'default': '\u2796', 'ascii': '-', 'wsl': '-', \
 DOWNLOAD_DIC = {'default': '\u21af', 'ascii': '>', 'wsl': '\u21af', \
                 'emoji': '\U0001f4be'}
 
-ERROR = ERROR_DIC[STREAM.glyphs]
-AUTODEL = AUTODEL_DIC[STREAM.glyphs]
-USERDEL = USERDEL_DIC[STREAM.glyphs]
-PLANADD = PLANADD_DIC[STREAM.glyphs]
-PLANREM = PLANREM_DIC[STREAM.glyphs]
-DOWNLOAD = DOWNLOAD_DIC[STREAM.glyphs]
+#ERROR = ERROR_DIC[STREAM.glyphs]
+#AUTODEL = AUTODEL_DIC[STREAM.glyphs]
+#USERDEL = USERDEL_DIC[STREAM.glyphs]
+#PLANADD = PLANADD_DIC[STREAM.glyphs]
+#PLANREM = PLANREM_DIC[STREAM.glyphs]
+#DOWNLOAD = DOWNLOAD_DIC[STREAM.glyphs]
 
-WARNING_SIGN = '\u26a0' if UNICODE else '!'
-CROSS_MARK = '\u274c' if UNICODE else 'X'
-CIRCLE_X = '\u29bb' if UNICODE else '%'
-HEAVY_MINUS_SIGN = '\u2796' if UNICODE else '-'
-HEAVY_PLUS_SIGN = '\u2795' if UNICODE else '+'
-UP_DOWN_ARROW = '\u21f5' if UNICODE else '>'
+#WARNING_SIGN = '\u26a0' if UNICODE else '!'
+#CROSS_MARK = '\u274c' if UNICODE else 'X'
+#CIRCLE_X = '\u29bb' if UNICODE else '%'
+#HEAVY_MINUS_SIGN = '\u2796' if UNICODE else '-'
+#HEAVY_PLUS_SIGN = '\u2795' if UNICODE else '+'
+#UP_DOWN_ARROW = '\u21f5' if UNICODE else '>'
 
 
 #WARNING_SIGN = '\u26a0' if UNICODE else '!' # Used for: Errors
@@ -65,6 +65,7 @@ def subscribe_info(msg):
 
 def subscribe_error(msg):
     '''Generic error'''
+    ERROR = ERROR_DIC[STREAM.glyphs]
     err = ' %s ' % ERROR
     msg = err + msg
     STREAM.error(msg)
@@ -76,6 +77,7 @@ def subscribe_error(msg):
 
 def config_fatal(msg):
     '''Fatal errors encountered during config read'''
+    ERROR = ERROR_DIC[STREAM.glyphs]
     STREAM.fatal(' %s %s' % (ERROR, msg))
     sys.exit(1)
 
@@ -113,6 +115,9 @@ def plans_nochanges(subdata):
 
 def plans_upgrade(subdata):
     '''Summary of files to be downloaded and deleted'''
+    USERDEL = USERDEL_DIC[STREAM.glyphs]
+    PLANADD = PLANADD_DIC[STREAM.glyphs]
+    PLANREM = PLANREM_DIC[STREAM.glyphs]
     msg = subdata.sub.title.text.upper()
     no_udeleted = len(subdata.udeleted)
     no_unwanted = len(subdata.unwanted)
@@ -137,6 +142,7 @@ def plans_upgrade(subdata):
 # ####################################### #
 
 def processing_user_deleted(entry):
+    USERDEL = USERDEL_DIC[STREAM.glyphs]
     '''One line per entry telling user of episodes deleted by user'''
     episode = entry['title'] or entry['poca_filename']
     msg = ' %s %s deleted by user' % (USERDEL, episode)
@@ -145,16 +151,17 @@ def processing_user_deleted(entry):
 
 def processing_removal(entry):
     '''One line per entry telling user of episodes being deleted by poca'''
+    AUTODEL = AUTODEL_DIC[STREAM.glyphs]
     episode = entry['title'] or entry['poca_filename']
     size = entry['poca_mb']
     size_str = ' [%s Mb]' % str(round(size)) if size else ' [Unknown]'
-    #msg = ' %s %s %s' % (STREAM.glyphs, episode, size_str)
     msg = ' %s %s %s' % (AUTODEL, episode, size_str)
     STREAM.debug(msg)
 
 
 def processing_download(entry):
     '''One line per entry telling user of episodes being downloaded by poca'''
+    DOWNLOAD = DOWNLOAD_DIC[STREAM.glyphs]
     episode = entry['title'] or entry['poca_filename']
     size = entry['poca_mb']
     size_str = ' [%s Mb]' % str(round(size)) if size else ' [Unknown]'
@@ -167,6 +174,7 @@ def processing_download(entry):
 # ####################################### #
 
 def fail_common(msg, after_stream_msg):
+    ERROR = ERROR_DIC[STREAM.glyphs]
     stream_msg = ' %s %s' % (ERROR, msg)
     STREAM.debug(stream_msg)
     AFTER_STREAM.info(after_stream_msg)
