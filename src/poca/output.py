@@ -18,6 +18,26 @@ SUMMARY = logging.getLogger('POCA_SUMMARY')
 
 UNICODE = True if str.lower(sys.stdout.encoding) == 'utf-8' else False
 
+ERROR_DIC = {'default': '\u203c', 'ascii': '!', 'wsl': '\u203c', \
+             'emoji': '\U0001f6a8'}
+AUTODEL_DIC = {'default': '\u2717', 'ascii': 'X', 'wsl': '\u2717', \
+               'emoji': '\U0001f5d1\ufe0f'}
+USERDEL_DIC = {'default': '\u2718', 'ascii': '%', 'wsl': '\u2718', \
+               'emoji': '\U0001f6ae'}
+PLANADD_DIC = {'default': '\u2795', 'ascii': '+', 'wsl': '+', \
+               'emoji': '\U0001f44d'}
+PLANREM_DIC = {'default': '\u2796', 'ascii': '-', 'wsl': '-', \
+               'emoji': '\U0001f44e'}
+DOWNLOAD_DIC = {'default': '\u21af', 'ascii': '>', 'wsl': '\u21af', \
+                'emoji': '\U0001f4be'}
+
+ERROR = ERROR_DIC[STREAM.glyphs]
+AUTODEL = AUTODEL_DIC[STREAM.glyphs]
+USERDEL = USERDEL_DIC[STREAM.glyphs]
+PLANADD = PLANADD_DIC[STREAM.glyphs]
+PLANREM = PLANREM_DIC[STREAM.glyphs]
+DOWNLOAD = DOWNLOAD_DIC[STREAM.glyphs]
+
 WARNING_SIGN = '\u26a0' if UNICODE else '!'
 CROSS_MARK = '\u274c' if UNICODE else 'X'
 CIRCLE_X = '\u29bb' if UNICODE else '%'
@@ -45,7 +65,7 @@ def subscribe_info(msg):
 
 def subscribe_error(msg):
     '''Generic error'''
-    err = ' %s ' % WARNING_SIGN
+    err = ' %s ' % ERROR
     msg = err + msg
     STREAM.error(msg)
 
@@ -56,7 +76,7 @@ def subscribe_error(msg):
 
 def config_fatal(msg):
     '''Fatal errors encountered during config read'''
-    STREAM.fatal(' %s %s' % (WARNING_SIGN, msg))
+    STREAM.fatal(' %s %s' % (ERROR, msg))
     sys.exit(1)
 
 
@@ -100,15 +120,15 @@ def plans_upgrade(subdata):
     if no_udeleted > 0 or no_unwanted > 0 or no_lacking > 0:
         msg = msg + '. '
     if no_udeleted > 0:
-        msg = msg + str(no_udeleted) + ' ' + CIRCLE_X
+        msg = msg + str(no_udeleted) + ' ' + USERDEL
     if no_udeleted > 0 and (no_unwanted > 0 or no_lacking > 0):
         msg = msg + ' / '
     if no_unwanted > 0:
-        msg = msg + str(no_unwanted) + ' ' + HEAVY_MINUS_SIGN
+        msg = msg + str(no_unwanted) + ' ' + PLANREM
     if no_unwanted > 0 and no_lacking > 0:
         msg = msg + ' / '
     if no_lacking > 0:
-        msg = msg + str(no_lacking) + ' ' + HEAVY_PLUS_SIGN
+        msg = msg + str(no_lacking) + ' ' + PLANADD
     STREAM.info(msg)
 
 
@@ -119,7 +139,7 @@ def plans_upgrade(subdata):
 def processing_user_deleted(entry):
     '''One line per entry telling user of episodes deleted by user'''
     episode = entry['title'] or entry['poca_filename']
-    msg = ' %s %s deleted by user' % (CIRCLE_X, episode)
+    msg = ' %s %s deleted by user' % (USERDEL, episode)
     STREAM.debug(msg)
 
 
@@ -128,8 +148,8 @@ def processing_removal(entry):
     episode = entry['title'] or entry['poca_filename']
     size = entry['poca_mb']
     size_str = ' [%s Mb]' % str(round(size)) if size else ' [Unknown]'
-    msg = ' %s %s %s' % (STREAM.glyphs, episode, size_str)
-    #msg = ' %s %s %s' % (CROSS_MARK, episode, size_str)
+    #msg = ' %s %s %s' % (STREAM.glyphs, episode, size_str)
+    msg = ' %s %s %s' % (AUTODEL, episode, size_str)
     STREAM.debug(msg)
 
 
@@ -138,7 +158,7 @@ def processing_download(entry):
     episode = entry['title'] or entry['poca_filename']
     size = entry['poca_mb']
     size_str = ' [%s Mb]' % str(round(size)) if size else ' [Unknown]'
-    msg = ' %s %s %s' % (UP_DOWN_ARROW, episode, size_str)
+    msg = ' %s %s %s' % (DOWNLOAD, episode, size_str)
     STREAM.debug(msg)
 
 
@@ -147,7 +167,7 @@ def processing_download(entry):
 # ####################################### #
 
 def fail_common(msg, after_stream_msg):
-    stream_msg = ' %s %s' % (WARNING_SIGN, msg)
+    stream_msg = ' %s %s' % (ERROR, msg)
     STREAM.debug(stream_msg)
     AFTER_STREAM.info(after_stream_msg)
 
