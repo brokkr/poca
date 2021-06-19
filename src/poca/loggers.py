@@ -42,6 +42,8 @@ def start_stream_logger(args):
     else:
         logger.setLevel(logging.INFO)
         stream_handler.setLevel(logging.INFO)
+    glyphs = ['default', 'ascii', 'wsl', 'emoji']
+    logger.glyphs = args.glyphs if args.glyphs in glyphs else 'default'
     logger.addHandler(stream_handler)
     return logger
 

@@ -26,6 +26,14 @@ HEAVY_PLUS_SIGN = '\u2795' if UNICODE else '+'
 UP_DOWN_ARROW = '\u21f5' if UNICODE else '>'
 
 
+#WARNING_SIGN = '\u26a0' if UNICODE else '!' # Used for: Errors
+#CROSS_MARK = '\u274c' if UNICODE else 'X' # Used for: Automatic removal
+#CIRCLE_X = '\u29bb' if UNICODE else '%' # Used for: User deleted
+#HEAVY_MINUS_SIGN = '\u2796' if UNICODE else '-' # Used for: Planned removal
+#HEAVY_PLUS_SIGN = '\u2795' if UNICODE else '+' # Used for: Planned addition
+#UP_DOWN_ARROW = '\u21f5' if UNICODE else '>' # Used for: Download
+
+
 # ####################################### #
 # SUBSCRIBE                               #
 # ####################################### #
@@ -80,7 +88,8 @@ def plans_moved(subdata, _outcome):
 def plans_nochanges(subdata):
     '''No changes made, just output title'''
     msg = subdata.sub.title.text.upper()
-    STREAM.info(msg)
+    STREAM.info(STREAM.glyphs)
+    #STREAM.info(msg)
 
 
 def plans_upgrade(subdata):

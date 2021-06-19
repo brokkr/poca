@@ -28,6 +28,9 @@ def get_poca_args():
                         help='Output to email (set in config)')
     parser.add_argument('-c', '--config',
                         help='Use alternate config directory')
+    parser.add_argument('-g', '--glyphs', default="default", type=str,
+                        help='Glyph set to use. Options: default, ascii, '
+                        'wsl, and emoji')
     parser.add_argument('-t', '--threads', default=1, type=int,
                         help='Number of concurrent downloads to allow. '
                         '\'--verbose\' forces single thread.')
