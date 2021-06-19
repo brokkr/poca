@@ -89,8 +89,9 @@ def download_img_file(url, sub_dir, settings):
         return Outcome(False, 'Download of image failed. Unknown MIME type.')
     file_path = os.path.join(sub_dir, 'cover' + extension)
     if os.path.isfile(file_path):
-        file_size = os.path.getsize(file_path)
-        if str(file_size) == r.headers['Content-Length']:
+        file_size = str(os.path.getsize(file_path))
+        remote_size = r.headers.get('content-length', str(len(r.content)))
+        if file_size == remote_size:
             return Outcome(True, 'Same image file already downloaded')
     with open(file_path, 'wb') as f:
         f.write(r.content)
