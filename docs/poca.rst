@@ -6,7 +6,7 @@ Help
 
 .. code-block:: none
 
-    usage: poca [-h] [-q | -v] [-l] [-e] [-c CONFIG] [-t THREADS]
+    usage: poca [-h] [-q | -v] [-l] [-e] [-c CONFIG] [-g GLYPHS] [-t THREADS]
 
     Poca 1.0 : A fast and highly customizable command line podcast client
 
@@ -18,6 +18,9 @@ Help
       -e, --email           Output to email (set in config)
       -c CONFIG, --config CONFIG
                             Use alternate config directory
+      -g GLYPHS, --glyphs GLYPHS
+                            Glyph set to use. Options: default, ascii, wsl, and
+                            emoji
       -t THREADS, --threads THREADS
                             Number of concurrent downloads to allow. '--verbose'
                             forces single thread.
@@ -28,22 +31,24 @@ Output
 In normal and verbose mode poca summarizes operations for each subscription. 
 The glyphs should be interpreted as follows:
 
-.. |circle_x| unicode:: \u29bb
-.. |heavy_minus_sign| unicode:: \u2796
-.. |heavy_plus_sign| unicode:: \u2795
+.. |userdel| unicode:: \u2718
+.. |planrem| unicode:: \u2796
+.. |planadd| unicode:: \u2795
 
-- |circle_x| signifies the number of user-deleted files detected
-- |heavy_minus_sign| signifies the number of automatically deleted files due
-  to hitting the ``max_number`` cap
-- |heavy_plus_sign| signifies the number of files to be downloaded
+- |userdel| signifies the number of user-deleted files detected
+- |planrem| signifies the number of files to be removed due to to hitting the 
+  ``max_number`` cap
+- |planadd| signifies the number of files to be downloaded
 
 In verbose mode poca will also generate output for each individual operation. 
 The glyphs should be interpreted as follows:
 
-.. |cross_mark| unicode:: \u274c
-.. |up_down_arrow| unicode:: \u21f5
-.. |warning_sign| unicode:: \u26a0
+.. |autodel| unicode:: \u2717
+.. |download| unicode:: \u21af
+.. |error| unicode:: \u203c
 
-- |cross_mark| indicates deletion of a file
-- |up_down_arrow| indicates download of a file
-- |warning_sign| indicates an error
+- |autodel| indicates deletion of a file
+- |download| indicates download of a file
+- |error| indicates an error
+
+Using the -g parameter these can be changed to other glyph sets.

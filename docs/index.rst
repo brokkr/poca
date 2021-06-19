@@ -78,10 +78,15 @@ To remove Poca simply do:
 Requirements
 ^^^^^^^^^^^^
 
-- Python 3.4 or later
+- Python 3.6 or later
 - Third-party modules: ``requests`` ``feedparser`` ``lxml`` ``mutagen``
 - Pip will automatically install any one of these found missing
-- A unicode capable terminal is recommended
+- A unicode capable terminal is recommended but not required
+- Due to dependencies of third-party modules (lxml requires libxml2 v. 2.9.2 
+  and libxslt 1.1.27) distros no older than Ubuntu 18.04 are recommended.
+- For use on WSL, the "-g wsl" flag is recommended as it will substitute out 
+  characters known not to work on WSL (see 
+  https://github.com/microsoft/WSL/issues/75)
 
 
 Quickstart
