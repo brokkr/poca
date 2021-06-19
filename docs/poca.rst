@@ -8,7 +8,7 @@ Help
 
     usage: poca [-h] [-q | -v] [-l] [-e] [-c CONFIG] [-g GLYPHS] [-t THREADS]
 
-    Poca 1.0 : A fast and highly customizable command line podcast client
+    Poca 1.1 : A fast and highly customizable command line podcast client
 
     optional arguments:
       -h, --help            show this help message and exit

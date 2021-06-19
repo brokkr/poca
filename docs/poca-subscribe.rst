@@ -9,7 +9,7 @@ Help
    usage: poca-subscribe [-h] [-c CONFIG]
                          {add,list,tags,delete,toggle,stats} ...
 
-   poca-subscribe 1.0 : A subscription management tool for poca
+   poca-subscribe 1.1 : A subscription management tool for poca
 
    optional arguments:
      -h, --help            show this help message and exit
