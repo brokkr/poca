@@ -31,28 +31,6 @@ PLANREM_DIC = {'default': '\u2796', 'ascii': '-', 'wsl': '-', \
 DOWNLOAD_DIC = {'default': '\u21af', 'ascii': '>', 'wsl': '\u21af', \
                 'emoji': '\U0001f4be'}
 
-#ERROR = ERROR_DIC[STREAM.glyphs]
-#AUTODEL = AUTODEL_DIC[STREAM.glyphs]
-#USERDEL = USERDEL_DIC[STREAM.glyphs]
-#PLANADD = PLANADD_DIC[STREAM.glyphs]
-#PLANREM = PLANREM_DIC[STREAM.glyphs]
-#DOWNLOAD = DOWNLOAD_DIC[STREAM.glyphs]
-
-#WARNING_SIGN = '\u26a0' if UNICODE else '!'
-#CROSS_MARK = '\u274c' if UNICODE else 'X'
-#CIRCLE_X = '\u29bb' if UNICODE else '%'
-#HEAVY_MINUS_SIGN = '\u2796' if UNICODE else '-'
-#HEAVY_PLUS_SIGN = '\u2795' if UNICODE else '+'
-#UP_DOWN_ARROW = '\u21f5' if UNICODE else '>'
-
-
-#WARNING_SIGN = '\u26a0' if UNICODE else '!' # Used for: Errors
-#CROSS_MARK = '\u274c' if UNICODE else 'X' # Used for: Automatic removal
-#CIRCLE_X = '\u29bb' if UNICODE else '%' # Used for: User deleted
-#HEAVY_MINUS_SIGN = '\u2796' if UNICODE else '-' # Used for: Planned removal
-#HEAVY_PLUS_SIGN = '\u2795' if UNICODE else '+' # Used for: Planned addition
-#UP_DOWN_ARROW = '\u21f5' if UNICODE else '>' # Used for: Download
-
 
 # ####################################### #
 # SUBSCRIBE                               #
