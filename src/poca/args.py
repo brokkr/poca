@@ -31,7 +31,7 @@ def get_poca_args():
     parser.add_argument('-g', '--glyphs', default="default", type=str,
                         help='Glyph set to use. Options: default, ascii, '
                         'wsl, and emoji')
-    parser.add_argument('-t', '--threads', default=1, type=int,
+    parser.add_argument('-t', '--threads', default=4, type=int,
                         help='Number of concurrent downloads to allow. '
                         '\'--verbose\' forces single thread.')
     return parser.parse_args()

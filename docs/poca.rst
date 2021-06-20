@@ -51,4 +51,5 @@ The glyphs should be interpreted as follows:
 - |download| indicates download of a file
 - |error| indicates an error
 
-Using the -g parameter these can be changed to other glyph sets.
+Using the -g parameter these can be changed to other glyph sets, including
+WSL-friendly and ASCII-only.
