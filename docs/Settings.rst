@@ -109,15 +109,14 @@ Optional settings (other)
 useragent
 ^^^^^^^^^
 
-This is a fallback option. Poca will always first attempt download with the 
-'honest' user agent declaration (Python's *request* library). Setting 
-``useragent`` allows poca to make a second attempt in case of failure due to 
-blocking, only this time with a spoofed user agent. Enter any user agent 
-string you want - you can find some useful ones in `this big list 
-<https://techblog.willshouse.com/2012/01/03/most-common-user-agents/>`_ - or 
-leave it empty/remove it if you don't want poca to use spoofing. We suggest 
-you leave as it is and only return to it if you see lots of messages like 
-this when you run poca: "Download failed. HTTP Error 403: Forbidden".
+This is a fallback option, if you experience a lot of download failures. Some
+servers refuse downloads using Python's request library ("If bad guys are using
+hammers, ban hammers, right?"). Setting ``useragent`` allows poca to make a 
+second attempt in case of failure due to blocking, only this time with a 
+spoofed user agent. Enter any user agent string you want - search for "what's 
+my useragent" and copy your browser's string. Leave it empty/remove it if 
+you don't want poca to use spoofing. We suggest you leave as it is and only 
+return to it if you experience persistent download failures.
 
 filenames (new in 1.1)
 ^^^^^^^^^^^^^^^^^^^^^^
