@@ -84,7 +84,10 @@ def info_user_vars(entry):
     user_vars['title'] = entry['sub_title']
     # title and id are both optional elements of at least rss spec :/
     user_vars['episode_title'] = str(entry['title'])
-    user_vars['uid'] = entry['id']
+    try:
+        user_vars['uid'] = entry['id']
+    except KeyError:
+        print(entry['title'])
     # is it foolish to assume they are always there?
     user_vars['org_name'] = entry['basename']
     #print(user_vars)
