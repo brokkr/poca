@@ -89,7 +89,7 @@ def write_config_file(config_file_path):
         config_file.write(config_xml_str)
         config_file.close()
         msg = ("Default config succesfully written to %s.\n"
-               "Please edit or run 'poca-subscribe' to add subscriptions."
+               "Please edit or run 'poca-subscribe add' to add subscriptions."
                % config_file_path)
         return Outcome(True, msg)
     except IOError as e:
