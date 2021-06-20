@@ -84,10 +84,9 @@ def info_user_vars(entry):
     user_vars['title'] = entry['sub_title']
     # title and id are both optional elements of at least rss spec :/
     user_vars['episode_title'] = str(entry['title'])
-    try:
-        user_vars['uid'] = entry['id']
-    except KeyError:
-        print(entry['title'])
+    user_vars['uuid'] = uuid.uuid4().hex[:9]
+    user_vars['uid'] = entry['id'] if hasattr(entry, 'id') else \
+                       user_vars['uuid']
     # is it foolish to assume they are always there?
     user_vars['org_name'] = entry['basename']
     #print(user_vars)
@@ -115,7 +114,7 @@ def names(entry):
     name_dic['permissive'] = filename_permissive(name_base)
     name_dic['ntfs'] = filename_ntfs(name_base)
     name_dic['restrictive'] = filename_restrictive(name_base)
-    name_dic['fallback'] = '-'.join((user_vars['date'], uuid.uuid4().hex[:9]))
+    name_dic['fallback'] = '-'.join((user_vars['date'], user_vars['uuid']))
     #print(name_dic)
     return name_dic
 
