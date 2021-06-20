@@ -103,6 +103,10 @@ def names(entry):
     if entry['rename'] is not None:
         name_children = [el for el in entry['rename'].iterchildren()]
         name_tags = [el.tag for el in name_children if el.tag in user_vars]
+        # note: if a used key is not in user_vars, it is silently discarded
+        # so: a user misspelling a key will possibly end up with a zero-length
+        # filename. that will result in using the fallback name and be
+        # difficult to understand why that happens.
         name_lst = [user_vars[tag] for tag in name_tags]
         divider = entry['rename'].get('divider') or ' '
         space = entry['rename'].get('space') or ' '
