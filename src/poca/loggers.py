@@ -35,6 +35,7 @@ def start_stream_logger(args):
     if not hasattr(args, 'verbose'):
         args.verbose = False
     if args.quiet:
+        logger.glyphs = 'default'
         return logger
     elif args.verbose:
         logger.setLevel(logging.DEBUG)
