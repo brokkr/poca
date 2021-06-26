@@ -17,6 +17,7 @@ def main():
     '''Main script'''
     args = poca.args.get_poca_subscribe_args()
     args.quiet = False
+    args.glyphs = 'default'
     stream_logger = poca.loggers.start_stream_logger(args)
     conf = poca.config.Config(args, merge_default=False)
     if args.cmd_name == 'delete':
