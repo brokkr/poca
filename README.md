@@ -38,7 +38,7 @@ subscriptions, deals intelligently with interruptions, updates moved feeds
 Interface
 ---------
 
-[![asciicast](https://asciinema.org/a/rhntenkCKcn7zkmfQRdgjre1S.svg)](https://asciinema.org/a/rhntenkCKcn7zkmfQRdgjre1S)
+[![asciicast](https://asciinema.org/a/kQkIACs7YN0dB208yzBaKfcdc.svg)](https://asciinema.org/a/kQkIACs7YN0dB208yzBaKfcdc)
 
 All configuration is done in a single XML-format file. For cron job 
 compatibility, Poca has a quiet mode in addition to normal and verbose.
