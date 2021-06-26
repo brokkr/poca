@@ -196,6 +196,10 @@ class Wanted():
 
     def match_filename(self, dic, filter_text):
         '''The episode filename must match a regex/string'''
+        # 1.0 entries do not have the 'org_filename' key
+        for x in dic.keys():
+            if not 'org_filename' in dic[x]:
+                dic[x]['org_filename'] = dic[x]['filename']
         self.lst = [x for x in self.lst if
                     bool(re.search(filter_text, dic[x]['org_filename']))]
 
