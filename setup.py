@@ -38,6 +38,6 @@ setup(
                  'License :: OSI Approved :: GNU General Public License (GPL)',
                  'Natural Language :: English',
                  'Operating System :: POSIX',
-                 'Programming Language :: Python :: 3.5',
+                 'Programming Language :: Python :: 3.6',
                  'Topic :: Multimedia :: Sound/Audio']
 )
