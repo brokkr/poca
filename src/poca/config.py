@@ -8,39 +8,11 @@
 """A config parser using lxml objectify and XPath"""
 
 from os import path
-from lxml import etree, objectify
+from pathlib import Path
 from copy import deepcopy
 
-from poca import files, output, xmlconf
-from poca.lxmlfuncs import merge
+from poca import files, output
 from poca.outcome import Outcome
-
-
-E = objectify.ElementMaker(annotate=False)
-DEFAULT_XML = E.poca(
-                     E.settings(
-                                E.base_dir('/tmp/poca'),
-                                E.filenames('permissive', {'v0': 'permissive',
-                                                           'v1': 'ntfs',
-                                                           'v2': 'restrictive',
-                                                           'v3': 'fallback'}),
-                                E.id3v2version(4, {'v0': 3, 'v1': 4}),
-                                E.id3removev1('yes', {'v0': 'yes',
-                                                      'v1': 'no'}),
-                                E.useragent(''),
-                                E.email(
-                                        E.only_errors('no', {'v0': 'yes',
-                                                             'v1': 'no'}),
-                                        E.threshold(1),
-                                        E.host('localhost'),
-                                        E.starttls('no', {'v0': 'yes',
-                                                          'v1': 'no'}),
-                                        E.password('')
-                                       )
-                               ),
-                     E.defaults(),
-                     E.subscriptions()
-                     )
 
 
 class Config:
@@ -48,55 +20,38 @@ class Config:
     def __init__(self, args, merge_default=False):
         self.args = args
         self.paths = Paths(args)
-        if merge_default:
-            objectify.deannotate(DEFAULT_XML)
-            self.xml = deepcopy(DEFAULT_XML)
-            user_xml = self.get_xml()
-            errors = merge(user_xml, self.xml, DEFAULT_XML, errors=[])
-            for outcome in errors:
-                output.config_fatal(outcome.msg)
-        else:
-            self.xml = self.get_xml()
-        base_dir = self.xml.settings.base_dir.text
-        self.paths.test_base_dir(base_dir)
-
-    def get_xml(self):
-        '''Returns the XML tree root harvested from the users poca.xml file.'''
-        try:
-            with open(self.paths.config_file, 'r') as f:
-                xml_object = objectify.parse(f)
-            return xml_object.getroot()
-        except etree.XMLSyntaxError as e:
-            msg = 'Could not parse %s. Parser said:\n%s' % \
-                (self.paths.config_file, str(e))
-            output.config_fatal(msg)
-        except PermissionError:
-            msg = 'Could not read %s' % self.paths.config_file
-            output.config_fatal(msg)
-
+        # merge with default currently missing
+        with self.config_file.open() as f:
+            config_yaml = yaml.safe_load(f)
+        # settings turned into attributes (KeyErrors anyone?)
+        self.base_dir = Path(config_yaml['settings']['base_dir'])
+        self.filenames = config_yaml['settings']['filenames']
+        self.useragent = config_yaml['settings']['useragent']
+        self.id3 = {'removev1': config_yaml['settings']['id3removev1'],
+                    'v2version': config_yaml['settings']['id3version2']}
+        base_dir_outcome = files.check_path(self.base_dir)
+        if not base_dir_outcome.success:
+            output.config_fatal(base_dir_outcome.msg)
+        self.subs = config_yaml['subscriptions']
 
 class Paths:
     '''A data-holder object for all program paths'''
     def __init__(self, args):
         if args.config:
-            self.config_dir = self.expandall(args.config)
+            self.config_dir = Path(args.config)
         else:
-            self.config_dir = self.expandall(path.join('~', '.poca'))
-        self.config_file = path.join(self.config_dir, 'poca.xml')
-        self.db_dir = path.join(self.config_dir, 'db')
-        self.log_file = path.join(self.config_dir, 'poca.log')
+            self.config_dir = Path.home().joinpath('.poca')
+        self.config_file = self.config_dir.joinpath('poca.yaml')
+        self.db_dir = self.config_dir.joinpath('db')
+        self.log_file = self.config_dir.joinpath('poca.log')
         self.test_paths(args)
 
-    def expandall(self, _path):
-        '''turn var into full absolute path'''
-        _path = path.expandvars(path.expanduser(_path))
-        _path = path.abspath(_path)
-        return _path
-
     def test_paths(self, args):
-        '''Checks for presence of ~/.poca/poca.xml. If that doesn't exist, try
+        '''Checks for presence of ~/.poca/poca.yaml. If that doesn't exist, try
         to create it. Also, check for existance of the db directory.'''
-        if not path.isfile(self.config_file):
+        # why arent' we
+        # * first checking
+        if not self.config_file.is_file():
             config_dir_outcome = files.check_path(self.config_dir)
             if not config_dir_outcome.success:
                 output.config_fatal(config_dir_outcome.msg)
@@ -115,16 +70,8 @@ class Paths:
         except AttributeError:
             pass
 
-    def test_base_dir(self, base_dir):
-        # test base_dir is writable
-        self.base_dir = base_dir
-        base_dir_outcome = files.check_path(self.base_dir)
-        if not base_dir_outcome.success:
-            output.config_fatal(base_dir_outcome.msg)
-
 def subs(conf):
-    xp_str = './subscription[not(@state="inactive")][title][url]'
-    valid_subs = conf.xml.subscriptions.xpath(xp_str)
+    #valid_subs = conf.xml.subscriptions.xpath(xp_str)
     valid_subs = [sub for sub in valid_subs if sub.title.text and sub.url.text]
     sub_names = [sub.title.text for sub in valid_subs]
     dupes = set([x for x in sub_names if sub_names.count(x) > 1])

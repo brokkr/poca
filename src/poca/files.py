@@ -114,31 +114,34 @@ def verify_file(entry):
 
 def check_path(check_dir):
     '''Check directory exists and is writable; if not create directory'''
-    if os.path.isdir(check_dir):
+    if check_dir.is_dir():
         if os.access(check_dir, os.W_OK):
-            return Outcome(True, '%s exists already' % check_dir)
+            return Outcome(True, '%s exists already' % check_dir.absolute())
         else:
-            return Outcome(False, 'Could not save files to %s' % check_dir)
+            return Outcome(False, 'Could not save files to %s' % \
+                           check_dir.absolute())
     try:
-        os.makedirs(check_dir)
-        return Outcome(True, '%s was successfully created' % check_dir)
+        os.makedirs(check_dir.absolute())
+        return Outcome(True, '%s was created' % check_dir.absolute())
     except FileExistsError:
         return Outcome(False, 'Could not create %s. File already exists?' \
-                       % check_dir)
-    except OSError:
-        return Outcome(False, 'Could not create %s. Illegal characters for ' \
-                       'filesystem in directory name?' % check_dir)
+                       % check_dir.absolute())
+    except (OSError, PermissionError) as e:
+        return Outcome(False, 'Could not create %s.'  % check_dir.absolute())
 
 def check_file_write(check_file):
     '''Check to see if file is writable/can be created'''
-    if os.path.isfile(check_file):
+    if check_file.is_file():
         if os.access(check_file, os.W_OK):
-            return Outcome(True, '%s exists and is writable' % check_file)
+            return Outcome(True, '%s exists and is writable' % \
+                           check_file.absolute())
         else:
-            return Outcome(False, '%s exists but is not writable' % check_file)
-    if os.path.isdir(check_file):
-        return Outcome(False, '%s is a directory, not a file' % check_file)
-    outcome = check_path(os.path.dirname(check_file))
+            return Outcome(False, '%s exists but is not writable' % \
+                           check_file.absolute())
+    if check_file.is_dir():
+        return Outcome(False, '%s is a directory, not a file' % \
+                       check_file.absolute())
+    outcome = check_path(check_file.parent)
     return outcome
 
 def delete_sub(conf, title, reset=False):
