@@ -20,19 +20,30 @@ class Config:
     def __init__(self, args, merge_default=False):
         self.args = args
         self.paths = Paths(args)
-        # merge with default currently missing
         with self.config_file.open() as f:
             config_yaml = yaml.safe_load(f)
+        # merge with default currently missing
         # settings turned into attributes (KeyErrors anyone?)
-        self.base_dir = Path(config_yaml['settings']['base_dir'])
-        self.filenames = config_yaml['settings']['filenames']
-        self.useragent = config_yaml['settings']['useragent']
-        self.id3 = {'removev1': config_yaml['settings']['id3removev1'],
-                    'v2version': config_yaml['settings']['id3version2']}
+        for setting in config_yaml['settings']:
+            setattr(self, setting, config_yaml['settings'][setting])
+        # not currently using defaults
+        self.defaults = config_yaml['defaults']
+        self.subs = self.validate_subs(config_yaml['subscriptions'])
+        # test base_dir derived from settings
         base_dir_outcome = files.check_path(self.base_dir)
         if not base_dir_outcome.success:
             output.config_fatal(base_dir_outcome.msg)
-        self.subs = config_yaml['subscriptions']
+
+    def validate_subs(subs):
+        valid_subs = [sub for sub in subs if all(key in sub for key in \
+                                                 ('title', 'url'))]
+        sub_names = [sub['title'] for sub in valid_subs]
+        dupes = set([x for x in sub_names if sub_names.count(x) > 1])
+        if len(dupes) > 0:
+            msg = "Found the following duplicate titles: %s" % ', '.join(dupes)
+            output.config_fatal(msg)
+        return subs
+
 
 class Paths:
     '''A data-holder object for all program paths'''
@@ -55,7 +66,7 @@ class Paths:
             config_dir_outcome = files.check_path(self.config_dir)
             if not config_dir_outcome.success:
                 output.config_fatal(config_dir_outcome.msg)
-            config_file_outcome = xmlconf.write_config_file(self.config_file)
+            #config_file_outcome = xmlconf.write_config_file(self.config_file)
             output.config_fatal(config_file_outcome.msg)
         # test db_dir is writable
         db_dir_outcome = files.check_path(self.db_dir)
@@ -69,13 +80,3 @@ class Paths:
         # poca-subscribe does not have logfile as argument option
         except AttributeError:
             pass
-
-def subs(conf):
-    #valid_subs = conf.xml.subscriptions.xpath(xp_str)
-    valid_subs = [sub for sub in valid_subs if sub.title.text and sub.url.text]
-    sub_names = [sub.title.text for sub in valid_subs]
-    dupes = set([x for x in sub_names if sub_names.count(x) > 1])
-    if len(dupes) > 0:
-        msg = "Found the following duplicate titles: %s" % ', '.join(dupes)
-        output.config_fatal(msg)
-    return valid_subs
