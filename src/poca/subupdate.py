@@ -14,9 +14,7 @@ from copy import deepcopy
 from threading import Thread
 
 import feedparser
-#from lxml import etree
-from poca import files, history, entryinfo
-#from poca.lxmlfuncs import merge
+from poca import files, entryinfo
 from poca.outcome import Outcome
 
 
@@ -38,14 +36,14 @@ class SubUpdateThread(Thread):
 class SubUpdate():
     '''Data carrier for subscription: entries to dl, entries to remove,
        user deleted entries, etc.'''
-    def __init__(self, conf, sub):
-        self.conf = conf
+    def __init__(self, sub, base_dir, defaults):
         self.sub = sub
+        self.defaults = defaults
         self.status = 0
-        self.sub_dir = os.path.join(self.conf.paths.base_dir,\
-                                    self.sub.title.text)
+        self.sub_dir = base_dir.joinpath(sub['title'])
         self.outcome = files.check_path(self.sub_dir)
         if not self.outcome.success:
+            print(self.outcome.msg)
             return
 
         # merge sub settings and defaults
@@ -63,16 +61,16 @@ class SubUpdate():
 
         # get jar and check for user deleted files
         self.udeleted = []
-        self.jar, self.outcome = history.get_subjar(self.conf.paths,
-                                                    self.sub)
-        if not self.outcome.success:
-            return
-        self.check_jar()
-        if not self.outcome.success:
-            return
+        #self.jar, self.outcome = history.get_subjar(self.conf.paths,
+        #                                            self.sub)
+        #if not self.outcome.success:
+        #    return
+        #self.check_jar()
+        #if not self.outcome.success:
+        #    return
 
         # get feed, combine with jar and filter the lot
-        feed = Feed(self.sub, self.jar, self.udeleted)
+        feed = Feed(self.sub, self.udeleted)
         self.status = feed.status
         if self.status == 301:
             self.outcome = Outcome(True, 'Feed has moved. Config updated.')
@@ -85,31 +83,31 @@ class SubUpdate():
             return
         else:
             self.outcome = Outcome(True, 'Success')
-        combo = Combo(feed, self.jar, self.sub)
-        self.wanted = Wanted(self.sub, feed, combo, self.jar.del_lst,
-                             self.sub_dir)
+        combo = Combo(feed, self.sub)
+        self.wanted = Wanted(self.sub, feed, combo, self.sub_dir)
         self.outcome = self.wanted.outcome
         if not self.outcome.success:
             return
-        from_the_top = self.sub.find('from_the_top') or 'no'
-        if from_the_top == 'no':
-            self.wanted.lst.reverse()
+        #from_the_top = self.sub.find('from_the_top') or 'no'
+        #if from_the_top == 'no':
+        #    self.wanted.lst.reverse()
 
         # subupgrade will delete unwanted and download lacking
-        self.unwanted = [x for x in self.jar.lst if x not in self.wanted.lst]
-        self.lacking = [x for x in self.wanted.lst if x not in self.jar.lst]
+        #self.unwanted = [x for x in self.jar.lst if x not in self.wanted.lst]
+        #self.lacking = [x for x in self.wanted.lst if x not in self.jar.lst]
+        self.lacking = [x for x in self.wanted.lst]
 
-    def check_jar(self):
-        '''Check for user deleted files so we can filter them out'''
-        for uid in self.jar.lst:
-            entry = self.jar.dic[uid]
-            outcome = files.verify_file(entry)
-            if not outcome.success:
-                self.udeleted.append(entry)
-                self.jar.del_lst.append(uid)
-                self.jar.del_dic[uid] = self.jar.dic.pop(uid)
-        self.jar.lst = [x for x in self.jar.lst if x not in self.jar.del_lst]
-        self.outcome = self.jar.save()
+    #def check_jar(self):
+    #    '''Check for user deleted files so we can filter them out'''
+    #    for uid in self.jar.lst:
+    #        entry = self.jar.dic[uid]
+    #        outcome = files.verify_file(entry)
+    #        if not outcome.success:
+    #            self.udeleted.append(entry)
+    #            self.jar.del_lst.append(uid)
+    #            self.jar.del_dic[uid] = self.jar.dic.pop(uid)
+    #    self.jar.lst = [x for x in self.jar.lst if x not in self.jar.del_lst]
+    #    self.outcome = self.jar.save()
 
 
 class Feed:
