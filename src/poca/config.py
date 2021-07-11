@@ -20,7 +20,7 @@ class Config:
     def __init__(self, args, merge_default=False):
         self.args = args
         self.paths = Paths(args)
-        with self.config_file.open() as f:
+        with self.paths.config_file.open() as f:
             config_yaml = yaml.safe_load(f)
         # merge with default currently missing
         # settings turned into attributes (KeyErrors anyone?)
@@ -35,6 +35,7 @@ class Config:
             output.config_fatal(base_dir_outcome.msg)
 
     def validate_subs(subs):
+        '''at present tests for a title and url and refuses duplicates'''
         valid_subs = [sub for sub in subs if all(key in sub for key in \
                                                  ('title', 'url'))]
         sub_names = [sub['title'] for sub in valid_subs]
@@ -42,7 +43,7 @@ class Config:
         if len(dupes) > 0:
             msg = "Found the following duplicate titles: %s" % ', '.join(dupes)
             output.config_fatal(msg)
-        return subs
+        return valid_subs
 
 
 class Paths:
@@ -60,14 +61,12 @@ class Paths:
     def test_paths(self, args):
         '''Checks for presence of ~/.poca/poca.yaml. If that doesn't exist, try
         to create it. Also, check for existance of the db directory.'''
-        # why arent' we
-        # * first checking
         if not self.config_file.is_file():
             config_dir_outcome = files.check_path(self.config_dir)
             if not config_dir_outcome.success:
                 output.config_fatal(config_dir_outcome.msg)
             #config_file_outcome = xmlconf.write_config_file(self.config_file)
-            output.config_fatal(config_file_outcome.msg)
+            output.config_fatal(config_dir_outcome.msg)
         # test db_dir is writable
         db_dir_outcome = files.check_path(self.db_dir)
         if not db_dir_outcome.success:
