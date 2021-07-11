@@ -61,7 +61,7 @@ def main():
         skip_subs = []
         for sub in subs:
             update_thread = poca.subupdate.SubUpdateThread(
-                update_q, poca.subupdate.SubUpdate, conf, sub)
+                update_q, poca.subupdate.SubUpdate, sub, defaults, base_dir)
             update_threads.append(update_thread)
             update_thread.start()
 

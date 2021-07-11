@@ -36,7 +36,7 @@ class SubUpdateThread(Thread):
 class SubUpdate():
     '''Data carrier for subscription: entries to dl, entries to remove,
        user deleted entries, etc.'''
-    def __init__(self, sub, base_dir, defaults):
+    def __init__(self, sub, defaults, base_dir):
         self.sub = sub
         self.defaults = defaults
         self.status = 0
