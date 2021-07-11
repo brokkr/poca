@@ -144,9 +144,9 @@ class Feed:
                 self.outcome = Outcome(False, 'Cant find entries in feed.')
                 # should we set an artificial status here? Or does feedparser?
                 # return
-        from_the_top = sub.find('from_the_top') or 'no'
-        if from_the_top == 'yes':
-            self.lst.reverse()
+        #from_the_top = sub.find('from_the_top') or 'no'
+        #if from_the_top == 'yes':
+        #    self.lst.reverse()
         try:
             self.image = doc.feed.image['href']
         except (AttributeError, KeyError):
