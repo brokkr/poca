@@ -112,7 +112,8 @@ class SubUpdate():
 
 class Feed:
     '''Constructs a container for feed entries'''
-    def __init__(self, sub, jar, udeleted):
+    def __init__(self, sub, udeleted):
+        jar = []
         etag = getattr(jar, 'etag', None)
         modified = getattr(jar, 'modified', None)
         #sub_str = etree.tostring(sub, encoding='unicode')
@@ -155,25 +156,25 @@ class Feed:
 class Combo:
     '''Constructs a container holding all combined feed and jar
     entries. Copies feed then adds non-duplicates from jar'''
-    def __init__(self, feed, jar, sub):
-        from_the_top = sub.find('from_the_top') or 'no'
-        if from_the_top == 'yes':
-            self.lst = list(jar.lst)
-            self.lst.extend(uid for uid in feed.lst if uid not in jar.lst)
-        else:
-            self.lst = list(feed.lst)
-            self.lst.extend(uid for uid in jar.lst if uid not in feed.lst)
-        self.dic = {uid: entryinfo.validate(feed.dic[uid]) for uid in feed.lst
-                    if uid not in jar.lst}
-        self.dic.update(jar.dic)
+    def __init__(self, feed, sub):
+        #from_the_top = sub.find('from_the_top') or 'no'
+        #if from_the_top == 'yes':
+        #    self.lst = list(jar.lst)
+        #    self.lst.extend(uid for uid in feed.lst if uid not in jar.lst)
+        #else:
+        self.lst = list(feed.lst)
+        #self.lst.extend(uid for uid in jar.lst if uid not in feed.lst)
+        self.dic = {uid: entryinfo.validate(feed.dic[uid]) for uid in feed.lst}
+                    #if uid not in jar.lst}
+        #self.dic.update(jar.dic)
 
 
 class Wanted():
     '''Filters the combo entries and decides which ones to go for'''
-    def __init__(self, sub, feed, combo, del_lst, sub_dir):
+    def __init__(self, sub, feed, combo, sub_dir):
         self.outcome = Outcome(True, 'Default true')
         self.lst = combo.lst
-        self.lst = list(filter(lambda x: x not in del_lst, self.lst))
+        #self.lst = list(filter(lambda x: x not in del_lst, self.lst))
         self.lst = list(filter(lambda x: combo.dic[x]['valid'], self.lst))
         if hasattr(sub, 'filters'):
             self.apply_filters(sub, combo)
