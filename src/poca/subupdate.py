@@ -121,7 +121,7 @@ class Feed:
         #if sub_str != jarsub_str or udeleted:
         #    etag = None
         #    modified = None
-        doc = feedparser.parse(sub.url.text, etag=etag, modified=modified)
+        doc = feedparser.parse(sub['url'], etag=etag, modified=modified)
         self.status = getattr(doc, 'status', 418)
         self.etag = getattr(doc, 'etag', etag)
         self.modified = getattr(doc, 'modified', modified)
