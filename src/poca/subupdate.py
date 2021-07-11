@@ -14,9 +14,9 @@ from copy import deepcopy
 from threading import Thread
 
 import feedparser
-from lxml import etree
+#from lxml import etree
 from poca import files, history, entryinfo
-from poca.lxmlfuncs import merge
+#from poca.lxmlfuncs import merge
 from poca.outcome import Outcome
 
 
@@ -49,17 +49,17 @@ class SubUpdate():
             return
 
         # merge sub settings and defaults
-        defaults = deepcopy(self.conf.xml.defaults)
-        rename = deepcopy(self.sub.rename) if hasattr(self.sub, 'rename') \
-            else None
-        errors = merge(self.sub, defaults, self.conf.xml.defaults, errors=[])
-        self.outcome = errors[0] if errors else Outcome(True, '')
-        defaults.tag = "subscription"
-        self.sub = defaults
-        if rename is not None:
-            self.sub.rename = rename
-        if not self.outcome.success:
-            return
+        #defaults = deepcopy(self.conf.xml.defaults)
+        #rename = deepcopy(self.sub.rename) if hasattr(self.sub, 'rename') \
+        #    else None
+        #errors = merge(self.sub, defaults, self.conf.xml.defaults, errors=[])
+        #self.outcome = errors[0] if errors else Outcome(True, '')
+        #defaults.tag = "subscription"
+        #self.sub = defaults
+        #if rename is not None:
+        #    self.sub.rename = rename
+        #if not self.outcome.success:
+        #    return
 
         # get jar and check for user deleted files
         self.udeleted = []
@@ -117,11 +117,11 @@ class Feed:
     def __init__(self, sub, jar, udeleted):
         etag = getattr(jar, 'etag', None)
         modified = getattr(jar, 'modified', None)
-        sub_str = etree.tostring(sub, encoding='unicode')
-        jarsub_str = etree.tostring(jar.sub, encoding='unicode')
-        if sub_str != jarsub_str or udeleted:
-            etag = None
-            modified = None
+        #sub_str = etree.tostring(sub, encoding='unicode')
+        #jarsub_str = etree.tostring(jar.sub, encoding='unicode')
+        #if sub_str != jarsub_str or udeleted:
+        #    etag = None
+        #    modified = None
         doc = feedparser.parse(sub.url.text, etag=etag, modified=modified)
         self.status = getattr(doc, 'status', 418)
         self.etag = getattr(doc, 'etag', etag)
