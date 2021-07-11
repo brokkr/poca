@@ -14,7 +14,7 @@ from distutils.core import setup
 
 setup(
     name='poca',
-    version='1.1',
+    version='1.9',
     license='GPL3',
     description='A fast and customizable command line podcast client',
     long_description=('A fast and customizable command line podcast client'),
@@ -27,8 +27,8 @@ setup(
     package_dir={'poca': 'src/poca'},
     data_files=[('share/man/man1', ["man/poca.1"]),
                 ('share/man/man1', ["man/poca-subscribe.1"])],
-    requires=['feedparser', 'lxml', 'mutagen', 'requests'],
-    install_requires=['feedparser', 'lxml', 'mutagen', 'requests'],
+    requires=['feedparser', 'pyyaml', 'mutagen', 'requests'],
+    install_requires=['feedparser', 'pyyaml', 'mutagen', 'requests'],
     provides=['poca'],
     platforms=['POSIX'],
     keywords=['podcast', 'client', 'aggregator', 'cli'],

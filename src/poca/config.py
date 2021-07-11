@@ -5,11 +5,13 @@
 # the Free Software Foundation, either version 3 of the License,
 # or (at your option) any later version.
 
-"""A config parser using lxml objectify and XPath"""
+"""A config parser using yaml"""
+
+import yaml
 
 from os import path
 from pathlib import Path
-from copy import deepcopy
+#from copy import deepcopy
 
 from poca import files, output
 from poca.outcome import Outcome
