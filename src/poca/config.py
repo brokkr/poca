@@ -17,6 +17,19 @@ from poca import files, output
 from poca.outcome import Outcome
 
 
+def read_yaml(file_path):
+    with file_path.open() as f:
+        yaml_content = yaml.safe_load(f)
+    return yaml_content
+
+def get_settings(poca_yaml):
+    '''validate here?'''
+    dl_settings = poca_yaml['settings']
+    id3_settings = {'removev1': dl_settings.pop('id3removev1'),
+                    'v2version': dl_settings.pop('id3v2version')}
+    return (dl_settings, id3_settings)
+
+
 class Config:
     '''Collection of all configuration options'''
     def __init__(self, args, merge_default=False):
@@ -26,6 +39,7 @@ class Config:
             config_yaml = yaml.safe_load(f)
         # merge with default currently missing
         # settings turned into attributes (KeyErrors anyone?)
+        self.base_dir = Path(config_yaml['settings'].pop('base_dir'))
         for setting in config_yaml['settings']:
             setattr(self, setting, config_yaml['settings'][setting])
         # not currently using defaults
@@ -36,7 +50,7 @@ class Config:
         if not base_dir_outcome.success:
             output.config_fatal(base_dir_outcome.msg)
 
-    def validate_subs(subs):
+    def validate_subs(self, subs):
         '''at present tests for a title and url and refuses duplicates'''
         valid_subs = [sub for sub in subs if all(key in sub for key in \
                                                  ('title', 'url'))]

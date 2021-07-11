@@ -69,7 +69,7 @@ def start_after_stream_logger(args):
     return logger
 
 
-def start_summary_logger(args, paths, settings):
+def start_summary_logger(args, paths):
     '''Starts up the summary logger (for use in file and email logging)'''
     logger = get_logger('POCA_SUMMARY')
     logger.setLevel(logging.INFO)
@@ -79,13 +79,13 @@ def start_summary_logger(args, paths, settings):
         file_handler = get_file_handler(paths)
         logger.addHandler(file_handler)
         logger.poca_file_handler = file_handler
-    if args.email and settings.find('email[fromaddr][toaddr]') is not None:
-        bsmtp_handler = BufferSMTPHandler(settings.email, paths)
-        loglevel = logging.ERROR if settings.email.only_errors == 'yes' \
-            else logging.INFO
-        bsmtp_handler.setLevel(loglevel)
-        logger.addHandler(bsmtp_handler)
-        logger.poca_email_handler = bsmtp_handler
+    #if args.email and settings.find('email[fromaddr][toaddr]') is not None:
+    #    bsmtp_handler = BufferSMTPHandler(settings.email, paths)
+    #    loglevel = logging.ERROR if settings.email.only_errors == 'yes' \
+    #        else logging.INFO
+    #    bsmtp_handler.setLevel(loglevel)
+    #    logger.addHandler(bsmtp_handler)
+    #    logger.poca_email_handler = bsmtp_handler
     return logger
 
 
@@ -99,79 +99,80 @@ def get_file_handler(paths):
     return file_handler
 
 
-class BufferSMTPHandler(handlers.BufferingHandler):
-    '''SMTPHandler that send one email per flush'''
-    def __init__(self, email, paths):
-        handlers.BufferingHandler.__init__(self, int(email.threshold))
-        self.state_jar, outcome = history.get_statejar(paths)
-        self.buffer = self.state_jar.buffer
-        self.outcome = Outcome(None, '')
-        self.email = email
-        smtp_formatter = logging.Formatter("%(asctime)s %(message)s",
-                                           datefmt='%Y-%m-%d %H:%M')
-        self.setFormatter(smtp_formatter)
-
-    def flush(self):
-        '''Flush if we exceed threshold; otherwise save the buffer'''
-        if not self.buffer:
-            self.outcome = Outcome(None, 'Buffer was empty')
-            return
-        if len(self.buffer) < self.capacity:
-            self.outcome = Outcome(None, 'Buffer no sufficiently full')
-            self.save()
-            return
-        body = str()
-        for record in self.buffer:
-            body = body + self.format(record) + "\r\n"
-        msg = MIMEText(body.encode('utf-8'), _charset="utf-8")
-        msg['From'] = self.email.fromaddr.text
-        msg['To'] = self.email.toaddr.text
-        msg['Subject'] = Header("POCA log")
-        if self.email.starttls == 'yes':
-            try:
-                smtp = smtplib.SMTP(self.email.host.text, 587, timeout=10)
-                ehlo = smtp.ehlo()
-            except (ConnectionRefusedError, socket.gaierror, socket.timeout) \
-                    as error:
-                self.outcome = Outcome(False, str(error))
-                self.save()
-                return
-            smtp.starttls()
-            try:
-                smtp.login(self.email.fromaddr.text, self.email.password.text)
-            except smtplib.SMTPAuthenticationError as error:
-                self.outcome = Outcome(False, str(error))
-                self.save()
-                return
-        else:
-            try:
-                smtp = smtplib.SMTP(self.email.host.text, 25, timeout=10)
-                ehlo = smtp.ehlo()
-            except (ConnectionRefusedError, socket.gaierror, socket.timeout) \
-                    as error:
-                self.outcome = Outcome(False, str(error))
-                self.save()
-                return
-        try:
-            smtp.sendmail(self.email.fromaddr.text, [self.email.toaddr.text],
-                          msg.as_string())
-            self.outcome = Outcome(True, "Succesfully sent email")
-        except (smtplib.SMTPException, socket.timeout) as error:
-            self.outcome = Outcome(False, str(error))
-            self.save()
-            return
-        smtp.quit()
-        self.buffer = []
-        self.state_jar.buffer = self.buffer
-        self.state_jar.save()
-
-    def shouldFlush(self, record):
-        '''Returns false to stop automatic flushing (we flush on close)'''
-        return False
-
-    def save(self):
-        '''Save the buffer for some other time (it either isn't
-           full yet or we can't empty it)'''
-        self.state_jar.buffer = self.buffer
-        self.state_jar.save()
-        self.buffer = []
+#class BufferSMTPHandler(handlers.BufferingHandler):
+#    '''SMTPHandler that send one email per flush'''
+#    def __init__(self, email, paths):
+#        handlers.BufferingHandler.__init__(self, int(email.threshold))
+#        self.state_jar, outcome = history.get_statejar(paths)
+#        self.buffer = self.state_jar.buffer
+#        self.outcome = Outcome(None, '')
+#        self.email = email
+#        smtp_formatter = logging.Formatter("%(asctime)s %(message)s",
+#                                           datefmt='%Y-%m-%d %H:%M')
+#        self.setFormatter(smtp_formatter)
+#
+#    def flush(self):
+#        '''Flush if we exceed threshold; otherwise save the buffer'''
+#        if not self.buffer:
+#            self.outcome = Outcome(None, 'Buffer was empty')
+#            return
+#        if len(self.buffer) < self.capacity:
+#            self.outcome = Outcome(None, 'Buffer no sufficiently full')
+#            self.save()
+#            return
+#        body = str()
+#        for record in self.buffer:
+#            body = body + self.format(record) + "\r\n"
+#        msg = MIMEText(body.encode('utf-8'), _charset="utf-8")
+#        msg['From'] = self.email.fromaddr.text
+#        msg['To'] = self.email.toaddr.text
+#        msg['Subject'] = Header("POCA log")
+#        if self.email.starttls == 'yes':
+#            try:
+#                smtp = smtplib.SMTP(self.email.host.text, 587, timeout=10)
+#                ehlo = smtp.ehlo()
+#            except (ConnectionRefusedError, socket.gaierror, socket.timeout) \
+#
+#                    as error:
+#                self.outcome = Outcome(False, str(error))
+#                self.save()
+#                return
+#            smtp.starttls()
+#            try:
+#                smtp.login(self.email.fromaddr.text, self.email.password.text)
+#            except smtplib.SMTPAuthenticationError as error:
+#                self.outcome = Outcome(False, str(error))
+#                self.save()
+#                return
+#        else:
+#            try:
+#                smtp = smtplib.SMTP(self.email.host.text, 25, timeout=10)
+#                ehlo = smtp.ehlo()
+#            except (ConnectionRefusedError, socket.gaierror, socket.timeout) \
+#                    as error:
+#                self.outcome = Outcome(False, str(error))
+#                self.save()
+#                return
+#        try:
+#            smtp.sendmail(self.email.fromaddr.text, [self.email.toaddr.text],
+#                          msg.as_string())
+#            self.outcome = Outcome(True, "Succesfully sent email")
+#        except (smtplib.SMTPException, socket.timeout) as error:
+#            self.outcome = Outcome(False, str(error))
+#            self.save()
+#            return
+#        smtp.quit()
+#        self.buffer = []
+#        self.state_jar.buffer = self.buffer
+#        self.state_jar.save()
+#
+#    def shouldFlush(self, record):
+#        '''Returns false to stop automatic flushing (we flush on close)'''
+#        return False
+#
+#    def save(self):
+#        '''Save the buffer for some other time (it either isn't
+#           full yet or we can't empty it)'''
+#        self.state_jar.buffer = self.buffer
+#        self.state_jar.save()
+#        self.buffer = []

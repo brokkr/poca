@@ -21,21 +21,42 @@ def main():
     '''Main script'''
     try:
 
-        # setup
-        update_threads = []
-        update_q = Queue()
-        upgrade_threads = []
-        skip_subs = []
+        # args to paths
         args = poca.args.get_poca_args()
         max_threads = args.threads if not args.verbose else 1
         stream_logger = poca.loggers.start_stream_logger(args)
         streamfail_logger = poca.loggers.start_after_stream_logger(args)
-        conf = poca.config.Config(args, merge_default=True)
-        valid_subs = poca.config.subs(conf)
-        summary_logger = poca.loggers.start_summary_logger(args, conf.paths,
-                                                           conf.xml.settings)
+        paths = poca.config.Paths(args)
+        summary_logger = poca.loggers.start_summary_logger(args, paths)
+        # poca
+        poca_yaml = poca.config.read_yaml(paths.config_file)
+        subs = poca_yaml.pop('subscriptions')
+        defaults = poca_yaml.pop('defaults')
+        # note string
+        base_dir = poca_yaml['settings'].pop('base_dir')
+        dl_settings, id3_settings = poca.config.get_settings(poca_yaml)
+
+        # state
+        #state_yaml = config.read_yaml(paths.state_file)
+        # start identifying log_file and get state.yaml -> blocklist etc.
+
+        print('subs')
+        print(subs)
+        print('defaults')
+        print(defaults)
+        print('base_dir')
+        print(base_dir)
+        print('dl_settings')
+        print(dl_settings)
+        print('id3_settings')
+        print(id3_settings)
+
+        sys.exit()
 
         # update loop
+        update_threads = []
+        update_q = Queue()
+        skip_subs = []
         for sub in valid_subs:
             update_thread = poca.subupdate.SubUpdateThread(
                 update_q, poca.subupdate.SubUpdate, conf, sub)
@@ -43,6 +64,7 @@ def main():
             update_thread.start()
 
         # upgrade loop
+        upgrade_threads = []
         while len(upgrade_threads) + len(skip_subs) < len(valid_subs):
             while (len([t for t in upgrade_threads if t.is_alive()])
                    < max_threads and not update_q.empty()):
