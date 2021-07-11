@@ -1,0 +1,25 @@
+settings:
+  base_dir: /tmp/media/
+  filenames: permissive
+  id3removev1: true
+  id3v2version: 3
+  useragent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101 Firefox/78.0
+defaults:
+  metadata:
+    genre: podcast
+subscriptions:
+- title: "Er håbet stadig grønt?"
+  url: https://www.dr.dk/mu/feed/er-habet-stadig-groent.xml?format=podcast
+  max_number: 2
+  filters:
+    title: natur
+  metadata:
+    artist: Det:Er
+  rename:
+  - title
+  - episode_title
+- title: The Crate and Crowbar
+  url: http://crateandcrowbar.com/category/episode/feed/
+  max_number: 2
+  filters:
+    filename: CCEpSpecial
