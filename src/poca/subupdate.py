@@ -126,7 +126,7 @@ class Feed:
         self.etag = getattr(doc, 'etag', etag)
         self.modified = getattr(doc, 'modified', modified)
         self.bozo_exception = getattr(doc, 'bozo_exception', str())
-        self.href = getattr(doc, 'href', sub.url.text)
+        self.href = getattr(doc, 'href', sub['url'])
         self.set_entries(doc, sub)
 
     def set_entries(self, doc, sub):
