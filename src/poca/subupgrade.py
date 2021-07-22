@@ -47,7 +47,7 @@ class SubUpgrade():
 
         for uid in subdata.lacking:
             entry = subdata.wanted.dic[uid]
-            self.acquire(dl_settings, uid, entry, subdata)
+            self.acquire(dl_settings, id3_settings, uid, entry, subdata)
             if self.outcome.success is None:
                 return
 
@@ -70,7 +70,7 @@ class SubUpgrade():
         # print summary of operations in file log
         output.file_summary(subdata, self.removed, self.downed, self.failed)
 
-    def acquire(self, dl_settings, uid, entry, subdata):
+    def acquire(self, dl_settings, id3_settings, uid, entry, subdata):
         '''Get new entries, tag them and add to history'''
         output.processing_download(entry)
         wantedindex = subdata.wanted.lst.index(uid) - len(self.failed)
