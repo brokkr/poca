@@ -48,11 +48,12 @@ def expand(entry, sub, sub_dir):
     '''expands entry with url, paths and size'''
     if entry['expanded'] is True:
         return entry
-    entry['sub_title'] = sub.title.text
+    entry['sub_title'] = sub['title']
     entry['directory'] = sub_dir
     entry['poca_mb'] = info_megabytes(entry)
     #entry['metadata'] = "Coming soon"
     entry['user_vars'] = info_user_vars(entry)
+    # sub never has rename attr in v2
     entry['rename'] = sub.rename if hasattr(sub, 'rename') else None
     entry['names'] = names(entry)
     # NOTE: 'poca_filename' used to be the filename to be written to.
