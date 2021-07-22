@@ -31,7 +31,7 @@ def get_settings(poca_yaml):
 
 
 class Config:
-    '''Collection of all configuration options'''
+    '''no longer in use, see scripts/poca'''
     def __init__(self, args, merge_default=False):
         self.args = args
         self.paths = Paths(args)
