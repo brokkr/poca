@@ -176,9 +176,9 @@ class Wanted():
         self.lst = combo.lst
         #self.lst = list(filter(lambda x: x not in del_lst, self.lst))
         self.lst = list(filter(lambda x: combo.dic[x]['valid'], self.lst))
-        if hasattr(sub, 'filters'):
+        if 'filters' in sub:
             self.apply_filters(sub, combo)
-        if hasattr(sub, 'max_number'):
+        if 'max_number' in sub:
             self.limit(sub)
         self.dic = {uid: entryinfo.expand(combo.dic[uid], sub, sub_dir)
                     for uid in self.lst}
@@ -231,11 +231,11 @@ class Wanted():
                     'title': self.match_title,
                     'hour': self.match_hour,
                     'weekdays': self.match_weekdays}
-        filters = {node.tag for node in sub.filters.iterchildren()}
+        filters = sub['filters'].keys()
         valid_filters = filters & set(func_dic.keys())
         for key in valid_filters:
             try:
-                func_dic[key](combo.dic, sub.filters[key].text)
+                func_dic[key](combo.dic, sub['filters'][key])
                 self.outcome = Outcome(True, 'Filters applied successfully')
             except KeyError as e:
                 self.outcome = Outcome(False, 'Entry is missing info: %s' % e)
@@ -245,7 +245,7 @@ class Wanted():
     def limit(self, sub):
         '''Limit the number of episodes to that set in max_number'''
         try:
-            self.lst = self.lst[:int(sub.max_number)]
+            self.lst = self.lst[:int(sub['max_number'])]
             # don't overwrite filter failure
             if self.outcome.success:
                 self.outcome = Outcome(True, 'Number limited successfully')
