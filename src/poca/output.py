@@ -64,9 +64,9 @@ def config_fatal(msg):
 
 def plans_error(subdata):
     '''sub-fatal errors encountered processing a specific subscription'''
-    stream_msg = '%s. %s' % (subdata.sub.title.text.upper(),
+    stream_msg = '%s. %s' % (subdata.sub['title'].upper(),
                              subdata.outcome.msg)
-    after_stream_msg = 'SUB ERROR (%s): %s' % (subdata.sub.title.text,
+    after_stream_msg = 'SUB ERROR (%s): %s' % (subdata.sub['title'],
                                                subdata.outcome.msg)
     STREAM.debug(stream_msg)
     AFTER_STREAM.info(after_stream_msg)
@@ -75,8 +75,8 @@ def plans_error(subdata):
 
 def plans_moved(subdata, _outcome):
     '''Sub has moved (http status 301) - succes/failure in updating config'''
-    stream_msg = '%s. %s' % (subdata.sub.title.text.upper(), _outcome.msg)
-    after_stream_msg = 'SUB MOVE (301) (%s): %s' % (subdata.sub.title.text,
+    stream_msg = '%s. %s' % (subdata.sub['title'].upper(), _outcome.msg)
+    after_stream_msg = 'SUB MOVE (301) (%s): %s' % (subdata.sub['title'],
                                                     _outcome.msg)
     STREAM.debug(stream_msg)
     AFTER_STREAM.info(after_stream_msg)
@@ -85,7 +85,7 @@ def plans_moved(subdata, _outcome):
 
 def plans_nochanges(subdata):
     '''No changes made, just output title'''
-    msg = subdata.sub.title.text.upper()
+    msg = subdata.sub['title'].upper()
     STREAM.info(msg)
 
 
@@ -94,9 +94,10 @@ def plans_upgrade(subdata):
     USERDEL = USERDEL_DIC[STREAM.glyphs]
     PLANADD = PLANADD_DIC[STREAM.glyphs]
     PLANREM = PLANREM_DIC[STREAM.glyphs]
-    msg = subdata.sub.title.text.upper()
+    msg = subdata.sub['title'].upper()
     no_udeleted = len(subdata.udeleted)
-    no_unwanted = len(subdata.unwanted)
+    #no_unwanted = len(subdata.unwanted)
+    no_unwanted = 0
     no_lacking = len(subdata.lacking)
     if no_udeleted > 0 or no_unwanted > 0 or no_lacking > 0:
         msg = msg + '. '
@@ -197,7 +198,7 @@ def after_stream_flush():
 # file operations summary (for file log)
 def file_summary(subdata, removed, downed, failed):
     '''Print summary to log'''
-    title = subdata.sub.title.text.upper()
+    title = subdata.sub['title'].upper()
     if subdata.udeleted:
         udeleted_files = [x['filename'] for x in subdata.udeleted]
         SUMMARY.info(title + '. User deleted: ' + ', '.join(udeleted_files))

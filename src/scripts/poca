@@ -90,7 +90,7 @@ def main():
                 state['modified'] = subdata.wanted.feed_modified
                 state['current'] = subdata.lacking
                 print(title, state)
-                #poca.output.plans_upgrade(subdata)
+                poca.output.plans_upgrade(subdata)
                 #upgrade_thread = poca.subupgrade.SubUpgradeThread(
                 #    subdata, update_q, poca.subupgrade.SubUpgrade)
                 #upgrade_threads.append(upgrade_thread)
