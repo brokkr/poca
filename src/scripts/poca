@@ -91,13 +91,14 @@ def main():
                 state['current'] = subdata.lacking
                 print(title, state)
                 poca.output.plans_upgrade(subdata)
-                #upgrade_thread = poca.subupgrade.SubUpgradeThread(
-                #    subdata, update_q, poca.subupgrade.SubUpgrade)
-                #upgrade_threads.append(upgrade_thread)
-                #upgrade_thread.start()
+                upgrade_thread = poca.subupgrade.SubUpgradeThread(update_q,
+                    poca.subupgrade.SubUpgrade, subdata, dl_settings,
+                    id3_settings)
+                upgrade_threads.append(upgrade_thread)
+                upgrade_thread.start()
             sleep(0.5)
-        #for upgrade_thread in upgrade_threads:
-        #    upgrade_thread.join()
+        for upgrade_thread in upgrade_threads:
+            upgrade_thread.join()
 
         # wrap up
         poca.output.after_stream_flush()

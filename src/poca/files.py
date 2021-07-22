@@ -16,14 +16,13 @@ from threading import current_thread
 from poca.outcome import Outcome
 
 
-def download_file(entry, settings):
+def download_file(entry, dl_settings):
     '''Download function with block time outs'''
     my_thread = current_thread()
     headers = requests.utils.default_headers()
     url = entry['poca_url']
-    if settings.useragent.text:
-        useragent = {'User-Agent': settings.useragent.text}
-        headers.update(useragent)
+    if dl_settings['useragent']:
+        headers.update({'User-Agent': dl_settings['useragent']})
     if getattr(my_thread, "kill", False):
         return Outcome(None, 'Download cancelled by user')
     try:
@@ -36,16 +35,16 @@ def download_file(entry, settings):
     if r.status_code >= 400:
         return Outcome(False, 'Download of %s failed' % url)
     filename_keys = ['permissive', 'ntfs', 'restrictive', 'fallback']
-    start_at = settings.filenames.text or 'permissive'
+    start_at = dl_settings.get('filenames', 'permissive')
     if start_at in filename_keys:
         filename_keys = filename_keys[filename_keys.index(start_at):]
     if not entry['unique_filename']:
         filename_keys = ['fallback']
     for key in filename_keys:
         filename = '.'.join((entry['names'][key], entry['extension']))
-        file_path = os.path.join(entry['directory'], filename)
+        file_path = entry['directory'].joinpath(filename)
         try:
-            with open(file_path, 'wb') as f:
+            with file_path.open(mode='wb') as f:
                 try:
                     for chunk in r.iter_content(chunk_size=1024):
                         if getattr(my_thread, "kill", False):
@@ -71,7 +70,7 @@ def download_file(entry, settings):
     # this should really never happen
     return Outcome(False, 'Somehow none of the filenames we tried worked')
 
-def download_img_file(url, sub_dir, settings):
+def download_img_file(url, sub_dir)
     '''Download an image file'''
     try:
         r = requests.get(url, timeout=60)
@@ -85,15 +84,17 @@ def download_img_file(url, sub_dir, settings):
                 'image/png': '.png',
                 'image/webp': '.webp'}
     extension = mime_dic.get(content_type, None)
+    # maybe tell user content_type (helps with debugging)
     if extension is None:
         return Outcome(False, 'Download of image failed. Unknown MIME type.')
-    file_path = os.path.join(sub_dir, 'cover' + extension)
-    if os.path.isfile(file_path):
-        file_size = str(os.path.getsize(file_path))
+    filename = ''.join(('cover', extension))
+    file_path = sub_dir.joinpath(filename)
+    if file_path.is_file():
+        file_size = str(file_path.stat().st_size)
         remote_size = r.headers.get('content-length', str(len(r.content)))
         if file_size == remote_size:
             return Outcome(True, 'Same image file already downloaded')
-    with open(file_path, 'wb') as f:
+    with file_path.open(mode='wb') as f:
         f.write(r.content)
     return Outcome(True, 'Image file downloaded')
 

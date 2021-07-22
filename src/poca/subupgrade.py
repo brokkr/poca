@@ -14,20 +14,20 @@ from poca import files, output, tag
 
 class SubUpgradeThread(Thread):
     '''A thread class that creates handles a SubData instance'''
-    def __init__(self, subdata, queue, target):
-        self.subdata = subdata
+    def __init__(self, queue, target, *args):
         self.queue = queue
         self.target = target
+        self.args = args
         super(SubUpgradeThread, self).__init__()
 
     def run(self):
-        sub_upgrade = self.target(self.subdata)
+        sub_upgrade = self.target(*self.args)
         self.queue.task_done()
 
 
 class SubUpgrade():
     '''Use the SubData packet to implement file operations'''
-    def __init__(self, subdata):
+    def __init__(self, subdata, dl_settings, id3_settings):
 
         # know thyself
         self.my_thread = current_thread()
@@ -52,21 +52,20 @@ class SubUpgrade():
                 return
 
         # save etag and subsettings after succesful update
-        if self.fail_flag is False:
-            subdata.jar.sub = subdata.sub
-            subdata.jar.etag = subdata.wanted.feed_etag
-            subdata.jar.modified = subdata.wanted.feed_modified
-        _outcome = subdata.jar.save()
-        if _outcome.success is False:
-            output.fail_database(_outcome)
+        #if self.fail_flag is False:
+        #    subdata.jar.sub = subdata.sub
+        #    subdata.jar.etag = subdata.wanted.feed_etag
+        #    subdata.jar.modified = subdata.wanted.feed_modified
+        #_outcome = subdata.jar.save()
+        #if _outcome.success is False:
+        #    output.fail_database(_outcome)
 
-        # download cover image
+        # download cover image (maybe throw in useragent?)
         if self.downed and subdata.wanted.feed_image:
             _outcome = files.download_img_file(subdata.wanted.feed_image,
-                                               subdata.sub_dir,
-                                               subdata.conf.xml.settings)
+                                               subdata.sub_dir)
             if _outcome.success is False:
-                output.fail_download(subdata.sub.title.text, _outcome)
+                output.fail_download(subdata.sub['title'], _outcome)
 
         # print summary of operations in file log
         output.file_summary(subdata, self.removed, self.downed, self.failed)
@@ -76,42 +75,41 @@ class SubUpgrade():
         output.processing_download(entry)
         wantedindex = subdata.wanted.lst.index(uid) - len(self.failed)
         # see https://github.com/brokkr/poca/wiki/__Developer-notes__
-        self.outcome = files.download_file(entry, subdata.conf.xml.settings)
+        self.outcome = files.download_file(entry, dl_settings)
         if self.outcome.success is False:
             entry['filename'], entry['poca_abspath'] = ('', '')
             self.fail_flag = True
             # can prob get title from entry
-            output.fail_download(subdata.sub.title.text, self.outcome)
+            output.fail_download(subdata.sub['title'], self.outcome)
             self.failed.append(entry)
             return
         if self.outcome.success is None:
             return
         # some inconsistency in key naming here - needed for backwards compat
         entry['filename'], entry['poca_abspath'] = self.outcome.msg
-        subdata.jar.lst.insert(wantedindex, uid)
-        subdata.jar.dic[uid] = entry
-        _outcome = subdata.jar.save()
-        if _outcome.success is False:
-            self.fail_flag = True
-            output.fail_database(_outcome)
+        #subdata.jar.lst.insert(wantedindex, uid)
+        #subdata.jar.dic[uid] = entry
+        #_outcome = subdata.jar.save()
+        #if _outcome.success is False:
+        #    self.fail_flag = True
+        #    output.fail_database(_outcome)
         self.downed.append(entry)
-        _outcome = tag.tag_audio_file(subdata.conf.xml.settings,
-                                      subdata.sub, subdata.jar, entry)
+        _outcome = tag.tag_audio_file(id3_settings, subdata.sub, entry)
         if not _outcome.success:
-            output.fail_tag(subdata.sub.title.text, _outcome)
+            output.fail_tag(subdata.sub['title'], _outcome)
 
     def remove(self, uid, entry, subdata):
         '''Deletes the file and removes the entry from the jar'''
         self.outcome = files.delete_file(entry['poca_abspath'])
         if self.outcome.success is False:
             self.fail_flag = True
-            output.fail_delete(subdata.sub.title.text, self.outcome)
+            output.fail_delete(subdata.sub['title'], self.outcome)
             return
         output.processing_removal(entry)
         self.removed.append(entry)
-        subdata.jar.lst.remove(uid)
-        del(subdata.jar.dic[uid])
-        _outcome = subdata.jar.save()
-        if _outcome.success is False:
-            self.fail_flag = True
-            output.fail_database(_outcome)
+        #subdata.jar.lst.remove(uid)
+        #del(subdata.jar.dic[uid])
+        #_outcome = subdata.jar.save()
+        #if _outcome.success is False:
+        #    self.fail_flag = True
+        #    output.fail_database(_outcome)

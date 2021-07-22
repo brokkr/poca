@@ -16,19 +16,19 @@ from poca.outcome import Outcome
 encodings = {3: id3.Encoding.UTF16, 4: id3.Encoding.UTF8}
 id3v1_dic = {'yes': 0, 'no': 2}
 
-def tag_audio_file(settings, sub, jar, entry):
+def tag_audio_file(id3_settings, sub, entry):
     '''Metadata tagging using mutagen'''
     # id3 settings
-    id3v1 = id3v1_dic[settings.id3removev1.text]
-    id3v2 = int(settings.id3v2version)
+    id3v1 = id3v1_dic[id3_settings['id3removev1']]
+    id3v2 = id3_settings['id3v2version']
     id3encoding = encodings[id3v2]
     # overrides
-    frames = sub.xpath('./metadata/*')
-    overrides = [(override.tag, override.text) for override in frames]
+    overrides = list(sub['metadata'].items()) if 'metadata' in sub else []
     key_errors = {}
     # track numbering
-    tracks = sub.find('./track_numbering')
-    tracks = tracks.text if tracks else 'no'
+    #tracks = sub.find('./track_numbering')
+    #tracks = tracks.text if tracks else 'no'
+    tracks = 'no'
     if not overrides and tracks == 'no':
         return Outcome(True, 'Tagging skipped')
     # get 'easy' access to metadata
@@ -90,4 +90,4 @@ def tag_audio_file(settings, sub, jar, entry):
         return Outcome(True, 'Metadata successfully updated')
     else:
         return Outcome(False, '%s is set to add invalid tags: %s' %
-                       (sub.title.text, ', '.join(invalid_keys)))
+                       (sub['title'], ', '.join(invalid_keys)))

@@ -95,6 +95,7 @@ class SubUpdate():
         # subupgrade will delete unwanted and download lacking
         #self.unwanted = [x for x in self.jar.lst if x not in self.wanted.lst]
         #self.lacking = [x for x in self.wanted.lst if x not in self.jar.lst]
+        self.unwanted = []
         self.lacking = [x for x in self.wanted.lst]
 
     #def check_jar(self):

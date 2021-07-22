@@ -25,8 +25,8 @@ def read_yaml(file_path):
 def get_settings(poca_yaml):
     '''validate here?'''
     dl_settings = poca_yaml['settings']
-    id3_settings = {'removev1': dl_settings.pop('id3removev1'),
-                    'v2version': dl_settings.pop('id3v2version')}
+    id3_settings = {'id3removev1': dl_settings.pop('id3removev1'),
+                    'id3v2version': dl_settings.pop('id3v2version')}
     return (dl_settings, id3_settings)
 
 

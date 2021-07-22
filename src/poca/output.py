@@ -96,8 +96,7 @@ def plans_upgrade(subdata):
     PLANREM = PLANREM_DIC[STREAM.glyphs]
     msg = subdata.sub['title'].upper()
     no_udeleted = len(subdata.udeleted)
-    #no_unwanted = len(subdata.unwanted)
-    no_unwanted = 0
+    no_unwanted = len(subdata.unwanted)
     no_lacking = len(subdata.lacking)
     if no_udeleted > 0 or no_unwanted > 0 or no_lacking > 0:
         msg = msg + '. '
