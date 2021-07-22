@@ -14,7 +14,7 @@ from poca.outcome import Outcome
 
 
 encodings = {3: id3.Encoding.UTF16, 4: id3.Encoding.UTF8}
-id3v1_dic = {'yes': 0, 'no': 2}
+id3v1_dic = {True: 0, False: 2}
 
 def tag_audio_file(id3_settings, sub, entry):
     '''Metadata tagging using mutagen'''
