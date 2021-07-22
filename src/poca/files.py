@@ -70,7 +70,7 @@ def download_file(entry, dl_settings):
     # this should really never happen
     return Outcome(False, 'Somehow none of the filenames we tried worked')
 
-def download_img_file(url, sub_dir)
+def download_img_file(url, sub_dir):
     '''Download an image file'''
     try:
         r = requests.get(url, timeout=60)
