@@ -1,0 +1,74 @@
+Er håbet stadig grønt?:
+  etag: abcdef123
+  modified: null
+  current:
+    11032012007:
+      path: /tmp/placeholder
+      variables:
+        date_struct: null
+        weekday: null
+        hour: null
+        date_str: null
+        title_episode: null
+        title_sub: null
+        title_feed: null
+        filename: null
+    11032012006:
+      path: /tmp/placeholder
+      variables:
+        date_struct: null
+        weekday: null
+        hour: null
+        date_str: null
+        title_episode: null
+        title_sub: null
+        title_feed: null
+        filename: null
+    nosuchid: /tmp/placeholder
+  blocked:
+    - alsofake
+    - 11032012001
+  active: true
+  image: 454119
+The Crate and Crowbar:
+  etag: aDSASDSADASD
+  modified: null
+  current:
+    http://crateandcrowbar.com/?p=3004: 
+      path: /tmp/placeholder
+      variables:
+        date_struct: null
+        weekday: null
+        hour: null
+        date_str: null
+        title_episode: null
+        title_sub: null
+        title_feed: null
+        filename: null
+    http://crateandcrowbar.com/?p=3012:
+      path: /tmp/placeholder
+      variables:
+        date_struct: null
+        weekday: null
+        hour: null
+        date_str: null
+        title_episode: null
+        title_sub: null
+        title_feed: null
+        filename: null
+    http://crateandcrowbar.com/?p=2520:
+      path: /tmp/placeholder
+      variables:
+        date_struct: null
+        weekday: null
+        hour: null
+        date_str: null
+        title_episode: null
+        title_sub: null
+        title_feed: null
+        filename: null
+  blocked:
+    - http://crateandcrowbar.com/?p=3000
+    - nosuchthing
+  active: true
+  image: 123456

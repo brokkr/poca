@@ -14,7 +14,7 @@ from copy import deepcopy
 from threading import Thread
 
 import feedparser
-from poca import files, entryinfo
+from poca import files, item
 from poca.outcome import Outcome
 
 
@@ -36,15 +36,10 @@ class SubUpdateThread(Thread):
 class SubUpdate():
     '''Data carrier for subscription: entries to dl, entries to remove,
        user deleted entries, etc.'''
-    def __init__(self, sub, defaults, base_dir):
+    def __init__(self, sub, defaults, state, base_dir):
         self.sub = sub
         self.defaults = defaults
-        self.status = 0
-        self.sub_dir = base_dir.joinpath(sub['title'])
-        self.outcome = files.check_path(self.sub_dir)
-        if not self.outcome.success:
-            print(self.outcome.msg)
-            return
+        self.state = state
 
         # merge sub settings and defaults
         #defaults = deepcopy(self.conf.xml.defaults)
@@ -59,35 +54,67 @@ class SubUpdate():
         #if not self.outcome.success:
         #    return
 
-        # get jar and check for user deleted files
-        self.udeleted = []
-        #self.jar, self.outcome = history.get_subjar(self.conf.paths,
-        #                                            self.sub)
-        #if not self.outcome.success:
-        #    return
-        #self.check_jar()
-        #if not self.outcome.success:
-        #    return
-
-        # get feed, combine with jar and filter the lot
-        feed = Feed(self.sub, self.udeleted)
-        self.status = feed.status
-        if self.status == 301:
-            self.outcome = Outcome(True, 'Feed has moved. Config updated.')
-            self.new_url = feed.href
-        elif self.status == 304:
+        # parsing response
+        doc = feedparser.parse(sub['url'], etag=state['etag'], \
+                               modified=state['modified'])
+        self.status = doc.status
+        if self.response == 301:
+            self.outcome = Outcome(True, 'Feed has moved')
+            self.new_url = getattr(doc, 'href', sub['url'])
+        elif self.response == 304:
             self.outcome = Outcome(True, 'Not modified')
             return
-        elif self.status >= 400:
-            self.outcome = Outcome(False, feed.bozo_exception)
+        # 410 -> set to inactive
+        elif self.response >= 400:
+            self.outcome = Outcome(False, doc.feed.bozo_exception)
             return
         else:
             self.outcome = Outcome(True, 'Success')
-        combo = Combo(feed, self.sub)
-        self.wanted = Wanted(self.sub, feed, combo, self.sub_dir)
-        self.outcome = self.wanted.outcome
-        if not self.outcome.success:
-            return
+        try:
+            self.image = doc.feed.image['href']
+        except (AttributeError, KeyError):
+            self.image = None
+        self.feed_etag = doc.feed.etag
+        self.feed_modified = doc.feed.modified
+
+        # before we moved to overwriting feed with state info...
+        #for guid in set(state['current']).intersection(items.keys()):
+        #    items[guid].set_current(state['current'].pop(guid))
+        #remainder = {guid: item.Item(state['current'][guid]) for guid in
+        #             state['current']})
+
+        # "combo"
+        self.items = {entry.guid: item.Item(entry) for entry in doc.entries}
+        current = {guid: item.CurrentItem(guid, state['current'][guid]) for \
+                   guid in state['current']}
+        blocked = {guid: item.BlockedItem(guid) for guid in state['blocked']}
+        # add: loop through current, converting to blocked as needed
+        self.items.update(current).update(blocked)
+
+        # validation
+        for item in [self.items[guid] for guid in self.items if not \
+                     self.items[guid].blocked]:
+            item.validate()
+            item.fill_filter_vars()
+
+        # wanted
+        if 'filters' in self.sub:
+            self.apply_filters()
+        # inclusion
+        if 'max_number' in self.sub:
+            self.limit()
+        for guid in [guid for guid in self.items if
+                     self.items[guid].stage_included]:
+            self.items[guid].extra_vars(sub, doc.feed)
+            self.items[guid].generate_names(base_dir, sub)
+        #filenames = [self.dic[uid]['poca_filename'] for uid in self.lst]
+        #for uid in self.lst:
+        #    count = filenames.count(self.dic[uid]['poca_filename'])
+        #    if count > 1:
+        #        self.dic[uid]['unique_filename'] = False
+        #    else:
+        #        self.dic[uid]['unique_filename'] = True
+
         #from_the_top = self.sub.find('from_the_top') or 'no'
         #if from_the_top == 'no':
         #    self.wanted.lst.reverse()
@@ -98,6 +125,28 @@ class SubUpdate():
         self.unwanted = []
         self.lacking = [x for x in self.wanted.lst]
 
+    def apply_filters(self):
+        '''Apply all filters set to be used on the subscription'''
+        func_dic = {'after_date': self.match_date,
+                    'filename': self.match_filename,
+                    'title': self.match_title,
+                    'hour': self.match_hour,
+                    'weekdays': self.match_weekdays}
+        filters = self.sub['filters'].keys()
+        valid_filters = filters & set(func_dic.keys())
+        for item in [self.items[guid] for guid in self.items if \
+                     self.items[guid].stage_valid]:
+            tests = [True]
+            for key in valid_filters:
+                try:
+                    tests.append(func_dic[key](item, self.sub['filters'][key]))
+                    self.outcome = Outcome(True, 'Filters applied successfully')
+                except KeyError as e:
+                    self.outcome = Outcome(False, 'Entry is missing info: %s' % e)
+                except (ValueError, TypeError, SyntaxError) as e:
+                    self.outcome = Outcome(False, 'Bad filter setting: %s' % e)
+            if all(tests):
+                item.stage_wanted = True
     #def check_jar(self):
     #    '''Check for user deleted files so we can filter them out'''
     #    for uid in self.jar.lst:
@@ -110,143 +159,34 @@ class SubUpdate():
     #    self.jar.lst = [x for x in self.jar.lst if x not in self.jar.del_lst]
     #    self.outcome = self.jar.save()
 
-
-class Feed:
-    '''Constructs a container for feed entries'''
-    def __init__(self, sub, udeleted):
-        jar = []
-        etag = getattr(jar, 'etag', None)
-        modified = getattr(jar, 'modified', None)
-        #sub_str = etree.tostring(sub, encoding='unicode')
-        #jarsub_str = etree.tostring(jar.sub, encoding='unicode')
-        #if sub_str != jarsub_str or udeleted:
-        #    etag = None
-        #    modified = None
-        doc = feedparser.parse(sub['url'], etag=etag, modified=modified)
-        self.status = getattr(doc, 'status', 418)
-        self.etag = getattr(doc, 'etag', etag)
-        self.modified = getattr(doc, 'modified', modified)
-        self.bozo_exception = getattr(doc, 'bozo_exception', str())
-        self.href = getattr(doc, 'href', sub['url'])
-        self.set_entries(doc, sub)
-
-    def set_entries(self, doc, sub):
-        '''Extract entries from the feed xml'''
-        try:
-            self.lst = [entry.id for entry in doc.entries]
-            self.dic = {entry.id: entry for entry in doc.entries}
-        except (KeyError, AttributeError):
-            try:
-                self.lst = [entry.enclosures[0]['href']
-                            for entry in doc.entries]
-                self.dic = {entry.enclosures[0]['href']: entry
-                            for entry in doc.entries}
-            except (KeyError, AttributeError):
-                self.outcome = Outcome(False, 'Cant find entries in feed.')
-                # should we set an artificial status here? Or does feedparser?
-                # return
-        #from_the_top = sub.find('from_the_top') or 'no'
-        #if from_the_top == 'yes':
-        #    self.lst.reverse()
-        try:
-            self.image = doc.feed.image['href']
-        except (AttributeError, KeyError):
-            self.image = None
-
-
-class Combo:
-    '''Constructs a container holding all combined feed and jar
-    entries. Copies feed then adds non-duplicates from jar'''
-    def __init__(self, feed, sub):
-        #from_the_top = sub.find('from_the_top') or 'no'
-        #if from_the_top == 'yes':
-        #    self.lst = list(jar.lst)
-        #    self.lst.extend(uid for uid in feed.lst if uid not in jar.lst)
-        #else:
-        self.lst = list(feed.lst)
-        #self.lst.extend(uid for uid in jar.lst if uid not in feed.lst)
-        self.dic = {uid: entryinfo.validate(feed.dic[uid]) for uid in feed.lst}
-                    #if uid not in jar.lst}
-        #self.dic.update(jar.dic)
-
-
-class Wanted():
-    '''Filters the combo entries and decides which ones to go for'''
-    def __init__(self, sub, feed, combo, sub_dir):
-        self.outcome = Outcome(True, 'Default true')
-        self.lst = combo.lst
-        #self.lst = list(filter(lambda x: x not in del_lst, self.lst))
-        self.lst = list(filter(lambda x: combo.dic[x]['valid'], self.lst))
-        if 'filters' in sub:
-            self.apply_filters(sub, combo)
-        if 'max_number' in sub:
-            self.limit(sub)
-        self.dic = {uid: entryinfo.expand(combo.dic[uid], sub, sub_dir)
-                    for uid in self.lst}
-        filenames = [self.dic[uid]['poca_filename'] for uid in self.lst]
-        for uid in self.lst:
-            count = filenames.count(self.dic[uid]['poca_filename'])
-            if count > 1:
-                self.dic[uid]['unique_filename'] = False
-            else:
-                self.dic[uid]['unique_filename'] = True
-        self.feed_etag = feed.etag
-        self.feed_modified = feed.modified
-        self.feed_image = feed.image
-
-    def match_filename(self, dic, filter_text):
+    def match_filename(self, item, filter_text):
         '''The episode filename must match a regex/string'''
-        # 1.0 entries do not have the 'org_filename' key
-        for x in dic.keys():
-            if not 'org_filename' in dic[x]:
-                dic[x]['org_filename'] = dic[x]['filename']
-        self.lst = [x for x in self.lst if
-                    bool(re.search(filter_text, dic[x]['org_filename']))]
+        return bool(re.search(filter_text, item.variables['filename']))
 
-    def match_title(self, dic, filter_text):
+    def match_title(self, item, filter_text):
         '''The episode title must match a regex/string'''
-        self.lst = [x for x in self.lst if
-                    bool(re.search(filter_text, dic[x]['title']))]
+        return bool(re.search(filter_text, item.variables['title_episode']))
 
-    def match_weekdays(self, dic, filter_text):
+    def match_weekdays(self, item, filter_text):
         '''Only return episodes published on specific week days'''
-        self.lst = [x for x in self.lst if
-                    str(dic[x]['published_parsed'].tm_wday) in
-                    list(filter_text)]
+        # careful: string or integer? (or make poca.yaml setting a list)
+        return item.variables['weekday'] in list(filter_text)
 
-    def match_date(self, dic, filter_text):
+    def match_date(self, item, filter_text):
         '''Only return episodes published after a specific date'''
-        filter_date = time.strptime(filter_text, '%Y-%m-%d')
-        self.lst = [x for x in self.lst if dic[x]['published_parsed'] >
-                    filter_date]
+        return item.variables['date'] > time.strptime(filter_text, '%Y-%m-%d')
 
-    def match_hour(self, dic, filter_text):
+    def match_hour(self, item, filter_text):
         '''Only return episodes published at a specific hour of the day'''
-        self.lst = [x for x in self.lst if dic[x]['published_parsed'].tm_hour
-                    == int(filter_text)]
+        return item.variables['hour'] == int(filter_text)
 
-    def apply_filters(self, sub, combo):
-        '''Apply all filters set to be used on the subscription'''
-        func_dic = {'after_date': self.match_date,
-                    'filename': self.match_filename,
-                    'title': self.match_title,
-                    'hour': self.match_hour,
-                    'weekdays': self.match_weekdays}
-        filters = sub['filters'].keys()
-        valid_filters = filters & set(func_dic.keys())
-        for key in valid_filters:
-            try:
-                func_dic[key](combo.dic, sub['filters'][key])
-                self.outcome = Outcome(True, 'Filters applied successfully')
-            except KeyError as e:
-                self.outcome = Outcome(False, 'Entry is missing info: %s' % e)
-            except (ValueError, TypeError, SyntaxError) as e:
-                self.outcome = Outcome(False, 'Bad filter setting: %s' % e)
-
-    def limit(self, sub):
+    def limit(self):
         '''Limit the number of episodes to that set in max_number'''
         try:
-            self.lst = self.lst[:int(sub['max_number'])]
+            wanted = [guid for guid in self.items if \
+                      self.items[guid].stage_wanted]
+            for guid in wanted[:int(self.sub['max_number'])]:
+                self.items[guid].stage_included = True
             # don't overwrite filter failure
             if self.outcome.success:
                 self.outcome = Outcome(True, 'Number limited successfully')

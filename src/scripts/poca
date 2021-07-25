@@ -11,6 +11,8 @@
 
 
 import sys
+import copy
+
 from queue import Queue
 from time import sleep
 
@@ -29,6 +31,7 @@ def main():
         summary_logger = poca.loggers.start_summary_logger(args, paths)
         # poca
         poca_yaml = poca.config.read_yaml(paths.config_file)
+        state_yaml = poca.config.read_yaml(paths.state_file)
         subs = poca_yaml.pop('subscriptions')
         defaults = poca_yaml.pop('defaults')
         # note string
@@ -55,18 +58,23 @@ def main():
         #sys.exit()
 
         # update loop
-        max_threads = args.threads if not args.verbose else 1
         update_threads = []
         update_q = Queue()
         skip_subs = []
+        state_tmpl = {'etag': None, 'modified': None, 'current': [],
+                      'blocked': [], 'active': True, 'image': 0}
         for sub in subs:
-            update_thread = poca.subupdate.SubUpdateThread(
-                update_q, poca.subupdate.SubUpdate, sub, defaults, base_dir)
+            state = state_yaml.pop(sub['title']) if sub['title'] in \
+                state_yaml else copy.deepcopy(state_tmpl)
+            # if args.force -> reset etag and modified in state
+            update_thread = poca.subupdate.SubUpdateThread(update_q,
+                poca.subupdate.SubUpdate, sub, defaults, state, base_dir)
             update_threads.append(update_thread)
             update_thread.start()
 
         # upgrade loop
         upgrade_threads = []
+        max_threads = args.threads if not args.verbose else 1
         while len(upgrade_threads) + len(skip_subs) < len(subs):
             while (len([t for t in upgrade_threads if t.is_alive()])
                    < max_threads and not update_q.empty()):

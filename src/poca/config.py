@@ -70,8 +70,8 @@ class Paths:
         else:
             self.config_dir = Path.home().joinpath('.poca')
         self.config_file = self.config_dir.joinpath('poca.yaml')
-        self.db_dir = self.config_dir.joinpath('db')
-        self.log_file = self.config_dir.joinpath('poca.log')
+        self.state_file = self.config_dir.joinpath('state.yaml')
+        self.log_file = self.config_dir.joinpath('logs.txt')
         self.test_paths(args)
 
     def test_paths(self, args):
@@ -83,10 +83,7 @@ class Paths:
                 output.config_fatal(config_dir_outcome.msg)
             #config_file_outcome = xmlconf.write_config_file(self.config_file)
             output.config_fatal(config_dir_outcome.msg)
-        # test db_dir is writable
-        db_dir_outcome = files.check_path(self.db_dir)
-        if not db_dir_outcome.success:
-            output.config_fatal(db_dir_outcome.msg)
+        # currently no test for state file
         try:
             if args.logfile:
                 logfile_outcome = files.check_file_write(self.log_file)

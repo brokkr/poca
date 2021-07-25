@@ -14,7 +14,7 @@ from . import output
 from . import subupdate
 from . import subupgrade
 from . import config
-from . import entryinfo
+from . import item
 from . import files
 from . import history
 from . import loggers
