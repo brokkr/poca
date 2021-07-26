@@ -95,7 +95,7 @@ class SubUpdate():
 
         # validation
         for guid in [guid for guid in self.items if not
-                     self.items[guid].blocked]:
+                     self.items[guid].type_blocked]:
             it = self.items[guid]
             it.validate()
             it.fill_filter_vars()
