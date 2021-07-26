@@ -57,7 +57,7 @@ class SubUpdate():
         # parsing response
         doc = feedparser.parse(sub['url'], etag=state['etag'], \
                                modified=state['modified'])
-        self.status = doc.status
+        self.response = doc.status
         if self.response == 301:
             self.outcome = Outcome(True, 'Feed has moved')
             self.new_url = getattr(doc, 'href', sub['url'])

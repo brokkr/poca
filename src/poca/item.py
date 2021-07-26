@@ -72,6 +72,7 @@ class Item:
         self.variables['basename'], self.variables['extension'] = \
             path.splitext(self.org_filename)
         del(self.entry)
+        print(self.variables)
 
     def generate_names(self, base_dir, sub):
         '''generates a dictionary of file names of decreasing permissiveness'''
