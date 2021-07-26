@@ -66,7 +66,7 @@ def main():
         for sub in subs:
             state = state_yaml.pop(sub['title']) if sub['title'] in \
                 state_yaml else copy.deepcopy(state_tmpl)
-            print(state)
+            #print(state)
             # if args.force -> reset etag and modified in state
             update_thread = poca.subupdate.SubUpdateThread(update_q,
                 poca.subupdate.SubUpdate, sub, defaults, state, base_dir)
