@@ -34,7 +34,7 @@ class SubUpgrade():
         self.my_thread = current_thread()
 
         # loop through user deleted and indicate recognition
-        udeleted = subdata.get_udeleted():
+        udeleted = subdata.get_udeleted()
         for guid in udeleted:
             it = subdata.items[guid]
             output.processing_user_deleted(it)
