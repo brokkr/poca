@@ -98,7 +98,7 @@ class SubUpdate():
                      self.items[guid].type_blocked]:
             it = self.items[guid]
             it.validate()
-            it.fill_filter_vars()
+            it.filter_vars()
 
         # wanted
         if 'filters' in self.sub:
