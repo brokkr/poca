@@ -106,8 +106,8 @@ class Item:
                                      self.variables['extension'])
         self.names['fallback'] = (base_dir,
                                   self.filename_restrictive(sub['title']),
-                                  '-'.join((user_vars['date'],
-                                            user_vars['uuid'])),
+                                  '-'.join((self.variables['date_str'],
+                                            self.variables['uuid'])),
                                   self.variables['extension'])
         self.name_test = ''.join((name_base, self.variables['extension']))
         #print(self.names)
