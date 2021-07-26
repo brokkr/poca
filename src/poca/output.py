@@ -64,9 +64,9 @@ def config_fatal(msg):
 
 def plans_error(subdata):
     '''sub-fatal errors encountered processing a specific subscription'''
-    stream_msg = '%s. %s' % (subdata.sub['title'].upper(),
+    stream_msg = '%s. %s' % (subdata.title.upper(),
                              subdata.outcome.msg)
-    after_stream_msg = 'SUB ERROR (%s): %s' % (subdata.sub['title'],
+    after_stream_msg = 'SUB ERROR (%s): %s' % (subdata.title,
                                                subdata.outcome.msg)
     STREAM.debug(stream_msg)
     AFTER_STREAM.info(after_stream_msg)
@@ -75,8 +75,8 @@ def plans_error(subdata):
 
 def plans_moved(subdata, _outcome):
     '''Sub has moved (http status 301) - succes/failure in updating config'''
-    stream_msg = '%s. %s' % (subdata.sub['title'].upper(), _outcome.msg)
-    after_stream_msg = 'SUB MOVE (301) (%s): %s' % (subdata.sub['title'],
+    stream_msg = '%s. %s' % (subdata.title.upper(), _outcome.msg)
+    after_stream_msg = 'SUB MOVE (301) (%s): %s' % (subdata.title,
                                                     _outcome.msg)
     STREAM.debug(stream_msg)
     AFTER_STREAM.info(after_stream_msg)
@@ -85,7 +85,7 @@ def plans_moved(subdata, _outcome):
 
 def plans_nochanges(subdata):
     '''No changes made, just output title'''
-    msg = subdata.sub['title'].upper()
+    msg = subdata.title.upper()
     STREAM.info(msg)
 
 
@@ -94,19 +94,19 @@ def plans_upgrade(subdata):
     USERDEL = USERDEL_DIC[STREAM.glyphs]
     PLANADD = PLANADD_DIC[STREAM.glyphs]
     PLANREM = PLANREM_DIC[STREAM.glyphs]
-    msg = subdata.sub['title'].upper()
-    no_udeleted = len(subdata.udeleted)
-    no_unwanted = len(subdata.unwanted)
-    no_lacking = len(subdata.lacking)
-    if no_udeleted > 0 or no_unwanted > 0 or no_lacking > 0:
+    msg = subdata.title.upper()
+    no_udeleted = len(subdata.get_udeleted())
+    no_trash = len(subdata.get_trash())
+    no_lacking = len(subdata.get_lacking())
+    if no_udeleted > 0 or no_trash > 0 or no_lacking > 0:
         msg = msg + '. '
     if no_udeleted > 0:
         msg = msg + str(no_udeleted) + ' ' + USERDEL
-    if no_udeleted > 0 and (no_unwanted > 0 or no_lacking > 0):
+    if no_udeleted > 0 and (no_trash > 0 or no_lacking > 0):
         msg = msg + ' / '
-    if no_unwanted > 0:
-        msg = msg + str(no_unwanted) + ' ' + PLANREM
-    if no_unwanted > 0 and no_lacking > 0:
+    if no_trash > 0:
+        msg = msg + str(no_trash) + ' ' + PLANREM
+    if no_trash > 0 and no_lacking > 0:
         msg = msg + ' / '
     if no_lacking > 0:
         msg = msg + str(no_lacking) + ' ' + PLANADD
@@ -197,7 +197,7 @@ def after_stream_flush():
 # file operations summary (for file log)
 def file_summary(subdata, removed, downed, failed):
     '''Print summary to log'''
-    title = subdata.sub['title'].upper()
+    title = subdata.title.upper()
     if subdata.udeleted:
         udeleted_files = [x['filename'] for x in subdata.udeleted]
         SUMMARY.info(title + '. User deleted: ' + ', '.join(udeleted_files))

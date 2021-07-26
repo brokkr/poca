@@ -199,3 +199,18 @@ class SubUpdate():
                 self.outcome = Outcome(True, 'Number limited successfully')
         except ValueError:
             self.outcome = Outcome(False, 'Bad max_number setting')
+
+    # GET SLICES OF ITEMS
+
+    def get_udeleted(self):
+        return [guid for guid in self.items if self.items[guid].blocked and
+                guid not in self.state['blocked'])
+
+    def get_trash(self):
+        return [guid for guid in self.items if self.items[guid].current and
+                not self.items[guid].included)
+
+    def get_lacking(self):
+        return [guid for guid in self.items if self.items[guid].included and
+                not self.items[guid].current)
+
