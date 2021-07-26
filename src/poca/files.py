@@ -45,6 +45,11 @@ def download_file(dl_settings, it):
         filename = ''.join((path_bits[2], path_bits[3]))
         dir_path = path_bits[0].joinpath(path_bits[1])
         file_path = dir_path.joinpath(filename)
+        outcome = check_directory(dir_path)
+        if not outcome.success:
+            # note that we try repeatedly even if the failure has nothing to do
+            # with name characters (but e.g. permissions)
+            continue
         try:
             with file_path.open(mode='wb') as f:
                 try:
@@ -52,6 +57,7 @@ def download_file(dl_settings, it):
                         if getattr(my_thread, "kill", False):
                             r.close()
                             _outcome = delete_file(f.name)
+                            # ideally remove folder if empty
                             return Outcome(None, 'Download cancelled by user')
                         if chunk:
                             f.write(chunk)
@@ -60,10 +66,12 @@ def download_file(dl_settings, it):
                 except requests.exceptions.ConnectionError as e:
                     r.close()
                     _outcome = delete_file(f.name)
+                    # ideally remove folder if empty
                     return Outcome(False, 'Download of %s broke off' % it.url)
                 except requests.exceptions.Timeout:
                     r.close()
                     _outcome = delete_file(f.name)
+                    # ideally remove folder if empty
                     return Outcome(False, 'Download of %s timed out' % it.url)
         except OSError:
             #print('%s did not work, trying another...' % file_path)
@@ -116,7 +124,7 @@ def verify_file(entry):
     return Outcome(isfile, entry['poca_abspath'] + ' exists: ' + str(isfile))
 
 
-def check_path(check_dir):
+def check_directory(check_dir):
     '''Check directory exists and is writable; if not create directory'''
     if check_dir.is_dir():
         if os.access(check_dir, os.W_OK):
@@ -125,10 +133,10 @@ def check_path(check_dir):
             return Outcome(False, 'Could not save files to %s' % \
                            check_dir.absolute())
     try:
-        os.makedirs(check_dir.absolute())
+        check_dir.mkdir()
         return Outcome(True, '%s was created' % check_dir.absolute())
     except FileExistsError:
-        return Outcome(False, 'Could not create %s. File already exists?' \
+        return Outcome(False, 'Could not create %s. File exists?' \
                        % check_dir.absolute())
     except (OSError, PermissionError) as e:
         return Outcome(False, 'Could not create %s.'  % check_dir.absolute())
