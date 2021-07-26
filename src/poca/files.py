@@ -12,6 +12,7 @@ import shutil
 import requests
 
 from threading import current_thread
+from pathlib import Path
 
 from poca.outcome import Outcome
 
