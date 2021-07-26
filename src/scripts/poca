@@ -90,7 +90,7 @@ def main():
                 if subdata.feedstatus.http_code == 301:
                     _outcome = poca.subscribe.update_url(args, subdata)
                     poca.output.plans_moved(subdata, _outcome)
-                if subdata.status == 304:
+                if subdata.feedstatus.http_code == 304:
                     skip_subs.append(subdata)
                     update_q.task_done()
                     poca.output.plans_nochanges(subdata)
