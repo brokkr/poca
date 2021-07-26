@@ -72,7 +72,6 @@ class Item:
         self.variables['basename'], self.variables['extension'] = \
             path.splitext(self.org_filename)
         del(self.entry)
-        print(self.variables)
 
     def generate_names(self, base_dir, sub):
         '''generates a dictionary of file names of decreasing permissiveness'''
@@ -110,7 +109,7 @@ class Item:
                                             self.variables['uuid'])),
                                   self.variables['extension'])
         self.name_test = ''.join((name_base, self.variables['extension']))
-        #print(self.names)
+        print(self.names)
 
     def filename_permissive(self, name_base):
         '''produces filenames that are allowed on most linux filesystems'''
