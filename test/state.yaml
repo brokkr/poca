@@ -5,36 +5,54 @@ Er håbet stadig grønt?:
     11032012007:
       path: /tmp/placeholder
       variables:
-        date_struct: null
-        weekday: null
-        hour: null
-        date_str: null
-        title_episode: null
-        title_sub: null
-        title_feed: null
-        filename: null
+        date: null
+        weekday: 3
+        hour: 9
+        title_episode: Stem Cells, Brain Repair and Tricks of Light
+        filename: asdasdasda.mp3
+        date_str: 2021-04-12
+        title_sub: Er håbet stadig grønt?
+        title_feed: Er håbet stadig grønt?
+        author_feed: Some guy
+        author_entry: Some dude
+        uuid: 234f234dfab3576
+        guid: LKJFF90234jjssqeqew
+        basename: asdasdasda
+        extension: .mp3
     11032012006:
       path: /tmp/placeholder
       variables:
-        date_struct: null
-        weekday: null
-        hour: null
-        date_str: null
-        title_episode: null
-        title_sub: null
-        title_feed: null
-        filename: null
+        date: null
+        weekday: 3
+        hour: 9
+        title_episode: Stem Cells, Brain Repair and Tricks of Light
+        filename: asdasdasda.mp3
+        date_str: 2021-04-12
+        title_sub: Er håbet stadig grønt?
+        title_feed: Er håbet stadig grønt?
+        author_feed: Some guy
+        author_entry: Some dude
+        uuid: 234f234dfab3576
+        guid: LKJFF90234jjssqeqew
+        basename: asdasdasda
+        extension: .mp3
     nosuchid:
       path: /tmp/placeholder
       variables:
-        date_struct: null
-        weekday: null
-        hour: null
-        date_str: null
-        title_episode: null
-        title_sub: null
-        title_feed: null
-        filename: null
+        date: null
+        weekday: 3
+        hour: 9
+        title_episode: Stem Cells, Brain Repair and Tricks of Light
+        filename: asdasdasda.mp3
+        date_str: 2021-04-12
+        title_sub: Er håbet stadig grønt?
+        title_feed: Er håbet stadig grønt?
+        author_feed: Some guy
+        author_entry: Some dude
+        uuid: 234f234dfab3576
+        guid: LKJFF90234jjssqeqew
+        basename: asdasdasda
+        extension: .mp3
   blocked:
     - alsofake
     - 11032012001
@@ -47,36 +65,54 @@ The Crate and Crowbar:
     http://crateandcrowbar.com/?p=3004: 
       path: /tmp/placeholder
       variables:
-        date_struct: null
-        weekday: null
-        hour: null
-        date_str: null
-        title_episode: null
-        title_sub: null
-        title_feed: null
-        filename: null
+        date: null
+        weekday: 3
+        hour: 9
+        title_episode: Stem Cells, Brain Repair and Tricks of Light
+        filename: asdasdasda.mp3
+        date_str: 2021-04-12
+        title_sub: Er håbet stadig grønt?
+        title_feed: Er håbet stadig grønt?
+        author_feed: Some guy
+        author_entry: Some dude
+        uuid: 234f234dfab3576
+        guid: LKJFF90234jjssqeqew
+        basename: asdasdasda
+        extension: .mp3
     http://crateandcrowbar.com/?p=3012:
       path: /tmp/placeholder
       variables:
-        date_struct: null
-        weekday: null
-        hour: null
-        date_str: null
-        title_episode: null
-        title_sub: null
-        title_feed: null
-        filename: null
+        date: null
+        weekday: 3
+        hour: 9
+        title_episode: Stem Cells, Brain Repair and Tricks of Light
+        filename: asdasdasda.mp3
+        date_str: 2021-04-12
+        title_sub: Er håbet stadig grønt?
+        title_feed: Er håbet stadig grønt?
+        author_feed: Some guy
+        author_entry: Some dude
+        uuid: 234f234dfab3576
+        guid: LKJFF90234jjssqeqew
+        basename: asdasdasda
+        extension: .mp3
     http://crateandcrowbar.com/?p=2520:
       path: /tmp/placeholder
       variables:
-        date_struct: null
-        weekday: null
-        hour: null
-        date_str: null
-        title_episode: null
-        title_sub: null
-        title_feed: null
-        filename: null
+        date: null
+        weekday: 3
+        hour: 9
+        title_episode: Stem Cells, Brain Repair and Tricks of Light
+        filename: asdasdasda.mp3
+        date_str: 2021-04-12
+        title_sub: Er håbet stadig grønt?
+        title_feed: Er håbet stadig grønt?
+        author_feed: Some guy
+        author_entry: Some dude
+        uuid: 234f234dfab3576
+        guid: LKJFF90234jjssqeqew
+        basename: asdasdasda
+        extension: .mp3
   blocked:
     - http://crateandcrowbar.com/?p=3000
     - nosuchthing

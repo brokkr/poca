@@ -58,7 +58,7 @@ class Item:
         '''expand with info that the user can use in renaming'''
         try:
             self.variables['date_str'] = time.strftime('%Y-%m-%d',
-                                                       entry['published_parsed'])
+                self.entry['published_parsed'])
         except (KeyError, TypeError):
             self.variables['date_str'] = '1970-01-01'
         self.variables['title_sub'] = sub['title']
