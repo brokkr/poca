@@ -151,7 +151,6 @@ class Item:
 
 class CurrentItem(Item):
     def __init__(self, guid, state_entry):
-        print(type(state_entry))
         self.type_feed = False
         self.type_current = True
         self.type_blocked = False
@@ -159,8 +158,8 @@ class CurrentItem(Item):
         self.stage_wanted = False
         self.stage_included = False
         self.guid = guid
-        self.variables = state_entry['variables']
         self.path = state_entry['path']
+        self.variables = state_entry['variables']
         self.names = {}
 
     def validate(self):

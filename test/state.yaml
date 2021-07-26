@@ -24,7 +24,17 @@ Er håbet stadig grønt?:
         title_sub: null
         title_feed: null
         filename: null
-    nosuchid: /tmp/placeholder
+    nosuchid:
+      path: /tmp/placeholder
+      variables:
+        date_struct: null
+        weekday: null
+        hour: null
+        date_str: null
+        title_episode: null
+        title_sub: null
+        title_feed: null
+        filename: null
   blocked:
     - alsofake
     - 11032012001
