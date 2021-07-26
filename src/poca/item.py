@@ -140,14 +140,13 @@ class Item:
         restrictive = re_restrictive.sub('', restrictive)
         return restrictive
 
-    def info_megabytes(self):
+    def size_vars(self):
         '''expand with info about length and size stats'''
         try:
-            _bytes = int(self.entry.enclosures[0]['length'])
-            megabytes = round(_bytes / 1048576.0, 2) or None
+            size_bytes = int(self.entry.enclosures[0]['length'])
+            self.size_mb = round(size_bytes / 1048576.0, 2) or None
         except (KeyError, ValueError, TypeError) as e:
-            megabytes = None
-        return megabytes
+            self.size_mb = None
 
 class CurrentItem(Item):
     def __init__(self, guid, state_entry):
@@ -174,6 +173,9 @@ class CurrentItem(Item):
         pass
 
     def extra_vars(self, sub, feed):
+        pass
+
+    def size_vars(self):
         pass
 
 class BlockedItem():

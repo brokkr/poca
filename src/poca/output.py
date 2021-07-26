@@ -117,31 +117,29 @@ def plans_upgrade(subdata):
 # PROCESSING                              #
 # ####################################### #
 
-def processing_user_deleted(entry):
-    USERDEL = USERDEL_DIC[STREAM.glyphs]
+def processing_user_deleted(it):
     '''One line per entry telling user of episodes deleted by user'''
-    episode = entry['title'] or entry['poca_filename']
-    msg = ' %s %s deleted by user' % (USERDEL, episode)
+    title = it.variables['title_episode']
+    USERDEL = USERDEL_DIC[STREAM.glyphs]
+    msg = ' %s %s deleted by user' % (USERDEL, title)
     STREAM.debug(msg)
 
 
-def processing_removal(entry):
+def processing_removal(it):
     '''One line per entry telling user of episodes being deleted by poca'''
+    title = it.variables['title_episode']
     AUTODEL = AUTODEL_DIC[STREAM.glyphs]
-    episode = entry['title'] or entry['poca_filename']
-    size = entry['poca_mb']
-    size_str = ' [%s Mb]' % str(round(size)) if size else ' [Unknown]'
-    msg = ' %s %s %s' % (AUTODEL, episode, size_str)
+    size_str = ' [%s Mb]' % str(it.size_mb) if it.size_mb else ' [? Mb]'
+    msg = ' %s %s %s' % (AUTODEL, title, size_str)
     STREAM.debug(msg)
 
 
-def processing_download(entry):
+def processing_download(it):
     '''One line per entry telling user of episodes being downloaded by poca'''
+    title = it.variables['title_episode']
     DOWNLOAD = DOWNLOAD_DIC[STREAM.glyphs]
-    episode = entry['title'] or entry['poca_filename']
-    size = entry['poca_mb']
-    size_str = ' [%s Mb]' % str(round(size)) if size else ' [Unknown]'
-    msg = ' %s %s %s' % (DOWNLOAD, episode, size_str)
+    size_str = ' [%s Mb]' % str(it.size_mb) if it.size_mb else ' [? Mb]'
+    msg = ' %s %s %s' % (DOWNLOAD, title, size_str)
     STREAM.debug(msg)
 
 

@@ -111,8 +111,10 @@ class SubUpdate():
             self.limit()
         for guid in [guid for guid in self.items if
                      self.items[guid].stage_included]:
-            self.items[guid].extra_vars(sub, doc.feed)
-            self.items[guid].generate_names(base_dir, sub)
+            it = self.items[guid]
+            it.extra_vars(sub, doc.feed)
+            it.generate_names(base_dir, sub)
+            it.size_vars()
 
         # wrapping up
         for guid in self.items:
