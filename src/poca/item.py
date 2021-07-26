@@ -160,6 +160,7 @@ class CurrentItem(Item):
         self.end_removed = False
         self.end_retrieved = False
         self.guid = guid
+        self.entry = None
         self.path = state_entry['path']
         self.variables = state_entry['variables']
         self.names = {}
@@ -188,3 +189,4 @@ class BlockedItem():
         self.end_removed = False
         self.end_retrieved = False
         self.guid = guid
+        self.entry = None
