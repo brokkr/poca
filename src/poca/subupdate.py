@@ -90,7 +90,8 @@ class SubUpdate():
         blocked = {guid: item.BlockedItem(guid) for guid in state['blocked']}
         print(type(self.items), type(current), type(blocked))
         # add: loop through current, converting to blocked as needed
-        self.items.update(current).update(blocked)
+        self.items.update(current)
+        self.items.update(blocked)
 
         # validation
         for guid in [guid for guid in self.items if not
