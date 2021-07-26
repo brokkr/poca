@@ -30,6 +30,8 @@ class Item:
         self.stage_valid = False
         self.stage_wanted = False
         self.stage_included = False
+        self.end_removed = False
+        self.end_retrieved = False
         self.guid = entry.guid
         self.entry = entry
         self.variables = {}
@@ -71,7 +73,6 @@ class Item:
         self.variables['guid'] = self.entry['guid']
         self.variables['basename'], self.variables['extension'] = \
             path.splitext(self.org_filename)
-        del(self.entry)
 
     def generate_names(self, base_dir, sub):
         '''generates a dictionary of file names of decreasing permissiveness'''
@@ -156,6 +157,8 @@ class CurrentItem(Item):
         self.stage_valid = False
         self.stage_wanted = False
         self.stage_included = False
+        self.end_removed = False
+        self.end_retrieved = False
         self.guid = guid
         self.path = state_entry['path']
         self.variables = state_entry['variables']
@@ -182,4 +185,6 @@ class BlockedItem():
         self.stage_valid = False
         self.stage_wanted = False
         self.stage_included = False
+        self.end_removed = False
+        self.end_retrieved = False
         self.guid = guid

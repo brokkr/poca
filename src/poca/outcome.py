@@ -14,3 +14,5 @@ from collections import namedtuple
 Outcome = namedtuple('Outcome', 'success msg')
 FeedStatus = namedtuple('FeedStatus',  ['http_code', 'new_url', 'exception',
                                         'image_href', 'etag', 'modified'])
+StateInfo = namedtuple('StateInfo', ['title', 'job', 'value'])
+

@@ -10,46 +10,50 @@
 
 from threading import Thread, current_thread
 from poca import files, output, tag
+from poca.outcome import StateInfo
 
 
 class SubUpgradeThread(Thread):
     '''A thread class that creates handles a SubData instance'''
-    def __init__(self, queue, target, *args):
-        self.queue = queue
+    def __init__(self, update_q, target, *args):
+        self.update_q = update_q
         self.target = target
         self.args = args
         super(SubUpgradeThread, self).__init__()
 
     def run(self):
         sub_upgrade = self.target(*self.args)
-        self.queue.task_done()
+        self.update_q.task_done()
 
 
 class SubUpgrade():
     '''Use the SubData packet to implement file operations'''
-    def __init__(self, subdata, dl_settings, id3_settings):
+    def __init__(self, state_q, subdata, dl_settings, id3_settings):
 
         # know thyself
         self.my_thread = current_thread()
 
-        # prepare list for summary
-        self.fail_flag = False
-        self.removed, self.downed, self.failed = [], [], []
-
         # loop through user deleted and indicate recognition
-        for entry in subdata.udeleted:
-            output.processing_user_deleted(entry)
+        for guid in subdata.get_udeleted():
+            it = subdata.items[guid]
+            output.processing_user_deleted(it)
+        state_q.put(StateInfo(subdata.title, 'udeleted', subdata.get_udeleted))
 
         # loop through unwanted (set) entries to remove
-        for uid in subdata.unwanted:
-            entry = subdata.jar.dic[uid]
-            self.remove(uid, entry, subdata)
+        for guid in subdata.get_trash():
+            it = subdata.items[guid]
+            self.remove(it)
+        state_q.put(StateInfo(subdata.title, 'removed',
+                              subdata.get_removed()))
 
-        for uid in subdata.lacking:
-            entry = subdata.wanted.dic[uid]
-            self.acquire(dl_settings, id3_settings, uid, entry, subdata)
-            if self.outcome.success is None:
-                return
+        for guid in subdata.get_lacking():
+            it = subdata.items[guid]
+            self.acquire(dl_settings, id3_settings, it)
+        state_q.put(StateInfo(subdata.title, 'retrieved',
+                              subdata.get_retrieved()))
+
+        # assuming we made it this far, we update etag, modified etc.
+        state_q.put(StateInfo(subdata.title, 'feed', subdata.feedstatus))
 
         # save etag and subsettings after succesful update
         #if self.fail_flag is False:
@@ -61,14 +65,14 @@ class SubUpgrade():
         #    output.fail_database(_outcome)
 
         # download cover image (maybe throw in useragent?)
-        if self.downed and subdata.wanted.feed_image:
-            _outcome = files.download_img_file(subdata.wanted.feed_image,
-                                               subdata.sub_dir)
-            if _outcome.success is False:
-                output.fail_download(subdata.sub['title'], _outcome)
+        #if self.downed and subdata.wanted.feed_image:
+        #    _outcome = files.download_img_file(subdata.wanted.feed_image,
+        #                                       subdata.sub_dir)
+        #    if _outcome.success is False:
+        #        output.fail_download(subdata.sub['title'], _outcome)
 
         # print summary of operations in file log
-        output.file_summary(subdata, self.removed, self.downed, self.failed)
+        output.file_summary(subdata)
 
     def acquire(self, dl_settings, id3_settings, uid, entry, subdata):
         '''Get new entries, tag them and add to history'''
@@ -98,15 +102,14 @@ class SubUpgrade():
         if not _outcome.success:
             output.fail_tag(subdata.sub['title'], _outcome)
 
-    def remove(self, uid, entry, subdata):
+    def remove(self, it):
         '''Deletes the file and removes the entry from the jar'''
-        self.outcome = files.delete_file(entry['poca_abspath'])
+        self.outcome = files.delete_file(it)
         if self.outcome.success is False:
-            self.fail_flag = True
-            output.fail_delete(subdata.sub['title'], self.outcome)
+            output.fail_delete(it, self.outcome)
             return
-        output.processing_removal(entry)
-        self.removed.append(entry)
+        it.end_downloaded = True
+        output.processing_removal(it)
         #subdata.jar.lst.remove(uid)
         #del(subdata.jar.dic[uid])
         #_outcome = subdata.jar.save()

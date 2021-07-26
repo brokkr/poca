@@ -114,6 +114,10 @@ class SubUpdate():
             self.items[guid].extra_vars(sub, doc.feed)
             self.items[guid].generate_names(base_dir, sub)
 
+        # wrapping up
+        for guid in self.items:
+            del(self.items[guid].entry)
+
         #filenames = [self.dic[uid]['poca_filename'] for uid in self.lst]
         #for uid in self.lst:
         #    count = filenames.count(self.dic[uid]['poca_filename'])
@@ -213,3 +217,8 @@ class SubUpdate():
         return [guid for guid in self.items if self.items[guid].stage_included
                 and not self.items[guid].type_current]
 
+    def get_retrieved(self):
+        return [guid for guid in self.items if self.items[guid].end_retrieved]
+
+    def get_removed(self):
+        return [guid for guid in self.items if self.items[guid].end_removed]
