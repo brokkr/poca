@@ -204,7 +204,7 @@ class SubUpdate():
 
     def get_udeleted(self):
         return [guid for guid in self.items if self.items[guid].blocked and
-                guid not in self.state['blocked']
+                guid not in self.state['blocked']]
 
     def get_trash(self):
         return [guid for guid in self.items if self.items[guid].current and
