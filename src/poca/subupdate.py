@@ -15,7 +15,7 @@ from threading import Thread
 
 import feedparser
 from poca import files, item
-from poca.outcome import Outcome
+from poca.outcome import Outcome, FeedStatus
 
 
 class SubUpdateThread(Thread):
@@ -38,6 +38,7 @@ class SubUpdate():
        user deleted entries, etc.'''
     def __init__(self, sub, defaults, state, base_dir):
         self.sub = sub
+        self.title = sub['title']
         self.defaults = defaults
         self.state = state
 
@@ -54,28 +55,31 @@ class SubUpdate():
         #if not self.outcome.success:
         #    return
 
-        # parsing response
+        # parsing response and saving feed status
+        new_url, exception = (None, None)
         doc = feedparser.parse(sub['url'], etag=state['etag'], \
                                modified=state['modified'])
-        self.response = doc.status
-        if self.response == 301:
+        if doc.status == 301:
             self.outcome = Outcome(True, 'Feed has moved')
-            self.new_url = getattr(doc, 'href', sub['url'])
-        elif self.response == 304:
+            new_url = getattr(doc, 'href', sub['url'])
+        elif doc.status == 304:
             self.outcome = Outcome(True, 'Not modified')
             return
         # 410 -> set to inactive
         elif self.response >= 400:
-            self.outcome = Outcome(False, doc.feed.bozo_exception)
+            exception = doc.feed.bozo_exception
+            self.outcome = Outcome(False, exception)
             return
         else:
             self.outcome = Outcome(True, 'Success')
         try:
-            self.image = doc.feed.image['href']
+            image_href = doc.feed.image['href']
         except (AttributeError, KeyError):
-            self.image = None
-        self.feed_etag = doc.etag if hasattr(doc, 'etag') else None
-        self.feed_modified = doc.modified if hasattr(doc, 'modified') else None
+            image_href = None
+        etag = doc.etag if hasattr(doc, 'etag') else None
+        modified = doc.modified if hasattr(doc, 'modified') else None
+        self.feedstatus = FeedStatus(doc.status, new_url, exception,
+                                     image_href, etag, modified)
 
         # before we moved to overwriting feed with state info...
         #for guid in set(state['current']).intersection(items.keys()):
@@ -110,6 +114,7 @@ class SubUpdate():
                      self.items[guid].stage_included]:
             self.items[guid].extra_vars(sub, doc.feed)
             self.items[guid].generate_names(base_dir, sub)
+
         #filenames = [self.dic[uid]['poca_filename'] for uid in self.lst]
         #for uid in self.lst:
         #    count = filenames.count(self.dic[uid]['poca_filename'])
@@ -125,8 +130,6 @@ class SubUpdate():
         # subupgrade will delete unwanted and download lacking
         #self.unwanted = [x for x in self.jar.lst if x not in self.wanted.lst]
         #self.lacking = [x for x in self.wanted.lst if x not in self.jar.lst]
-        self.unwanted = []
-        self.lacking = [x for x in self.wanted.lst]
 
     def apply_filters(self):
         '''Apply all filters set to be used on the subscription'''
