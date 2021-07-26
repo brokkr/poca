@@ -66,7 +66,7 @@ class SubUpdate():
             self.outcome = Outcome(True, 'Not modified')
             return
         # 410 -> set to inactive
-        elif self.response >= 400:
+        elif doc.status >= 400:
             exception = doc.feed.bozo_exception
             self.outcome = Outcome(False, exception)
             return
