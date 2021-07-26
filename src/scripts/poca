@@ -81,7 +81,7 @@ def main():
             while (len([t for t in upgrade_threads if t.is_alive()])
                    < max_threads and not update_q.empty()):
                 subdata = update_q.get()
-                print(subdata.feedstatus)
+                print(subdata.items)
                 if subdata.outcome.success is False:
                     poca.output.plans_error(subdata)
                     skip_subs.append(subdata)
