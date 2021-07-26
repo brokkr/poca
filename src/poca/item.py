@@ -151,7 +151,7 @@ class Item:
 
 class CurrentItem(Item):
     def __init__(self, guid, state_entry):
-        print(guid, state_entry)
+        print(type(state_entry))
         self.type_feed = False
         self.type_current = True
         self.type_blocked = False
