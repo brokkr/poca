@@ -61,7 +61,7 @@ def main():
         update_threads = []
         update_q = Queue()
         skip_subs = []
-        state_tmpl = {'etag': None, 'modified': None, 'current': {}
+        state_tmpl = {'etag': None, 'modified': None, 'current': {},
                       'blocked': [], 'active': True, 'image': 0}
         for sub in subs:
             state = state_yaml.pop(sub['title']) if sub['title'] in \
