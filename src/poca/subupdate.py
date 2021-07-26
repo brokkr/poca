@@ -74,8 +74,8 @@ class SubUpdate():
             self.image = doc.feed.image['href']
         except (AttributeError, KeyError):
             self.image = None
-        self.feed_etag = doc.feed.etag
-        self.feed_modified = doc.feed.modified
+        self.feed_etag = doc.etag if hasattr(doc, 'etag') else None
+        self.feed_modified = doc.modified if hasattr(doc, 'modified') else None
 
         # before we moved to overwriting feed with state info...
         #for guid in set(state['current']).intersection(items.keys()):
