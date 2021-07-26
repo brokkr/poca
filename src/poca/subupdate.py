@@ -92,10 +92,11 @@ class SubUpdate():
         self.items.update(current).update(blocked)
 
         # validation
-        for item in [self.items[guid] for guid in self.items if not \
+        for guid in [guid for guid in self.items if not
                      self.items[guid].blocked]:
-            item.validate()
-            item.fill_filter_vars()
+            it = self.items[guid]
+            it.validate()
+            it.fill_filter_vars()
 
         # wanted
         if 'filters' in self.sub:
@@ -134,19 +135,20 @@ class SubUpdate():
                     'weekdays': self.match_weekdays}
         filters = self.sub['filters'].keys()
         valid_filters = filters & set(func_dic.keys())
-        for item in [self.items[guid] for guid in self.items if \
+        for guid in [guid for guid in self.items if
                      self.items[guid].stage_valid]:
-            tests = [True]
+            it = self.items[guid]
+            tests = list()
             for key in valid_filters:
                 try:
-                    tests.append(func_dic[key](item, self.sub['filters'][key]))
+                    tests.append(func_dic[key](it, self.sub['filters'][key]))
                     self.outcome = Outcome(True, 'Filters applied successfully')
                 except KeyError as e:
                     self.outcome = Outcome(False, 'Entry is missing info: %s' % e)
                 except (ValueError, TypeError, SyntaxError) as e:
                     self.outcome = Outcome(False, 'Bad filter setting: %s' % e)
             if all(tests):
-                item.stage_wanted = True
+                it.stage_wanted = True
     #def check_jar(self):
     #    '''Check for user deleted files so we can filter them out'''
     #    for uid in self.jar.lst:
@@ -159,26 +161,26 @@ class SubUpdate():
     #    self.jar.lst = [x for x in self.jar.lst if x not in self.jar.del_lst]
     #    self.outcome = self.jar.save()
 
-    def match_filename(self, item, filter_text):
+    def match_filename(self, it, filter_text):
         '''The episode filename must match a regex/string'''
-        return bool(re.search(filter_text, item.variables['filename']))
+        return bool(re.search(filter_text, it.variables['filename']))
 
-    def match_title(self, item, filter_text):
+    def match_title(self, it, filter_text):
         '''The episode title must match a regex/string'''
-        return bool(re.search(filter_text, item.variables['title_episode']))
+        return bool(re.search(filter_text, it.variables['title_episode']))
 
-    def match_weekdays(self, item, filter_text):
+    def match_weekdays(self, it, filter_text):
         '''Only return episodes published on specific week days'''
         # careful: string or integer? (or make poca.yaml setting a list)
-        return item.variables['weekday'] in list(filter_text)
+        return it.variables['weekday'] in list(filter_text)
 
-    def match_date(self, item, filter_text):
+    def match_date(self, it, filter_text):
         '''Only return episodes published after a specific date'''
-        return item.variables['date'] > time.strptime(filter_text, '%Y-%m-%d')
+        return it.variables['date'] > time.strptime(filter_text, '%Y-%m-%d')
 
-    def match_hour(self, item, filter_text):
+    def match_hour(self, it, filter_text):
         '''Only return episodes published at a specific hour of the day'''
-        return item.variables['hour'] == int(filter_text)
+        return it.variables['hour'] == int(filter_text)
 
     def limit(self):
         '''Limit the number of episodes to that set in max_number'''
