@@ -35,7 +35,7 @@ class Item:
         self.variables = {}
         self.names = {}
 
-    def validate(self)
+    def validate(self):
         '''validates item if entry contains an enclosure with parsable url'''
         try:
             self.url = self.entry.enclosures[0]['href']
