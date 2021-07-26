@@ -27,7 +27,7 @@ def main():
         args = poca.args.get_poca_args()
         stream_logger = poca.loggers.start_stream_logger(args)
         streamfail_logger = poca.loggers.start_after_stream_logger(args)
-        paths = poca.config.Paths(args)
+        paths = poca.config.Pocapaths(args)
         summary_logger = poca.loggers.start_summary_logger(args, paths)
         # poca
         poca_yaml = poca.config.read_yaml(paths.config_file)
@@ -43,7 +43,7 @@ def main():
         # start identifying log_file and get state.yaml -> blocklist etc.
 
         print('paths')
-        print(paths.config_dir, paths.config_file, paths.db_dir, paths.log_file)
+        print(paths.config_dir, paths.config_file, paths.state_file, paths.log_file)
         print('subs')
         print(subs)
         print('defaults')

@@ -62,7 +62,7 @@ class Config:
         return valid_subs
 
 
-class Paths:
+class Pocapaths:
     '''A data-holder object for all program paths'''
     def __init__(self, args):
         if args.config:
