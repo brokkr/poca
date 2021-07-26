@@ -204,13 +204,13 @@ class SubUpdate():
 
     def get_udeleted(self):
         return [guid for guid in self.items if self.items[guid].blocked and
-                guid not in self.state['blocked'])
+                guid not in self.state['blocked']
 
     def get_trash(self):
         return [guid for guid in self.items if self.items[guid].current and
-                not self.items[guid].included)
+                not self.items[guid].included]
 
     def get_lacking(self):
         return [guid for guid in self.items if self.items[guid].included and
-                not self.items[guid].current)
+                not self.items[guid].current]
 
