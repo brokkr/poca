@@ -34,24 +34,27 @@ class SubUpgrade():
         self.my_thread = current_thread()
 
         # loop through user deleted and indicate recognition
-        for guid in subdata.get_udeleted():
+        udeleted = subdata.get_udeleted():
+        for guid in udeleted:
             it = subdata.items[guid]
             output.processing_user_deleted(it)
-        state_q.put(StateInfo(subdata.title, 'udeleted',
-                              subdata.get_udeleted()))
+        if udeleted:
+            state_q.put(StateInfo(subdata.title, 'udeleted', udeleted))
 
         # loop through unwanted (set) entries to remove
         for guid in subdata.get_trash():
             it = subdata.items[guid]
             self.remove(it)
-        state_q.put(StateInfo(subdata.title, 'removed',
-                              subdata.get_removed()))
+        removed = subdata.get_removed()
+        if removed:
+            state_q.put(StateInfo(subdata.title, 'removed', removed))
 
         for guid in subdata.get_lacking():
             it = subdata.items[guid]
             self.acquire(dl_settings, id3_settings, it)
-        state_q.put(StateInfo(subdata.title, 'retrieved',
-                              subdata.get_retrieved()))
+        retrieved = subdata.get_retrieved()
+        if retrieved:
+            state_q.put(StateInfo(subdata.title, 'retrieved', retrieved))
 
         # assuming we made it this far, we update etag, modified etc.
         state_q.put(StateInfo(subdata.title, 'feed', subdata.feedstatus))
@@ -75,30 +78,25 @@ class SubUpgrade():
         # print summary of operations in file log
         output.file_summary(subdata)
 
-    def acquire(self, dl_settings, id3_settings, uid, entry, subdata):
+    def acquire(self, dl_settings, id3_settings, it):
         '''Get new entries, tag them and add to history'''
-        output.processing_download(entry)
-        wantedindex = subdata.wanted.lst.index(uid) - len(self.failed)
+        output.processing_download(it)
+        #wantedindex = subdata.wanted.lst.index(uid) - len(self.failed)
         # see https://github.com/brokkr/poca/wiki/__Developer-notes__
-        self.outcome = files.download_file(entry, dl_settings)
+        self.outcome = files.download_file(dl_settings, it)
         if self.outcome.success is False:
-            entry['filename'], entry['poca_abspath'] = ('', '')
-            self.fail_flag = True
-            # can prob get title from entry
-            output.fail_download(subdata.sub['title'], self.outcome)
-            self.failed.append(entry)
+            filename, it.path = ('', '')
+            output.fail_download(it, self.outcome)
             return
         if self.outcome.success is None:
             return
-        # some inconsistency in key naming here - needed for backwards compat
-        entry['filename'], entry['poca_abspath'] = self.outcome.msg
+        filename, it.path = self.outcome.msg
         #subdata.jar.lst.insert(wantedindex, uid)
         #subdata.jar.dic[uid] = entry
         #_outcome = subdata.jar.save()
         #if _outcome.success is False:
         #    self.fail_flag = True
         #    output.fail_database(_outcome)
-        self.downed.append(entry)
         _outcome = tag.tag_audio_file(id3_settings, subdata.sub, entry)
         if not _outcome.success:
             output.fail_tag(subdata.sub['title'], _outcome)
@@ -109,7 +107,7 @@ class SubUpgrade():
         if self.outcome.success is False:
             output.fail_delete(it, self.outcome)
             return
-        it.end_downloaded = True
+        it.end_removed = True
         output.processing_removal(it)
         #subdata.jar.lst.remove(uid)
         #del(subdata.jar.dic[uid])

@@ -156,8 +156,9 @@ def fail_common(msg, after_stream_msg):
     AFTER_STREAM.info(after_stream_msg)
 
 
-def fail_download(title, outcome):
+def fail_download(it, outcome):
     '''Subline telling user of single entry download failure'''
+    title = it.variables['title_episode']
     after_stream_msg = 'DOWNLOAD ERROR (%s): %s' % (title, outcome.msg)
     fail_common(outcome.msg, after_stream_msg)
 
@@ -170,6 +171,7 @@ def fail_tag(title, outcome):
 
 def fail_delete(it, outcome):
     '''Subline telling user of single entry deletion failure'''
+    title = it.variables['title_episode']
     after_stream_msg = 'DELETE ERROR (%s): %s' % \
         (it.variables['title_episode'], outcome.msg)
     fail_common(outcome.msg, after_stream_msg)

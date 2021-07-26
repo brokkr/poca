@@ -17,33 +17,34 @@ from pathlib import Path
 from poca.outcome import Outcome
 
 
-def download_file(entry, dl_settings):
+def download_file(it, dl_settings):
     '''Download function with block time outs'''
     my_thread = current_thread()
     headers = requests.utils.default_headers()
-    url = entry['poca_url']
     if dl_settings['useragent']:
         headers.update({'User-Agent': dl_settings['useragent']})
     if getattr(my_thread, "kill", False):
         return Outcome(None, 'Download cancelled by user')
     try:
-        r = requests.get(url, stream=True, timeout=60, headers=headers)
+        r = requests.get(it.url, stream=True, timeout=60, headers=headers)
     except (requests.exceptions.ConnectionError,
             requests.exceptions.HTTPError) as e:
-        return Outcome(False, 'Download of %s failed' % url)
+        return Outcome(False, 'Download of %s failed' % it.url)
     except requests.exceptions.Timeout:
-        return Outcome(False, 'Download of %s timed out' % url)
+        return Outcome(False, 'Download of %s timed out' % it.url)
     if r.status_code >= 400:
-        return Outcome(False, 'Download of %s failed' % url)
+        return Outcome(False, 'Download of %s failed' % it.url)
     filename_keys = ['permissive', 'ntfs', 'restrictive', 'fallback']
     start_at = dl_settings.get('filenames', 'permissive')
     if start_at in filename_keys:
         filename_keys = filename_keys[filename_keys.index(start_at):]
-    if not entry['unique_filename']:
-        filename_keys = ['fallback']
+    #if not entry['unique_filename']:
+    #    filename_keys = ['fallback']
     for key in filename_keys:
-        filename = '.'.join((entry['names'][key], entry['extension']))
-        file_path = entry['directory'].joinpath(filename)
+        path_bits = it.names[key]
+        filename = ''.join((path_bits[2], path_bits[3]))
+        dir_path = path_bits[0].joinpath(path_bits[1])
+        file_path = dir_path.joinpath(filename)
         try:
             with file_path.open(mode='wb') as f:
                 try:
@@ -59,11 +60,11 @@ def download_file(entry, dl_settings):
                 except requests.exceptions.ConnectionError as e:
                     r.close()
                     _outcome = delete_file(f.name)
-                    return Outcome(False, 'Download of %s broke off' % url)
+                    return Outcome(False, 'Download of %s broke off' % it.url)
                 except requests.exceptions.Timeout:
                     r.close()
                     _outcome = delete_file(f.name)
-                    return Outcome(False, 'Download of %s timed out' % url)
+                    return Outcome(False, 'Download of %s timed out' % it.url)
         except OSError:
             #print('%s did not work, trying another...' % file_path)
             pass
