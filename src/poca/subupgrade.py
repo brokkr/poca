@@ -37,7 +37,8 @@ class SubUpgrade():
         for guid in subdata.get_udeleted():
             it = subdata.items[guid]
             output.processing_user_deleted(it)
-        state_q.put(StateInfo(subdata.title, 'udeleted', subdata.get_udeleted))
+        state_q.put(StateInfo(subdata.title, 'udeleted',
+                              subdata.get_udeleted()))
 
         # loop through unwanted (set) entries to remove
         for guid in subdata.get_trash():

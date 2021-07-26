@@ -98,8 +98,9 @@ def download_img_file(url, sub_dir):
         f.write(r.content)
     return Outcome(True, 'Image file downloaded')
 
-def delete_file(file_path):
+def delete_file(it):
     '''Deletes a file'''
+    file_path = Path(it.path)
     try:
         os.remove(file_path)
         return Outcome(True, file_path + ': File was successfully deleted')

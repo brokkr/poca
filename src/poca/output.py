@@ -168,9 +168,10 @@ def fail_tag(title, outcome):
     fail_common(outcome.msg, after_stream_msg)
 
 
-def fail_delete(title, outcome):
+def fail_delete(it, outcome):
     '''Subline telling user of single entry deletion failure'''
-    after_stream_msg = 'DELETE ERROR (%s): %s' % (title, outcome.msg)
+    after_stream_msg = 'DELETE ERROR (%s): %s' % \
+        (it.variables['title_episode'], outcome.msg)
     fail_common(outcome.msg, after_stream_msg)
 
 
