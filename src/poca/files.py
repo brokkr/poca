@@ -17,7 +17,7 @@ from pathlib import Path
 from poca.outcome import Outcome
 
 
-def download_file(it, dl_settings):
+def download_file(dl_settings, it):
     '''Download function with block time outs'''
     my_thread = current_thread()
     headers = requests.utils.default_headers()
