@@ -203,14 +203,14 @@ class SubUpdate():
     # GET SLICES OF ITEMS
 
     def get_udeleted(self):
-        return [guid for guid in self.items if self.items[guid].blocked and
-                guid not in self.state['blocked']]
+        return [guid for guid in self.items if self.items[guid].type_blocked
+                and guid not in self.state['blocked']]
 
     def get_trash(self):
-        return [guid for guid in self.items if self.items[guid].current and
-                not self.items[guid].included]
+        return [guid for guid in self.items if self.items[guid].type_current
+                and not self.items[guid].stage_included]
 
     def get_lacking(self):
-        return [guid for guid in self.items if self.items[guid].included and
-                not self.items[guid].current]
+        return [guid for guid in self.items if self.items[guid].stage_included
+                and not self.items[guid].type_current]
 
