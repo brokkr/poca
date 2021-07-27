@@ -32,11 +32,17 @@ def get_settings(poca_yaml):
 
 def get_state(file_path):
     if file_path.is_file():
-        return read_yaml(file_path)
+        state = read_yaml(file_path)
     else:
         # NOTE: if file_path.is_dir() not covered
         file_path.touch()
         return dict()
+    for sub_title in state:
+        for guid in state[sub_title]['current']:
+            it = state[sub_title]['current'][guid]
+            it['path'] = pathlib.Path(*it['path'])
+            it['variables']['date'] = time.gmtime(it['variables']['date'])
+    return state
 
 class Config:
     '''no longer in use, see scripts/poca'''
