@@ -26,13 +26,13 @@ class Update:
                     self.add(sub, state_info)
                 if state_info.job == 'udeleted':
                     self.block(sub, state_info)
-            state_yaml = yaml.dump(self.state, allow_unicode=True)
+            state_yaml = yaml.dump(self.state, sortkeys=False, allow_unicode=True)
             f.write(state_yaml)
 
     def feed(self, sub, state_info):
-        sub['etag'] = update.value.etag
-        sub['modified'] = update.value.modified
-        sub['image'] = update.value.image
+        sub['etag'] = state_info.value.etag
+        sub['modified'] = state_info.value.modified
+        sub['image'] = state_info.value.image
 
     def remove(self, sub, state_info):
         for it in state_info:
