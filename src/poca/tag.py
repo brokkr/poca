@@ -16,14 +16,14 @@ from poca.outcome import Outcome
 encodings = {3: id3.Encoding.UTF16, 4: id3.Encoding.UTF8}
 id3v1_dic = {True: 0, False: 2}
 
-def tag_audio_file(id3_settings, sub, entry):
+def tag_audio_file(id3_settings, sub, it):
     '''Metadata tagging using mutagen'''
     # id3 settings
     id3v1 = id3v1_dic[id3_settings['id3removev1']]
     id3v2 = id3_settings['id3v2version']
     id3encoding = encodings[id3v2]
     # overrides
-    overrides = list(sub['metadata'].items()) if 'metadata' in sub else []
+    overrides = list(sub['metadata'].items())
     key_errors = {}
     # track numbering
     #tracks = sub.find('./track_numbering')
@@ -33,26 +33,29 @@ def tag_audio_file(id3_settings, sub, entry):
         return Outcome(True, 'Tagging skipped')
     # get 'easy' access to metadata
     try:
-        audio = mutagen.File(entry['poca_abspath'], easy=True)
+        audio = mutagen.File(it.path, easy=True)
     except mutagen.MutagenError:
         return Outcome(False, '%s not found or invalid file type for tagging'
-                       % entry['poca_abspath'])
+                       % str(it.path))
     except mutagen.mp3.HeaderNotFoundError:
-        return Outcome(False, '%s is a bad mp3' % entry['poca_abspath'])
+        return Outcome(False, '%s is a bad mp3' % str(it.path))
     if audio is None:
         return Outcome(False, '%s is invalid file type for tagging' %
-                       entry['poca_abspath'])
+                       str(it.path))
     # add_tags is undocumented for easy but seems to work
     if audio.tags is None:
         audio.add_tags()
     # tracks
-    if tracks == 'yes' or (tracks == 'if missing' and 'tracknumber' not in
-                           audio):
-        track_no = jar.track_no if hasattr(jar, 'track_no') else 0
-        track_no += 1
-        overrides.append(('tracknumber', str(track_no)))
-        jar.track_no = track_no
-        jar.save()
+    # NOTE: We could reimplement tracks by way of state.yaml. Questions if if
+    # we should? Alternative: "itunes:episode" in some feeds
+    # NOTE: We currently skip tagging if no 'metadata', regardless of 'tracks'
+    #if tracks == 'yes' or (tracks == 'if missing' and 'tracknumber' not in
+                           #audio):
+        #track_no = jar.track_no if hasattr(jar, 'track_no') else 0
+        #track_no += 1
+        #overrides.append(('tracknumber', str(track_no)))
+        #jar.track_no = track_no
+        #jar.save()
     # run overrides and save
     while overrides:
         tag, text = overrides.pop()
@@ -67,7 +70,7 @@ def tag_audio_file(id3_settings, sub, entry):
     audio.save()
     # ONLY for ID3
     if isinstance(audio, mutagen.mp3.EasyMP3):
-        audio = mutagen.File(entry['poca_abspath'], easy=False)
+        audio = mutagen.File(it.path, easy=False)
         if 'comment' in key_errors:
             audio.tags.delall('COMM')
             comm_txt = key_errors.pop('comment')

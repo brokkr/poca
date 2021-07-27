@@ -34,7 +34,8 @@ def main():
         state_yaml = poca.config.read_yaml(paths.state_file)
         subs = poca_yaml.pop('subscriptions')
         defaults = poca_yaml.pop('defaults')
-        # note string
+        # base_dir isn't checked as part of paths (base_dir not existing ->
+        # fail)
         base_dir = poca.config.Path(poca_yaml['settings'].pop('base_dir'))
         dl_settings, id3_settings = poca.config.get_settings(poca_yaml)
 

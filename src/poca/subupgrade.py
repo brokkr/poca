@@ -49,9 +49,17 @@ class SubUpgrade():
         if removed:
             state_q.put(StateInfo(subdata.title, 'removed', removed))
 
+        # loop through lacking to retrieve
         for guid in subdata.get_lacking():
             it = subdata.items[guid]
-            self.acquire(dl_settings, id3_settings, it)
+            dl_outcome = self.acquire(dl_settings, it)
+            if not dl_outcome.success:
+                continue
+            if not 'metadata' in subdata.sub:
+                continue
+            tag_outcome = tag.tag_audio_file(id3_settings, subdata.sub, it)
+            if not tag_outcome.success:
+                output.fail_tag(subdata.title, tag_outcome)
         retrieved = subdata.get_retrieved()
         if retrieved:
             state_q.put(StateInfo(subdata.title, 'retrieved', retrieved))
@@ -78,28 +86,27 @@ class SubUpgrade():
         # print summary of operations in file log
         output.file_summary(subdata)
 
-    def acquire(self, dl_settings, id3_settings, it):
+    def acquire(self, dl_settings, it):
         '''Get new entries, tag them and add to history'''
         output.processing_download(it)
         #wantedindex = subdata.wanted.lst.index(uid) - len(self.failed)
         # see https://github.com/brokkr/poca/wiki/__Developer-notes__
-        self.outcome = files.download_file(dl_settings, it)
-        if self.outcome.success is False:
+        outcome = files.download_file(dl_settings, it)
+        if outcome.success is False:
             filename, it.path = ('', '')
-            output.fail_download(it, self.outcome)
-            return
-        if self.outcome.success is None:
-            return
-        filename, it.path = self.outcome.msg
+            output.fail_download(it, outcome)
+            return outcome
+        if outcome.success is None:
+            return outcome
+        else:
+            filename, it.path = outcome.msg
+            return outcome
         #subdata.jar.lst.insert(wantedindex, uid)
         #subdata.jar.dic[uid] = entry
         #_outcome = subdata.jar.save()
         #if _outcome.success is False:
         #    self.fail_flag = True
         #    output.fail_database(_outcome)
-        _outcome = tag.tag_audio_file(id3_settings, subdata.sub, entry)
-        if not _outcome.success:
-            output.fail_tag(subdata.sub['title'], _outcome)
 
     def remove(self, it):
         '''Deletes the file and removes the entry from the jar'''
