@@ -16,6 +16,8 @@ class Update:
     def __init__(self, file_path, state_infos):
         with file_path.open(mode='r+') as f:
             self.state = yaml.safe_load(f)
+            if self.state is None:
+                self.state = dict()
             for state_info in state_infos:
                 if not state_info.title in self.state:
                     self.state[state_info.title] = {'current': {}, 'blocked': []}
