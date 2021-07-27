@@ -79,11 +79,11 @@ def main():
         upgrade_threads = []
         max_threads = args.threads if not args.verbose else 1
         while len(upgrade_threads) + len(skip_subs) < len(subs):
-            state_infos = list()
-            while not state_q.empty():
-                state_infos.append(state_q.get())
-            if state_infos:
-                _update = poca.state.Update(paths.state_file, state_infos)
+            #state_infos = list()
+            #while not state_q.empty():
+            #    state_infos.append(state_q.get())
+            #if state_infos:
+            #    _update = poca.state.Update(paths.state_file, state_infos)
             while (len([t for t in upgrade_threads if t.is_alive()])
                    <= max_threads and not update_q.empty()):
                 subdata = update_q.get()
