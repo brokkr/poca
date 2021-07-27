@@ -6,6 +6,7 @@
 # or (at your option) any later version.
 
 
+import time
 import yaml
 
 from os import path
@@ -47,8 +48,11 @@ class Update:
     def add(self, sub, state_info):
         for it in state_info.value:
             sub['current'][it.guid] = {}
-            sub['current'][it.guid]['path'] = it.path
+            sub['current'][it.guid]['path'] = it.path.parts
             sub['current'][it.guid]['variables'] = it.variables
+            epoch = time.mktime(it.variables['date'])
+            sub['current'][it.guid]['variables']['date'] = epoch
+
 
     def block(self, sub, state_info):
         for it in state_info:
