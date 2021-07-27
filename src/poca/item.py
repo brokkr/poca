@@ -68,8 +68,8 @@ class Item:
         self.variables['title_feed'] = feed.title
         self.variables['author_feed'] = feed.author if hasattr(feed,
             'author') else 'No feed author'
-        self.variables['author_entry'] = self.entry.author if hasattr(entry,
-            'author') else 'No entry author'
+        self.variables['author_entry'] = self.entry.author if \
+            hasattr(self.entry, 'author') else 'No entry author'
         self.variables['uuid'] = uuid.uuid4().hex[:9]
         self.variables['guid'] = self.entry['guid']
         self.variables['basename'], self.variables['extension'] = \
