@@ -145,7 +145,7 @@ class Item:
         '''expand with info about length and size stats'''
         try:
             size_bytes = int(self.entry.enclosures[0]['length'])
-            self.size_mb = round(size_bytes / 1048576.0, 2) or None
+            self.size_mb = round(size_bytes / 1048576.0, ndigits=None) or None
         except (KeyError, ValueError, TypeError) as e:
             self.size_mb = None
 
