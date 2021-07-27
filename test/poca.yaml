@@ -16,8 +16,8 @@ subscriptions:
   metadata:
     artist: Det:Er
   rename:
-  - title
-  - episode_title
+  - title_sub
+  - title_episode
 - title: The Crate and Crowbar
   url: http://crateandcrowbar.com/category/episode/feed/
   max_number: 1
@@ -31,5 +31,15 @@ subscriptions:
   metadata:
     artist: Dan the Man
   rename:
-  - date
-  - episode_title
+  - date_str
+  - title_episode
+- title: newscast
+  url: https://podcasts.files.bbci.co.uk/p05299nl.rss
+  max_number: 2
+  filters:
+    filename: ^p08
+  metadata:
+    album: Swearing
+  rename:
+  - author_feed_bs
+  - date_str_bs
