@@ -226,9 +226,9 @@ class SubUpdate():
         return [guid for guid in self.items if self.items[guid].end_removed]
 
     def get_failed(self):
-        dl_fails = [guid for guid in get_lacking() if not
+        dl_fails = [guid for guid in self.get_lacking() if not
                     self.items[guid].end_retrieved]
-        rm_fails = [guid for guid in get_trash() if not
+        rm_fails = [guid for guid in self.get_trash() if not
                     self.items[guid].end_removed]
         return rm_fails.extend(dl_fails)
 
