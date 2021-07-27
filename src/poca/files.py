@@ -116,7 +116,7 @@ def delete_file(it):
     file_path = Path(it.path)
     try:
         os.remove(file_path)
-        return Outcome(True, file_path + ': File was successfully deleted')
+        return Outcome(True, str(file_path) + ': File was successfully deleted')
     except OSError as e:
         return Outcome(False, 'Could not delete %s' % file_path)
 

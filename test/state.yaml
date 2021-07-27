@@ -1,120 +1,201 @@
 Er håbet stadig grønt?:
-  etag: abcdef123
-  modified: null
   current:
-    11032012007:
-      path: /tmp/placeholder
+    '11032012008':
+      path:
+      - /
+      - tmp
+      - media
+      - Er håbet stadig grønt?
+      - Er håbet stadig grønt? - Er håbet stadig grønt? 8:8 - Alberte går i naturterapi.mp3
       variables:
-        date: null
+        date: 1602730980.0
         weekday: 3
-        hour: 9
-        title_episode: Stem Cells, Brain Repair and Tricks of Light
-        filename: asdasdasda.mp3
-        date_str: 2021-04-12
+        hour: 4
+        title_episode: Er håbet stadig grønt? 8:8 - Alberte går i naturterapi
+        filename: er-habet-stadig-groent-8-8.mp3
+        date_str: '2020-10-15'
         title_sub: Er håbet stadig grønt?
         title_feed: Er håbet stadig grønt?
-        author_feed: Some guy
-        author_entry: Some dude
-        uuid: 234f234dfab3576
-        guid: LKJFF90234jjssqeqew
-        basename: asdasdasda
+        author_feed: DR (podcast@dr.dk)
+        author_entry: DR
+        uuid: 8597b6ce2
+        guid: '11032012008'
+        basename: er-habet-stadig-groent-8-8
         extension: .mp3
-    11032012006:
-      path: /tmp/placeholder
+    '11032012005':
+      path:
+      - /
+      - tmp
+      - media
+      - Er håbet stadig grønt?
+      - Er håbet stadig grønt? - Er håbet stadig grønt? 5:8 - Men er der så natur
+        nok til alle?.mp3
       variables:
-        date: null
+        date: 1602730800.0
         weekday: 3
-        hour: 9
-        title_episode: Stem Cells, Brain Repair and Tricks of Light
-        filename: asdasdasda.mp3
-        date_str: 2021-04-12
+        hour: 4
+        title_episode: Er håbet stadig grønt? 5:8 - Men er der så natur nok til alle?
+        filename: er-habet-stadig-groent-5-8.mp3
+        date_str: '2020-10-15'
         title_sub: Er håbet stadig grønt?
         title_feed: Er håbet stadig grønt?
-        author_feed: Some guy
-        author_entry: Some dude
-        uuid: 234f234dfab3576
-        guid: LKJFF90234jjssqeqew
-        basename: asdasdasda
+        author_feed: DR (podcast@dr.dk)
+        author_entry: DR
+        uuid: fc6aa8c3d
+        guid: '11032012005'
+        basename: er-habet-stadig-groent-5-8
         extension: .mp3
-    nosuchid:
-      path: /tmp/placeholder
+  blocked: []
+  etag: null
+  modified: null
+  image: http://www.dr.dk/mu/Asset?Id=5fedb78171401428b4bd8a84.jpg
+newscast:
+  current:
+    urn:bbc:podcast:p08ztv8h:
+      path:
+      - /
+      - tmp
+      - media
+      - newscast
+      - 2020-11-27-27e6a9ff4.mp3
       variables:
-        date: null
-        weekday: 3
-        hour: 9
-        title_episode: Stem Cells, Brain Repair and Tricks of Light
-        filename: asdasdasda.mp3
-        date_str: 2021-04-12
-        title_sub: Er håbet stadig grønt?
-        title_feed: Er håbet stadig grønt?
-        author_feed: Some guy
-        author_entry: Some dude
-        uuid: 234f234dfab3576
-        guid: LKJFF90234jjssqeqew
-        basename: asdasdasda
+        date: 1606494060.0
+        weekday: 4
+        hour: 17
+        title_episode: Guy Garvey’s Glastonbury Taskforce
+        filename: p08ztz36.mp3
+        date_str: '2020-11-27'
+        title_sub: newscast
+        title_feed: Newscast
+        author_feed: BBC
+        author_entry: BBC Radio
+        uuid: 27e6a9ff4
+        guid: urn:bbc:podcast:p08ztv8h
+        basename: p08ztz36
         extension: .mp3
-  blocked:
-    - alsofake
-    - 11032012001
-  active: true
-  image: 454119
+    urn:bbc:podcast:p08zr9xd:
+      path:
+      - /
+      - tmp
+      - media
+      - newscast
+      - 2020-11-26-1592136cb.mp3
+      variables:
+        date: 1606423080.0
+        weekday: 3
+        hour: 21
+        title_episode: Tier Drop
+        filename: p08zr9rc.mp3
+        date_str: '2020-11-26'
+        title_sub: newscast
+        title_feed: Newscast
+        author_feed: BBC
+        author_entry: BBC Radio
+        uuid: 1592136cb
+        guid: urn:bbc:podcast:p08zr9xd
+        basename: p08zr9rc
+        extension: .mp3
+  blocked: []
+  etag: '"80edbcf716d26929d87d9bdeebd541de"'
+  modified: Tue, 27 Jul 2021 18:31:31 GMT
+  image: http://ichef.bbci.co.uk/images/ic/3000x3000/p08ksmn1.jpg
+savage-love:
+  current:
+    219bba24-dc77-461e-a91e-25cb46261202:
+      path:
+      - /
+      - tmp
+      - media
+      - savage-love
+      - 2021-07-20 - Savage Love Episode 769.mp3
+      variables:
+        date: 1626764400.0
+        weekday: 1
+        hour: 8
+        title_episode: Savage Love Episode 769
+        filename: savagelove-072021.mp3
+        date_str: '2021-07-20'
+        title_sub: savage-love
+        title_feed: Savage Lovecast
+        author_feed: Dan Savage
+        author_entry: No entry author
+        uuid: bc3213f50
+        guid: 219bba24-dc77-461e-a91e-25cb46261202
+        basename: savagelove-072021
+        extension: .mp3
+    565df955-f56a-4c4e-9622-0f7c68e7496f:
+      path:
+      - /
+      - tmp
+      - media
+      - savage-love
+      - 2021-05-11 - Savage Love Episode 759.mp3
+      variables:
+        date: 1620716400.0
+        weekday: 1
+        hour: 8
+        title_episode: Savage Love Episode 759
+        filename: savagelove-051121.mp3
+        date_str: '2021-05-11'
+        title_sub: savage-love
+        title_feed: Savage Lovecast
+        author_feed: Dan Savage
+        author_entry: No entry author
+        uuid: ab619b31c
+        guid: 565df955-f56a-4c4e-9622-0f7c68e7496f
+        basename: savagelove-051121
+        extension: .mp3
+    a039cdb2-b8b6-4d2f-9f8a-1e17ffa0e27e:
+      path:
+      - /
+      - tmp
+      - media
+      - savage-love
+      - 2021-03-02 - Savage Love Episode 749.mp3
+      variables:
+        date: 1614672000.0
+        weekday: 1
+        hour: 9
+        title_episode: Savage Love Episode 749
+        filename: savagelove-030221.mp3
+        date_str: '2021-03-02'
+        title_sub: savage-love
+        title_feed: Savage Lovecast
+        author_feed: Dan Savage
+        author_entry: No entry author
+        uuid: 5a4c272ef
+        guid: a039cdb2-b8b6-4d2f-9f8a-1e17ffa0e27e
+        basename: savagelove-030221
+        extension: .mp3
+  blocked: []
+  etag: null
+  modified: Tue, 27 Jul 2021 08:06:35 GMT
+  image: http://static.libsyn.com/p/assets/f/9/3/a/f93ab6a788f27e7a/SavageLovecast_1400-compressor.jpg
 The Crate and Crowbar:
-  etag: aDSASDSADASD
-  modified: null
   current:
-    http://crateandcrowbar.com/?p=3004: 
-      path: /tmp/placeholder
+    http://crateandcrowbar.com/?p=2951:
+      path:
+      - /
+      - tmp
+      - media
+      - The Crate and Crowbar
+      - CCEpSpecial-Valheim.mp3
       variables:
-        date: null
-        weekday: 3
-        hour: 9
-        title_episode: Stem Cells, Brain Repair and Tricks of Light
-        filename: asdasdasda.mp3
-        date_str: 2021-04-12
-        title_sub: Er håbet stadig grønt?
-        title_feed: Er håbet stadig grønt?
-        author_feed: Some guy
-        author_entry: Some dude
-        uuid: 234f234dfab3576
-        guid: LKJFF90234jjssqeqew
-        basename: asdasdasda
+        date: 1617389020.0
+        weekday: 4
+        hour: 19
+        title_episode: 'Valheim: A Lock-In at The Crate and Crowbar'
+        filename: CCEpSpecial-Valheim.mp3
+        date_str: '2021-04-02'
+        title_sub: The Crate and Crowbar
+        title_feed: The Crate and Crowbar
+        author_feed: contact@crateandcrowbar.com (The Crate and Crowbar)
+        author_entry: The Crate and Crowbar
+        uuid: 95d0b2770
+        guid: http://crateandcrowbar.com/?p=2951
+        basename: CCEpSpecial-Valheim
         extension: .mp3
-    http://crateandcrowbar.com/?p=3012:
-      path: /tmp/placeholder
-      variables:
-        date: null
-        weekday: 3
-        hour: 9
-        title_episode: Stem Cells, Brain Repair and Tricks of Light
-        filename: asdasdasda.mp3
-        date_str: 2021-04-12
-        title_sub: Er håbet stadig grønt?
-        title_feed: Er håbet stadig grønt?
-        author_feed: Some guy
-        author_entry: Some dude
-        uuid: 234f234dfab3576
-        guid: LKJFF90234jjssqeqew
-        basename: asdasdasda
-        extension: .mp3
-    http://crateandcrowbar.com/?p=2520:
-      path: /tmp/placeholder
-      variables:
-        date: null
-        weekday: 3
-        hour: 9
-        title_episode: Stem Cells, Brain Repair and Tricks of Light
-        filename: asdasdasda.mp3
-        date_str: 2021-04-12
-        title_sub: Er håbet stadig grønt?
-        title_feed: Er håbet stadig grønt?
-        author_feed: Some guy
-        author_entry: Some dude
-        uuid: 234f234dfab3576
-        guid: LKJFF90234jjssqeqew
-        basename: asdasdasda
-        extension: .mp3
-  blocked:
-    - http://crateandcrowbar.com/?p=3000
-    - nosuchthing
-  active: true
-  image: 123456
+  blocked: []
+  etag: '"f89437cbb08e082a3054c4eb3dd2b270"'
+  modified: Sat, 10 Jul 2021 11:29:26 GMT
+  image: http://s3-eu-west-1.amazonaws.com/crateandcrowbar/episodes/podcover.jpg
