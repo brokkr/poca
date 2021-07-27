@@ -42,6 +42,9 @@ def download_file(dl_settings, it):
     #    filename_keys = ['fallback']
     for key in filename_keys:
         path_bits = it.names[key]
+        # read: if any part is an empty string, move on
+        if not all(path_bits):
+            continue
         filename = ''.join((path_bits[2], path_bits[3]))
         dir_path = path_bits[0].joinpath(path_bits[1])
         file_path = dir_path.joinpath(filename)
