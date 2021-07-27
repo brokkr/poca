@@ -7,10 +7,11 @@
 
 """A config parser using yaml"""
 
+import time
+import pathlib
 import yaml
 
 from os import path
-from pathlib import Path
 #from copy import deepcopy
 
 from poca import files, output
@@ -73,9 +74,9 @@ class Pocapaths:
     '''A data-holder object for all program paths'''
     def __init__(self, args):
         if args.config:
-            self.config_dir = Path(args.config)
+            self.config_dir = pathlib.Path(args.config)
         else:
-            self.config_dir = Path.home().joinpath('.poca')
+            self.config_dir = pathlib.Path.home().joinpath('.poca')
         self.config_file = self.config_dir.joinpath('poca.yaml')
         self.state_file = self.config_dir.joinpath('state.yaml')
         self.log_file = self.config_dir.joinpath('logs.txt')
