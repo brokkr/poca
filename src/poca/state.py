@@ -32,7 +32,7 @@ class Update:
     def feed(self, sub, state_info):
         sub['etag'] = state_info.value.etag
         sub['modified'] = state_info.value.modified
-        sub['image'] = state_info.value.image
+        sub['image'] = state_info.value.image_href
 
     def remove(self, sub, state_info):
         for it in state_info:
