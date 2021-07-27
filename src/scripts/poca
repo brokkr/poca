@@ -12,6 +12,7 @@
 
 import sys
 import copy
+import pathlib
 
 from queue import Queue
 from time import sleep
@@ -36,7 +37,7 @@ def main():
         defaults = poca_yaml.pop('defaults')
         # base_dir isn't checked as part of paths (base_dir not existing ->
         # fail)
-        base_dir = poca.config.Path(poca_yaml['settings'].pop('base_dir'))
+        base_dir = pathlib.Path(poca_yaml['settings'].pop('base_dir'))
         dl_settings, id3_settings = poca.config.get_settings(poca_yaml)
 
         # state
