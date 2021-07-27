@@ -45,7 +45,7 @@ class Update:
             _dump = sub['current'].pop(it.guid)
 
     def add(self, sub, state_info):
-        for it in state_info:
+        for it in state_info.value:
             sub['current'][it.guid] = {}
             sub['current'][it.guid]['path'] = it.path
             sub['current'][it.guid]['variables'] = it.variables
