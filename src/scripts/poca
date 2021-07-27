@@ -78,20 +78,14 @@ def main():
         state_q = Queue()
         upgrade_threads = []
         max_threads = args.threads if not args.verbose else 1
-        i = 0
-        j = 0
         while len(upgrade_threads) + len(skip_subs) < len(subs):
-            i = i + 1
-            print(i, j)
-            j = 0
+            state_updates = list()
+            while not state_q.empty():
+                state_updates.append(state_q.get())
+            if state_updates:
+                print(state_updates)
             while (len([t for t in upgrade_threads if t.is_alive()])
                    <= max_threads and not update_q.empty()):
-                #state_updates = list()
-                #while not state_q.empty():
-                #    state_updates.append(state_q.get())
-                #if state_updates:
-                #    print(state_updates)
-                j = j + 1
                 subdata = update_q.get()
                 if subdata.outcome.success is False:
                     poca.output.plans_error(subdata)
@@ -113,9 +107,16 @@ def main():
                 upgrade_threads.append(upgrade_thread)
                 upgrade_thread.start()
             sleep(0.5)
+
         for upgrade_thread in upgrade_threads:
             upgrade_thread.join()
-        print(state_q.qsize())
+
+        state_updates = list()
+        while not state_q.empty():
+            state_updates.append(state_q.get())
+        if state_updates:
+            print(state_updates)
+        #print(state_q.qsize())
 
         # wrap up
         poca.output.after_stream_flush()
