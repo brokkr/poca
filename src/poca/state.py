@@ -26,7 +26,7 @@ class Update:
                     self.add(sub, state_info)
                 if state_info.job == 'udeleted':
                     self.block(sub, state_info)
-            state_yaml = yaml.dump(self.state, sortkeys=False, allow_unicode=True)
+            state_yaml = yaml.dump(self.state, sort_keys=False, allow_unicode=True)
             f.write(state_yaml)
 
     def feed(self, sub, state_info):
