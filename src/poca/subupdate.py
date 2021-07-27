@@ -64,11 +64,14 @@ class SubUpdate():
             new_url = getattr(doc, 'href', sub['url'])
         elif doc.status == 304:
             self.outcome = Outcome(True, 'Not modified')
+            self.feedstatus = FeedStatus(doc.status, None, None, None,
+                None, None)
             return
         # 410 -> set to inactive
         elif doc.status >= 400:
-            exception = doc.feed.bozo_exception
             self.outcome = Outcome(False, exception)
+            self.feedstatus = FeedStatus(doc.status, None,
+                doc.feed.bozo_exception, None, None, None)
             return
         else:
             self.outcome = Outcome(True, 'Success')
