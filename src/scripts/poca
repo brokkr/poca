@@ -79,8 +79,10 @@ def main():
         upgrade_threads = []
         max_threads = args.threads if not args.verbose else 1
         i = 0
+        j = 0
         while len(upgrade_threads) + len(skip_subs) < len(subs):
             i = i + 1
+            print(i, j)
             j = 0
             while (len([t for t in upgrade_threads if t.is_alive()])
                    <= max_threads and not update_q.empty()):
@@ -89,7 +91,7 @@ def main():
                 #    state_updates.append(state_q.get())
                 #if state_updates:
                 #    print(state_updates)
-                print(i, j:=j+1)
+                j = j + 1
                 subdata = update_q.get()
                 if subdata.outcome.success is False:
                     poca.output.plans_error(subdata)
