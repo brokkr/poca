@@ -100,6 +100,7 @@ class SubUpgrade():
             return outcome
         else:
             filename, it.path = outcome.msg
+            it.end_retrieved = True
             return outcome
         #subdata.jar.lst.insert(wantedindex, uid)
         #subdata.jar.dic[uid] = entry
