@@ -83,7 +83,7 @@ def main():
             while not state_q.empty():
                 state_updates.append(state_q.get())
             if state_updates:
-                print(state_updates)
+                _update = poca.state.Update(paths.state_file, state_updates)
             while (len([t for t in upgrade_threads if t.is_alive()])
                    <= max_threads and not update_q.empty()):
                 subdata = update_q.get()
@@ -115,7 +115,7 @@ def main():
         while not state_q.empty():
             state_updates.append(state_q.get())
         if state_updates:
-            print(state_updates)
+            _update = poca.state.Update(paths.state_file, state_updates)
         #print(state_q.qsize())
 
         # wrap up

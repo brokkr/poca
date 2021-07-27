@@ -78,6 +78,9 @@ class SubUpdate():
             image_href = None
         etag = doc.etag if hasattr(doc, 'etag') else None
         modified = doc.modified if hasattr(doc, 'modified') else None
+        # NOTE: we really need the image size for FeedStatus as well as the
+        # href in order to tell if the image has change. Or myabe requests has
+        # a better way of testing if the file has changed? image-etag/modified?
         self.feedstatus = FeedStatus(doc.status, new_url, exception,
                                      image_href, etag, modified)
 
