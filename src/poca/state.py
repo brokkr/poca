@@ -13,29 +13,37 @@ from pathlib import Path
 
 
 class Update:
-    def __init__(self, file_path, updates):
+    def __init__(self, file_path, state_infos):
         with file_path.open(mode='r+') as f:
             self.state = yaml.safe_load(f)
-            for update in updates:
-                if update.job == 'feed':
-                    self.feed(update)
-                if update.job == 'removed':
-                    self.remove(update)
-                if update.job == 'retrieve':
-                    self.add(update)
-                if update.job == 'udeleted':
-                    self.block(update)
+            for state_info in state_infos:
+                sub = self.state.get(state_info.title, {'current': {}, 'blocked': []})
+                if state_info.job == 'feed':
+                    self.feed(sub, state_info)
+                if state_info.job == 'removed':
+                    self.remove(sub, state_info)
+                if state_info.job == 'retrieve':
+                    self.add(sub, state_info)
+                if state_info.job == 'udeleted':
+                    self.block(sub, state_info)
             state_yaml = yaml.dump(self.state, allow_unicode=True)
             f.write(state_yaml)
 
-    def feed(self, update):
-        pass
+    def feed(self, sub, state_info):
+        sub['etag'] = update.value.etag
+        sub['modified'] = update.value.modified
+        sub['image'] = update.value.image
 
-    def remove(self, update):
-        pass
+    def remove(self, sub, state_info):
+        for it in state_info:
+            _dump = sub['current'].pop(it.guid)
 
-    def add(self, update):
-        pass
+    def add(self, sub, state_info):
+        for it in state_info:
+            sub['current'][it.guid] = {}
+            sub['current'][it.guid]['path'] = it.path
+            sub['current'][it.guid]['variables'] = it.variables
 
-    def block(self, update):
-        pass
+    def block(self, sub, state_info):
+        for it in state_info:
+            sub['blocked'].append(it.guid)

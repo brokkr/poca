@@ -39,7 +39,8 @@ class SubUpgrade():
             it = subdata.items[guid]
             output.processing_user_deleted(it)
         if udeleted:
-            state_q.put(StateInfo(subdata.title, 'udeleted', udeleted))
+            its = [self.items[guid] for guid in udeleted]
+            state_q.put(StateInfo(subdata.title, 'udeleted', its))
 
         # loop through unwanted (set) entries to remove
         for guid in subdata.get_trash():
@@ -47,7 +48,8 @@ class SubUpgrade():
             self.remove(it)
         removed = subdata.get_removed()
         if removed:
-            state_q.put(StateInfo(subdata.title, 'removed', removed))
+            its = [self.items[guid] for guid in removed]
+            state_q.put(StateInfo(subdata.title, 'removed', its))
 
         # loop through lacking to retrieve
         for guid in subdata.get_lacking():
@@ -62,7 +64,8 @@ class SubUpgrade():
                 output.fail_tag(subdata.title, tag_outcome)
         retrieved = subdata.get_retrieved()
         if retrieved:
-            state_q.put(StateInfo(subdata.title, 'retrieved', retrieved))
+            its = [self.items[guid] for guid in retrieved]
+            state_q.put(StateInfo(subdata.title, 'retrieved', its))
 
         # assuming we made it this far, we update etag, modified etc.
         state_q.put(StateInfo(subdata.title, 'feed', subdata.feedstatus))
