@@ -77,7 +77,7 @@ class Item:
 
     def generate_names(self, base_dir, sub):
         '''generates a dictionary of file names of decreasing permissiveness'''
-        if hasattr(sub, 'rename'):
+        if 'rename' in sub:
             name_tags = [tag for tag in sub['rename'] if tag in self.variables]
             # note: if a used key is not in user_vars, it is silently discarded
             # so: a user misspelling a key will possibly end up with a zero-length
@@ -111,7 +111,7 @@ class Item:
                                             self.variables['uuid'])),
                                   self.variables['extension'])
         self.name_test = ''.join((name_base, self.variables['extension']))
-        #print(self.names)
+        print(self.names)
 
     def filename_permissive(self, name_base):
         '''produces filenames that are allowed on most linux filesystems'''
