@@ -32,8 +32,9 @@ class Item:
         self.stage_included = False
         self.end_removed = False
         self.end_retrieved = False
-        self.guid = entry.guid
         self.entry = entry
+        self.title = self.entry['title']
+        self.guid = entry.guid
         self.variables = {}
         self.names = {}
 
@@ -163,6 +164,7 @@ class CurrentItem(Item):
         self.path = state_entry['path']
         self.variables = state_entry['variables']
         self.names = {}
+        self.title = self.variables['title_episode']
 
     def validate(self):
         '''where FeedItem's validate check's url, CurrentItem's validate
@@ -191,4 +193,5 @@ class BlockedItem():
         self.end_removed = False
         self.end_retrieved = False
         self.guid = guid
+        self.title = str()
         self.entry = None

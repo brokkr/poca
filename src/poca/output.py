@@ -196,21 +196,25 @@ def after_stream_flush():
 # ####################################### #
 
 # file operations summary (for file log)
-def file_summary(subdata, removed, downed, failed):
+def file_summary(subdata):
     '''Print summary to log'''
     title = subdata.title.upper()
-    if subdata.udeleted:
-        udeleted_files = [x['filename'] for x in subdata.udeleted]
-        SUMMARY.info(title + '. User deleted: ' + ', '.join(udeleted_files))
+    udeleted = subdata.get_udeleted()
+    removed = subdata.get_removed()
+    retrieved = subdata.get_retrieved()
+    failed = subdata.get_failed()
+    if udeleted:
+        files = [subdata.items[guid].title for guid in udeleted]
+        SUMMARY.info(title + '. User deleted: ' + ', '.join(files))
     if removed:
-        removed_files = [x['filename'] for x in removed]
-        SUMMARY.info(title + '. Removed: ' + ', '.join(removed_files))
-    if downed:
-        downed_files = [x['filename'] for x in downed]
-        SUMMARY.info(title + '. Downloaded: ' + ', '.join(downed_files))
+        files = [subdata.items[guid].title for guid in removed]
+        SUMMARY.info(title + '. Removed: ' + ', '.join(files))
+    if retrieved:
+        files = [subdata.items[guid].title for guid in retrieved]
+        SUMMARY.info(title + '. Downloaded: ' + ', '.join(files))
     if failed:
-        failed_files = [x['title'] for x in failed]
-        SUMMARY.error(title + '. Failed: ' + ', '.join(failed_files))
+        files = [subdata.items[guid].title for guid in failed]
+        SUMMARY.error(title + '. Failed: ' + ', '.join(files))
 
 
 def email_summary():
