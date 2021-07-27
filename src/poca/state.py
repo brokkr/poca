@@ -26,7 +26,7 @@ class Update:
                     self.feed(sub, state_info)
                 if state_info.job == 'removed':
                     self.remove(sub, state_info)
-                if state_info.job == 'retrieve':
+                if state_info.job == 'retrieved':
                     self.add(sub, state_info)
                 if state_info.job == 'udeleted':
                     self.block(sub, state_info)
