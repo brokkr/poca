@@ -17,7 +17,9 @@ class Update:
         with file_path.open(mode='r+') as f:
             self.state = yaml.safe_load(f)
             for state_info in state_infos:
-                sub = self.state.get(state_info.title, {'current': {}, 'blocked': []})
+                if not state_info.title in self.state:
+                    self.state[state_info.title] = {'current': {}, 'blocked': []}
+                sub = self.state[state_info.title]
                 if state_info.job == 'feed':
                     self.feed(sub, state_info)
                 if state_info.job == 'removed':
@@ -27,7 +29,9 @@ class Update:
                 if state_info.job == 'udeleted':
                     self.block(sub, state_info)
             state_yaml = yaml.dump(self.state, sort_keys=False, allow_unicode=True)
+            f.seek(0)
             f.write(state_yaml)
+            f.truncate()
 
     def feed(self, sub, state_info):
         sub['etag'] = state_info.value.etag
