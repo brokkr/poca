@@ -33,6 +33,8 @@ def get_state(file_path):
     if file_path.is_file():
         return read_yaml(file_path)
     else:
+        # NOTE: if file_path.is_dir() not covered
+        file_path.touch()
         return dict()
 
 class Config:
