@@ -39,7 +39,7 @@ class SubUpgrade():
             it = subdata.items[guid]
             output.processing_user_deleted(it)
         if udeleted:
-            its = [self.items[guid] for guid in udeleted]
+            its = [subdata.items[guid] for guid in udeleted]
             state_q.put(StateInfo(subdata.title, 'udeleted', its))
 
         # loop through unwanted (set) entries to remove
@@ -48,7 +48,7 @@ class SubUpgrade():
             self.remove(it)
         removed = subdata.get_removed()
         if removed:
-            its = [self.items[guid] for guid in removed]
+            its = [subdata.items[guid] for guid in removed]
             state_q.put(StateInfo(subdata.title, 'removed', its))
 
         # loop through lacking to retrieve
@@ -64,7 +64,7 @@ class SubUpgrade():
                 output.fail_tag(subdata.title, tag_outcome)
         retrieved = subdata.get_retrieved()
         if retrieved:
-            its = [self.items[guid] for guid in retrieved]
+            its = [subdata.items[guid] for guid in retrieved]
             state_q.put(StateInfo(subdata.title, 'retrieved', its))
 
         # assuming we made it this far, we update etag, modified etc.
