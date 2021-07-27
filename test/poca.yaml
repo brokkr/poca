@@ -10,7 +10,7 @@ defaults:
 subscriptions:
 - title: "Er håbet stadig grønt?"
   url: https://www.dr.dk/mu/feed/er-habet-stadig-groent.xml?format=podcast
-  max_number: 2
+  max_number: 1
   filters:
     title: natur
   metadata:
@@ -20,6 +20,16 @@ subscriptions:
   - episode_title
 - title: The Crate and Crowbar
   url: http://crateandcrowbar.com/category/episode/feed/
-  max_number: 2
+  max_number: 1
   filters:
     filename: CCEpSpecial
+- title: savage-love
+  url: http://savagelove.libsyn.com/rss
+  max_number: 3
+  filters:
+    title: 9$
+  metadata:
+    artist: Dan the Man
+  rename:
+  - date
+  - episode_title
