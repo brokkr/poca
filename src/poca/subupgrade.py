@@ -65,6 +65,7 @@ class SubUpgrade():
         retrieved = subdata.get_retrieved()
         if retrieved:
             its = [subdata.items[guid] for guid in retrieved]
+            print(its)
             state_q.put(StateInfo(subdata.title, 'retrieved', its))
 
         # assuming we made it this far, we update etag, modified etc.
