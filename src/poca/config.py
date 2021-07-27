@@ -29,6 +29,11 @@ def get_settings(poca_yaml):
                     'id3v2version': dl_settings.pop('id3v2version')}
     return (dl_settings, id3_settings)
 
+def get_state(file_path):
+    if file_path.is_file():
+        return read_yaml(file_path)
+    else:
+        return dict()
 
 class Config:
     '''no longer in use, see scripts/poca'''

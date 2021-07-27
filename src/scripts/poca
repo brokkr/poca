@@ -31,7 +31,7 @@ def main():
         summary_logger = poca.loggers.start_summary_logger(args, paths)
         # poca
         poca_yaml = poca.config.read_yaml(paths.config_file)
-        state_yaml = poca.config.read_yaml(paths.state_file)
+        state_yaml = poca.config.get_state(paths.state_file)
         subs = poca_yaml.pop('subscriptions')
         defaults = poca_yaml.pop('defaults')
         # base_dir isn't checked as part of paths (base_dir not existing ->
@@ -93,8 +93,8 @@ def main():
                     update_q.task_done()
                     continue
                 if subdata.feedstatus.http_code == 301:
-                    _outcome = poca.subscribe.update_url(args, subdata)
-                    poca.output.plans_moved(subdata, _outcome)
+                    outcome = poca.subscribe.update_url(args, subdata)
+                    poca.output.plans_moved(subdata, outcome)
                 if subdata.feedstatus.http_code == 304:
                     skip_subs.append(subdata)
                     update_q.task_done()
