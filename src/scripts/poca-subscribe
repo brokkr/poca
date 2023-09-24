@@ -23,7 +23,7 @@ def main():
     if args.cmd_name == 'delete':
         poca.subscribe.delete(conf, args)
     elif args.cmd_name == 'add':
-        sub_dic, sub_category = poca.subscribe.user_input_add_sub()
+        sub_dic, sub_category = poca.subscribe.user_input_add_sub(args.url)
         if sub_dic is not None:
             poca.subscribe.add_sub(conf, sub_category, sub_dic)
     elif args.cmd_name == 'list':
