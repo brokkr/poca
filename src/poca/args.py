@@ -48,6 +48,8 @@ def get_poca_subscribe_args():
         'command --help\' for futher information')
     add_parser = subparsers.add_parser('add', help='Add a new subscription '
                                        'interactively')
+    add_parser.add_argument('url', nargs='?',
+                            help="URL of feed")
     list_parser = subparsers.add_parser('list',
                                         help='List current subscriptions')
     tags_parser = subparsers.add_parser('tags',
